@@ -4,7 +4,10 @@ const logger = require('../utils/logger');
 // Configuration de la pool de connexions PostgreSQL
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // SSL désactivé pour les containers locaux, activé seulement pour les bases externes
+  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('@postgres:') 
+    ? false 
+    : process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20, // Maximum de connexions dans la pool
   idleTimeoutMillis: 30000, // Fermeture des connexions inactives après 30s
   connectionTimeoutMillis: 2000, // Timeout de connexion à 2s
@@ -127,10 +130,9 @@ async function performMaintenance() {
     logger.info('Démarrage de la maintenance de la base de données...');
     
     // Nettoyage des inscriptions non vérifiées anciennes
-    const cleanupResult = await query('SELECT cleanup_old_unverified_registrations()');
-    const deletedCount = cleanupResult.rows[0].cleanup_old_unverified_registrations;
+    const cleanupResult = await query('SELECT cleanup_old_data()');
     
-    logger.info(`Maintenance terminée: ${deletedCount} inscriptions anciennes supprimées`);
+    logger.info('Maintenance terminée avec succès');
     
     // Statistiques de la pool
     const poolStats = {
@@ -141,7 +143,7 @@ async function performMaintenance() {
     
     logger.info('Statistiques de la pool PostgreSQL:', poolStats);
     
-    return { deleted: deletedCount, poolStats };
+    return { poolStats };
   } catch (error) {
     logger.error('Erreur lors de la maintenance:', error.message);
     throw error;
