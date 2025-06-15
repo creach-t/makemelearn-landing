@@ -1,23 +1,56 @@
 version: '3.8'
 
 services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: makemelearn_postgres
+    environment:
+      POSTGRES_DB: makemelearn
+      POSTGRES_USER: makemelearn_user
+      POSTGRES_PASSWORD: MakeMeLearn2025!SecurePass
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - makemelearn-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U makemelearn_user -d makemelearn"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=false"  # Pas exposé publiquement
+
   # API Backend Node.js
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
     container_name: makemelearn_api
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
-      # Base de données PostgreSQL EXTERNE
-      DATABASE_URL: ${DATABASE_URL}
+      # Base de données PostgreSQL dans le même réseau Docker
+      DATABASE_URL: postgresql://makemelearn_user:MakeMeLearn2025!SecurePass@postgres:5432/makemelearn
       CORS_ORIGIN: https://makemelearn.fr
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX_REQUESTS: 100
     networks:
       - traefik-public
+      - makemelearn-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     labels:
       # Traefik configuration pour l'API sur makemelearn.fr/api/
       - "traefik.enable=true"
@@ -77,6 +110,14 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
+volumes:
+  postgres_data:
+    driver: local
+    name: makemelearn_postgres_data
+
 networks:
   traefik-public:
     external: true
+  makemelearn-network:
+    driver: bridge
+    name: makemelearn_network
