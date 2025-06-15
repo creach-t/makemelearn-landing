@@ -11,33 +11,32 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://makemelearn_user:MakeMeLearn2025!SecurePass@host.docker.internal:5432/makemelearn
-      CORS_ORIGIN: https://makemelearn.fr,https://inscription.makemelearn.fr
+      CORS_ORIGIN: https://makemelearn.fr
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX_REQUESTS: 100
     networks:
       - traefik-public
     restart: unless-stopped
     labels:
-      # Traefik configuration
+      # Traefik configuration pour l'API sur /api/
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      
-      # API endpoint sur inscription.makemelearn.fr
-      - "traefik.http.routers.makemelearn-api.rule=Host(`inscription.makemelearn.fr`)"
+
+      # API sur makemelearn.fr/api/
+      - "traefik.http.routers.makemelearn-api.rule=Host(`makemelearn.fr`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.makemelearn-api.entrypoints=websecure"
       - "traefik.http.routers.makemelearn-api.tls=true"
       - "traefik.http.routers.makemelearn-api.tls.certresolver=myresolver"
       - "traefik.http.services.makemelearn-api.loadbalancer.server.port=3000"
-      
-      # Redirection HTTP vers HTTPS
-      - "traefik.http.routers.makemelearn-api-insecure.rule=Host(`inscription.makemelearn.fr`)"
+
+      # Middleware pour supprimer /api/ du path avant d'envoyer à l'API
+      - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.makemelearn-api.middlewares=api-stripprefix"
+
+      # Redirection HTTP vers HTTPS pour l'API
+      - "traefik.http.routers.makemelearn-api-insecure.rule=Host(`makemelearn.fr`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.makemelearn-api-insecure.entrypoints=web"
       - "traefik.http.routers.makemelearn-api-insecure.middlewares=redirect-to-https"
-      
-      # Headers security
-      - "traefik.http.middlewares.makemelearn-api-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.makemelearn-api-headers.headers.sslredirect=true"
-      - "traefik.http.routers.makemelearn-api.middlewares=makemelearn-api-headers"
 
   # Frontend statique
   frontend:
@@ -53,24 +52,25 @@ services:
       # Traefik configuration pour le frontend
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      
-      # Frontend sur makemelearn.fr
+
+      # Frontend sur makemelearn.fr (tous les chemins sauf /api/)
       - "traefik.http.routers.makemelearn-frontend.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
       - "traefik.http.routers.makemelearn-frontend.entrypoints=websecure"
       - "traefik.http.routers.makemelearn-frontend.tls=true"
       - "traefik.http.routers.makemelearn-frontend.tls.certresolver=myresolver"
       - "traefik.http.services.makemelearn-frontend.loadbalancer.server.port=80"
-      
+      - "traefik.http.routers.makemelearn-frontend.priority=1"  # Priorité plus faible que l'API
+
       # Redirection HTTP vers HTTPS
       - "traefik.http.routers.makemelearn-frontend-insecure.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
       - "traefik.http.routers.makemelearn-frontend-insecure.entrypoints=web"
       - "traefik.http.routers.makemelearn-frontend-insecure.middlewares=redirect-to-https"
-      
+
       # Redirect www to non-www
       - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.regex=^https://www\\.makemelearn\\.fr/(.*)"
       - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.replacement=https://makemelearn.fr/$${1}"
       - "traefik.http.routers.makemelearn-frontend.middlewares=makemelearn-redirect-www"
-      
+
       # Middleware de redirection HTTPS
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"

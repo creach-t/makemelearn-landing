@@ -1,12 +1,12 @@
 // ===== API CONFIGURATION =====
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api' 
-    : 'https://inscription.makemelearn.fr/api';
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : 'https://makemelearn.fr/api';
 
 // ===== API UTILITY FUNCTIONS =====
 async function apiRequest(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const defaultOptions = {
         headers: {
             'Content-Type': 'application/json',
@@ -14,17 +14,17 @@ async function apiRequest(endpoint, options = {}) {
         },
         credentials: 'omit' // Pas de cookies pour cette API
     };
-    
+
     const finalOptions = { ...defaultOptions, ...options };
-    
+
     try {
         const response = await fetch(url, finalOptions);
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         return data;
     } catch (error) {
         console.error('API Request Error:', error);
@@ -39,11 +39,11 @@ if (signupForm) {
     signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('emailInput').value;
-        
+
         if (email) {
             const button = e.target.querySelector('button');
             const originalContent = button.innerHTML;
-            
+
             // Loading state
             button.innerHTML = `
                 <svg class="btn-icon animate-spin" viewBox="0 0 20 20" fill="currentColor">
@@ -52,7 +52,7 @@ if (signupForm) {
                 Inscription en cours...
             `;
             button.disabled = true;
-            
+
             try {
                 // Appel API réel
                 const result = await apiRequest('/registrations', {
@@ -69,7 +69,7 @@ if (signupForm) {
                         }
                     })
                 });
-                
+
                 // Success state
                 button.innerHTML = `
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -78,13 +78,13 @@ if (signupForm) {
                     Inscription confirmée !
                 `;
                 button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
-                
+
                 // Track successful signup
                 trackEvent('signup_success', { email: email, source: 'landing_page' });
-                
+
                 // Show success message
                 showNotification('Merci ! Votre inscription a été confirmée. Bienvenue dans la communauté MakeMeLearn !', 'success');
-                
+
                 // Reset form
                 setTimeout(() => {
                     button.innerHTML = originalContent;
@@ -92,10 +92,10 @@ if (signupForm) {
                     button.disabled = false;
                     document.getElementById('emailInput').value = '';
                 }, 3000);
-                
+
             } catch (error) {
                 console.error('Signup error:', error);
-                
+
                 // Error state
                 button.innerHTML = `
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -104,7 +104,7 @@ if (signupForm) {
                     Erreur d'inscription
                 `;
                 button.style.background = 'linear-gradient(120deg, #EF4444, #DC2626)';
-                
+
                 // Show error message
                 let errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
                 if (error.message.includes('déjà inscrite') || error.message.includes('already exists')) {
@@ -112,12 +112,12 @@ if (signupForm) {
                 } else if (error.message.includes('invalide')) {
                     errorMessage = 'Adresse email invalide. Veuillez vérifier votre saisie.';
                 }
-                
+
                 showNotification(errorMessage, 'error');
-                
+
                 // Track failed signup
                 trackEvent('signup_error', { email: email, error: error.message });
-                
+
                 // Reset button
                 setTimeout(() => {
                     button.innerHTML = originalContent;
@@ -134,18 +134,18 @@ const contactForm = document.getElementById('contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const formData = {
             name: document.getElementById('name').value,
             email: document.getElementById('email').value,
             subject: document.getElementById('subject').value,
             message: document.getElementById('message').value
         };
-        
+
         if (formData.name && formData.email && formData.subject && formData.message) {
             const button = e.target.querySelector('button');
             const originalContent = button.innerHTML;
-            
+
             // Loading state
             button.innerHTML = `
                 <svg class="btn-icon animate-spin" viewBox="0 0 20 20" fill="currentColor">
@@ -154,10 +154,10 @@ if (contactForm) {
                 Envoi en cours...
             `;
             button.disabled = true;
-            
+
             // Track contact form submission
             trackEvent('contact_form_submit', formData);
-            
+
             // Simulate form submission
             setTimeout(() => {
                 button.innerHTML = `
@@ -167,9 +167,9 @@ if (contactForm) {
                     Message envoyé !
                 `;
                 button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
-                
+
                 showNotification('Message envoyé avec succès ! Nous vous répondrons sous 24-48h.', 'success');
-                
+
                 // Reset form and button
                 setTimeout(() => {
                     button.innerHTML = originalContent;
@@ -187,7 +187,7 @@ function showNotification(message, type = 'info') {
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(n => n.remove());
-    
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -196,7 +196,7 @@ function showNotification(message, type = 'info') {
             <button class="notification-close">&times;</button>
         </div>
     `;
-    
+
     // Add styles if not already added
     if (!document.querySelector('#notification-styles')) {
         const styles = document.createElement('style');
@@ -261,14 +261,14 @@ function showNotification(message, type = 'info') {
         `;
         document.head.appendChild(styles);
     }
-    
+
     document.body.appendChild(notification);
-    
+
     // Close button functionality
     notification.querySelector('.notification-close').addEventListener('click', () => {
         notification.remove();
     });
-    
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
         if (document.body.contains(notification)) {
@@ -305,7 +305,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const buttonText = this.textContent.trim();
         console.log('Button clicked:', buttonText);
-        
+
         // Track specific actions
         if (buttonText.includes('Rejoindre')) {
             trackEvent('button_join_community', { button_text: buttonText });
@@ -371,7 +371,7 @@ document.querySelectorAll('.stat-item').forEach(stat => {
         stat.style.transform = 'scale(1.05) translateY(-5px)';
         stat.style.transition = 'all 0.3s ease';
     });
-    
+
     stat.addEventListener('mouseleave', () => {
         stat.style.transform = 'scale(1) translateY(0)';
     });
@@ -391,7 +391,7 @@ document.querySelectorAll('.faq-item').forEach(item => {
 function updateActiveNavLink() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('.nav-links a');
-    
+
     navLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href') === currentPage) {
@@ -420,7 +420,7 @@ function throttle(func, delay) {
     let lastExecTime = 0;
     return function (...args) {
         const currentTime = Date.now();
-        
+
         if (currentTime - lastExecTime > delay) {
             func.apply(this, args);
             lastExecTime = currentTime;
@@ -443,7 +443,7 @@ if (window.location.pathname.includes('how-it-works')) {
         card.addEventListener('mouseenter', () => {
             card.style.borderColor = 'rgba(102, 126, 234, 0.4)';
         });
-        
+
         card.addEventListener('mouseleave', () => {
             card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
         });
@@ -453,7 +453,7 @@ if (window.location.pathname.includes('how-it-works')) {
 // Contact page - form validation feedback
 if (window.location.pathname.includes('contact')) {
     const inputs = document.querySelectorAll('.contact-form input, .contact-form select, .contact-form textarea');
-    
+
     inputs.forEach(input => {
         input.addEventListener('blur', function() {
             if (this.checkValidity()) {
@@ -462,7 +462,7 @@ if (window.location.pathname.includes('contact')) {
                 this.style.borderColor = 'rgba(239, 68, 68, 0.5)';
             }
         });
-        
+
         input.addEventListener('focus', function() {
             this.style.borderColor = '#667eea';
         });
@@ -515,7 +515,7 @@ document.addEventListener('touchend', function(e) {
 function handleSwipe() {
     const swipeThreshold = 50;
     const diff = touchStartY - touchEndY;
-    
+
     if (Math.abs(diff) > swipeThreshold) {
         // Swipe gestures can be handled here
         console.log(diff > 0 ? 'Swipe up' : 'Swipe down');
@@ -542,20 +542,20 @@ if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').m
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('MakeMeLearn landing page loaded successfully');
-    
+
     // Update active navigation link
     updateActiveNavLink();
-    
+
     // Track page load
-    trackEvent('page_load', { 
+    trackEvent('page_load', {
         page: window.location.pathname,
         referrer: document.referrer,
         userAgent: navigator.userAgent
     });
-    
+
     // Add loading complete class
     document.body.classList.add('loaded');
-    
+
     // Performance monitoring
     if ('performance' in window) {
         window.addEventListener('load', function() {
