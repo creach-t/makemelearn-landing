@@ -37,21 +37,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          # Pas de cache pour éviter l'erreur package-lock.json manquant
+          cache: 'npm'
+          cache-dependency-path: 'api/package-lock.json'
 
       - name: Install API dependencies
         working-directory: ./api
         run: |
           echo "📦 Installation des dépendances API..."
-          npm install
-
-      - name: Generate package-lock.json if missing
-        working-directory: ./api
-        run: |
-          if [ ! -f "package-lock.json" ]; then
-            echo "📝 Génération de package-lock.json..."
-            npm install --package-lock-only
-          fi
+          npm ci
 
       - name: Run API tests
         working-directory: ./api
