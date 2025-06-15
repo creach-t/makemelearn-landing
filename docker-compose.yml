@@ -39,12 +39,12 @@ services:
         condition: service_healthy
     networks:
       - makemelearn_network
-      - traefik
+      - traefik-public
     restart: unless-stopped
     labels:
       # Traefik configuration
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
+      - "traefik.docker.network=traefik-public"
       
       # API endpoint sur inscription.makemelearn.fr
       - "traefik.http.routers.makemelearn-api.rule=Host(`inscription.makemelearn.fr`)"
@@ -65,12 +65,12 @@ services:
       - ./:/usr/share/nginx/html:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
-      - traefik
+      - traefik-public
     restart: unless-stopped
     labels:
       # Traefik configuration pour le frontend
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
+      - "traefik.docker.network=traefik-public"
       
       # Frontend sur makemelearn.fr
       - "traefik.http.routers.makemelearn-frontend.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
@@ -90,5 +90,5 @@ volumes:
 networks:
   makemelearn_network:
     driver: bridge
-  traefik:
+  traefik-public:
     external: true
