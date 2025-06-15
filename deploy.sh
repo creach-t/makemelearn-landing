@@ -43,9 +43,9 @@ check_requirements() {
         error "Docker n'est pas démarré"
     fi
 
-    # Vérifier que docker compose est disponible
-    if ! command -v docker compose &> /dev/null; then
-        error "docker compose n'est pas installé"
+    # Vérifier que docker compose est disponible (correction ici)
+    if ! docker compose version &> /dev/null; then
+        error "docker compose n'est pas disponible"
     fi
 
     # Vérifier que le dossier projet existe
