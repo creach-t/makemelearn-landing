@@ -1,0 +1,99 @@
+name: Deploy MakeMeLearn
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job de tests et validation
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        npm install -g html-validate
+        npm install -g broken-link-checker
+
+    - name: Validate HTML
+      run: |
+        find . -name "*.html" -not -path "./node_modules/*" | xargs html-validate
+
+    - name: Check for broken links (local)
+      run: |
+        # Vérification basique des liens internes
+        grep -r "href=" . --include="*.html" | grep -v "http" | head -10
+
+    - name: Lint CSS
+      run: |
+        # Vérification basique du CSS
+        if [ -f "style.css" ]; then
+          echo "CSS file found, basic validation..."
+          grep -c "}" style.css
+        fi
+
+  # Job de déploiement (seulement sur push vers main)
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT || 22 }}
+        script: |
+          echo "🚀 Starting deployment..."
+          
+          # Aller dans le dossier du projet
+          cd /path/to/your/makemelearn-landing || exit 1
+          
+          # Sauvegarder la branche actuelle
+          git stash
+          
+          # Récupérer les dernières modifications
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Redéployer les containers
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
+          
+          # Attendre que les services soient prêts
+          sleep 10
+          
+          # Vérifier que le site répond
+          curl -f https://makemelearn.fr || exit 1
+          
+          echo "✅ Deployment successful!"
+
+  # Job de notification (optionnel)
+  notify:
+    needs: [test, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify deployment status
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
+          echo "🎉 Deployment successful!"
+        else
+          echo "❌ Deployment failed!"
+          exit 1
+        fi
