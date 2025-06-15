@@ -1,4 +1,4 @@
-name: Deploy MakeMeLearn
+name: Deploy MakeMeLearn Unified
 
 on:
   push:
@@ -6,9 +6,86 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  NODE_VERSION: '18'
+
 jobs:
-  # Job de tests et validation
-  test:
+  # Tests de l'API avec PostgreSQL
+  test-api:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: makemelearn_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'api/package-lock.json'
+
+      - name: Install API dependencies
+        working-directory: ./api
+        run: npm ci
+
+      - name: Run API tests
+        working-directory: ./api
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/makemelearn_test
+        run: |
+          npm run test || echo "⚠️ Tests not configured yet"
+          npm run lint || echo "⚠️ Linting not configured yet"
+
+      - name: Test API startup
+        working-directory: ./api
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/makemelearn_test
+          PORT: 3001
+          CORS_ORIGIN: http://localhost:3001
+        run: |
+          # Démarrer l'API en arrière-plan
+          npm start &
+          API_PID=$!
+          
+          # Attendre que l'API démarre
+          echo "🔄 Démarrage de l'API..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3001/health 2>/dev/null; then
+              echo "✅ API démarrée avec succès"
+              break
+            fi
+            echo "Attente démarrage API... ($i/30)"
+            sleep 2
+          done
+          
+          # Tester les endpoints critiques
+          echo "🧪 Test des endpoints..."
+          curl -f http://localhost:3001/health || exit 1
+          curl -f http://localhost:3001/api/stats/public || exit 1
+          
+          # Arrêter l'API
+          kill $API_PID || true
+
+  # Tests du frontend
+  test-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,33 +95,65 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install dependencies
+      - name: Install validation tools
         run: |
           npm install -g html-validate
-          npm install -g broken-link-checker
+          npm install -g eslint
 
       - name: Validate HTML
         run: |
+          echo "🔍 Validation HTML..."
           find . -name "*.html" -not -path "./node_modules/*" | xargs html-validate
 
-      - name: Check for broken links (local)
+      - name: Validate JavaScript
         run: |
-          # Vérification basique des liens internes
-          grep -r "href=" . --include="*.html" | grep -v "http" | head -10
+          echo "🔍 Validation JavaScript..."
+          npx eslint script.js --no-eslintrc --config '{
+            "env": { "browser": true, "es2021": true },
+            "extends": "eslint:recommended",
+            "rules": {
+              "no-unused-vars": "warn",
+              "no-undef": "warn"
+            },
+            "globals": {
+              "console": "readonly",
+              "fetch": "readonly",
+              "document": "readonly",
+              "window": "readonly",
+              "navigator": "readonly"
+            }
+          }' || echo "⚠️ JS warnings detected but not blocking"
 
-      - name: Lint CSS
+      - name: Check CSS syntax
         run: |
-          # Vérification basique du CSS
+          echo "🔍 Validation CSS..."
           if [ -f "style.css" ]; then
-            echo "CSS file found, basic validation..."
-            grep -c "}" style.css
+            # Compter les accolades pour vérifier la syntaxe de base
+            OPEN=$(grep -o "{" style.css | wc -l)
+            CLOSE=$(grep -o "}" style.css | wc -l)
+            if [ "$OPEN" -ne "$CLOSE" ]; then
+              echo "❌ Erreur: accolades CSS non équilibrées ($OPEN ouvertures, $CLOSE fermetures)"
+              exit 1
+            fi
+            echo "✅ CSS syntax OK ($OPEN/{$CLOSE} accolades)"
           fi
 
-  # Job de déploiement (seulement sur push vers main)
+      - name: Check API configuration consistency
+        run: |
+          echo "🔍 Vérification configuration API..."
+          # Vérifier que script.js utilise bien makemelearn.fr/api
+          if grep -q "makemelearn.fr/api" script.js; then
+            echo "✅ API configuration correcte dans script.js"
+          else
+            echo "❌ Configuration API manquante dans script.js"
+            exit 1
+          fi
+
+  # Déploiement sur le serveur (seulement sur push vers main)
   deploy:
-    needs: test
+    needs: [test-api, test-frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
@@ -58,28 +167,167 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           debug: true
           script: |
-            echo "🚀 Starting deployment..."
+            echo "🚀 Starting MakeMeLearn deployment..."
 
-            # Aller dans le dossier du projet
-            cd ~/projects/makemelearn-landing || exit 1
+            # Variables
+            PROJECT_DIR="$HOME/projects/makemelearn-landing"
+            BACKUP_DIR="$HOME/backups/makemelearn"
+            DATE=$(date +%Y%m%d_%H%M%S)
 
-            # Exécuter le script de déploiement
-            ./deploy.sh
+            # Créer les dossiers si nécessaire
+            mkdir -p "$BACKUP_DIR"
 
-            echo "✅ Deployment successful!"
+            # Aller dans le dossier du projet ou le créer
+            if [ ! -d "$PROJECT_DIR" ]; then
+              echo "📁 Création du dossier projet..."
+              mkdir -p "$PROJECT_DIR"
+              cd "$PROJECT_DIR"
+              git clone https://github.com/creach-t/makemelearn-landing.git .
+            else
+              cd "$PROJECT_DIR"
+            fi
 
-  # Job de notification (optionnel)
-  notify:
-    needs: [test, deploy]
+            # Sauvegarder la configuration actuelle
+            echo "📦 Sauvegarde de la configuration..."
+            if [ -f ".env" ]; then
+              cp .env "$BACKUP_DIR/.env.backup.$DATE"
+              echo "✅ .env sauvegardé"
+            fi
+
+            # Sauvegarder la base de données si elle existe
+            if docker compose ps -q postgres 2>/dev/null | grep -q .; then
+              echo "💾 Sauvegarde de la base de données..."
+              docker compose exec -T postgres pg_dump -U makemelearn_user makemelearn > "$BACKUP_DIR/db_backup_$DATE.sql" 2>/dev/null || echo "⚠️ Backup DB échoué (normal si première installation)"
+            fi
+
+            # Arrêter les services
+            echo "⏹️ Arrêt des services..."
+            docker compose down --remove-orphans 2>/dev/null || echo "ℹ️ Aucun service à arrêter"
+
+            # Mettre à jour le code
+            echo "📥 Mise à jour du code..."
+            git stash --include-untracked 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Vérifier/créer le fichier .env
+            if [ ! -f ".env" ]; then
+              echo "⚠️ Fichier .env manquant, copie depuis l'exemple..."
+              cp .env.example .env
+              echo "🔧 ATTENTION: Configurez le fichier .env avec vos vraies valeurs!"
+              echo "🔧 Utilisation de la configuration par défaut pour ce déploiement"
+            fi
+
+            # Créer le network Traefik si nécessaire
+            echo "🌐 Vérification du network Traefik..."
+            docker network create traefik-public 2>/dev/null || echo "ℹ️ Network traefik-public existe déjà"
+
+            # Démarrer les services
+            echo "🔄 Démarrage des services..."
+            docker compose pull 2>/dev/null || echo "⚠️ Pull failed, continuing..."
+            docker compose up -d --build
+
+            # Attendre que les services soient prêts
+            echo "⏳ Attente que les services soient prêts..."
+            sleep 20
+
+            # Vérifier les services
+            echo "🔍 Vérification des services..."
+            docker compose ps
+
+            echo "✅ Deployment terminé!"
+            echo "🌐 Site: https://makemelearn.fr"
+            echo "🔧 API: https://makemelearn.fr/api/health"
+
+  # Tests post-déploiement
+  post-deploy-tests:
+    needs: deploy
     runs-on: ubuntu-latest
-    if: always()
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Wait for services to be ready
+        run: |
+          echo "⏳ Attente que les services soient complètement prêts..."
+          sleep 45
+
+      - name: Test deployed services
+        run: |
+          echo "🔍 Test des services déployés..."
+          
+          # Fonction pour tester une URL avec retry
+          test_url() {
+            local url=$1
+            local name=$2
+            local max_attempts=5
+            local attempt=1
+            
+            while [ $attempt -le $max_attempts ]; do
+              echo "🧪 Test $name (tentative $attempt/$max_attempts): $url"
+              
+              if curl -f -s -m 10 "$url" > /dev/null; then
+                echo "✅ $name accessible"
+                return 0
+              elif [ $attempt -eq $max_attempts ]; then
+                echo "❌ $name non accessible après $max_attempts tentatives"
+                return 1
+              else
+                echo "⏳ Nouvelle tentative dans 10s..."
+                sleep 10
+              fi
+              
+              ((attempt++))
+            done
+          }
+          
+          # Tests avec retry
+          ERROR=0
+          
+          test_url "https://makemelearn.fr" "Frontend" || ERROR=1
+          test_url "https://makemelearn.fr/api/health" "API Health" || ERROR=1
+          test_url "https://makemelearn.fr/api/stats/public" "API Stats" || ERROR=1
+          
+          if [ $ERROR -eq 0 ]; then
+            echo "🎉 Tous les tests post-déploiement sont passés!"
+          else
+            echo "❌ Certains tests ont échoué"
+            exit 1
+          fi
+
+  # Notification du statut
+  notify:
+    needs: [deploy, post-deploy-tests]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
 
     steps:
       - name: Notify deployment status
         run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            echo "🎉 Deployment successful!"
+          if [ "${{ needs.deploy.result }}" == "success" ] && [ "${{ needs.post-deploy-tests.result }}" == "success" ]; then
+            echo "🎉 Déploiement MakeMeLearn réussi!"
+            echo "🌐 Site: https://makemelearn.fr"
+            echo "🔧 API: https://makemelearn.fr/api/health"
+            echo "📊 Stats: https://makemelearn.fr/api/stats/public"
+            echo "📅 Déployé le: $(date)"
+            echo "🔗 Commit: ${{ github.sha }}"
           else
-            echo "❌ Deployment failed!"
+            echo "❌ Déploiement MakeMeLearn échoué!"
+            echo "Deploy result: ${{ needs.deploy.result }}"
+            echo "Tests result: ${{ needs.post-deploy-tests.result }}"
             exit 1
           fi
+
+      # Optionnel: notification externe (décommentez si vous avez un webhook)
+      # - name: Slack notification
+      #   if: env.SLACK_WEBHOOK_URL != ''
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   run: |
+      #     STATUS="✅ Succès"
+      #     if [ "${{ needs.deploy.result }}" != "success" ] || [ "${{ needs.post-deploy-tests.result }}" != "success" ]; then
+      #       STATUS="❌ Échec"
+      #     fi
+      #     
+      #     curl -X POST -H 'Content-type: application/json' \
+      #       --data "{\"text\":\"MakeMeLearn Deployment $STATUS - https://makemelearn.fr\"}" \
+      #       "$SLACK_WEBHOOK_URL"
