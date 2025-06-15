@@ -162,7 +162,7 @@ jobs:
           done
           
           if [ "$API_STARTED" = "true" ]; then
-            # Tester les endpoints critiques
+            # Tester les endpoints critiques - ROUTES CORRIGÉES
             echo "🧪 Test des endpoints..."
             
             # Test health check
@@ -174,23 +174,33 @@ jobs:
               exit 1
             fi
             
-            # Test stats endpoint (URL CORRIGÉE)
-            echo "Testing /api/stats/public endpoint..."
-            if curl -f -s http://localhost:3001/api/stats/public; then
+            # Test stats endpoint public - ROUTE CORRIGÉE (sans /api)
+            echo "Testing /stats/public endpoint..."
+            if curl -f -s http://localhost:3001/stats/public; then
               echo "✅ Stats endpoint OK"
             else
               echo "❌ Stats endpoint failed"
               exit 1
             fi
             
-            # Test track endpoint
-            echo "Testing /api/stats/track endpoint..."
-            if curl -f -s -X POST http://localhost:3001/api/stats/track \
+            # Test track endpoint - ROUTE CORRIGÉE (sans /api)
+            echo "Testing /stats/track endpoint..."
+            if curl -f -s -X POST http://localhost:3001/stats/track \
                 -H "Content-Type: application/json" \
                 -d '{"event":"test_event","value":1}'; then
               echo "✅ Track endpoint OK"
             else
               echo "⚠️ Track endpoint failed (non-blocking)"
+            fi
+            
+            # Test registrations endpoint - NOUVEAU TEST
+            echo "Testing /registrations endpoint..."
+            if curl -f -s -X POST http://localhost:3001/registrations \
+                -H "Content-Type: application/json" \
+                -d '{"email":"test@example.com","source":"ci_test"}'; then
+              echo "✅ Registrations endpoint OK"
+            else
+              echo "⚠️ Registrations endpoint failed (non-blocking)"
             fi
             
             echo "🎉 Tous les tests d'endpoints sont passés!"
@@ -460,7 +470,7 @@ jobs:
             echo "🌐 Site: https://makemelearn.fr"
             echo "🔧 API: https://makemelearn.fr/api/health"
 
-  # Tests post-déploiement
+  # Tests post-déploiement - ROUTES CORRIGÉES
   post-deploy-tests:
     needs: deploy
     runs-on: ubuntu-latest
@@ -501,18 +511,29 @@ jobs:
             done
           }
           
-          # Tests avec retry
+          # Tests avec retry - URLS CORRIGÉES POUR TRAEFIK
           ERROR=0
           
           test_url "https://makemelearn.fr" "Frontend" || ERROR=1
           test_url "https://makemelearn.fr/api/health" "API Health" || ERROR=1
           test_url "https://makemelearn.fr/api/stats/public" "API Stats" || ERROR=1
           
+          # Test optionnel du tracking
+          echo "🧪 Test optionnel du tracking d'événement..."
+          if curl -f -s -m 10 -X POST "https://makemelearn.fr/api/stats/track" \
+              -H "Content-Type: application/json" \
+              -d '{"event":"ci_test_event","value":1}' > /dev/null 2>&1; then
+            echo "✅ API Track accessible"
+          else
+            echo "⚠️ API Track non accessible (non-bloquant)"
+          fi
+          
           if [ $ERROR -eq 0 ]; then
             echo "🎉 Tous les tests post-déploiement sont passés!"
             echo "🌐 Frontend: https://makemelearn.fr"
             echo "🔧 API Health: https://makemelearn.fr/api/health"
             echo "📊 API Stats: https://makemelearn.fr/api/stats/public"
+            echo "📈 API Track: https://makemelearn.fr/api/stats/track"
           else
             echo "❌ Certains tests ont échoué"
             # Mais ne pas faire échouer le déploiement pour des problèmes de timing
@@ -536,6 +557,8 @@ jobs:
             echo "🌐 Site principal: https://makemelearn.fr"
             echo "🔧 API Health: https://makemelearn.fr/api/health"
             echo "📊 API Stats: https://makemelearn.fr/api/stats/public"
+            echo "📈 API Track: https://makemelearn.fr/api/stats/track"
+            echo "📧 API Register: https://makemelearn.fr/api/registrations"
             echo "📅 Déployé le: $(date)"
             echo "🔗 Commit: ${{ github.sha }}"
             echo "✅ Tests post-déploiement: ${{ needs.post-deploy-tests.result }}"
@@ -544,6 +567,11 @@ jobs:
             echo "- Vérifiez que le site fonctionne"
             echo "- Configurez votre fichier .env sur le serveur"
             echo "- Testez l'inscription sur votre site"
+            echo ""
+            echo "📋 ROUTES API ACTIVES (sans préfixe /api internal):"
+            echo "- Traefik: /api/health → API: /health"
+            echo "- Traefik: /api/stats/* → API: /stats/*"
+            echo "- Traefik: /api/registrations → API: /registrations"
           else
             echo "❌ Déploiement MakeMeLearn échoué!"
             echo "Deploy result: ${{ needs.deploy.result }}"
