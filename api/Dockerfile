@@ -17,16 +17,16 @@ WORKDIR /app
 # Copie des fichiers de dépendances
 COPY package*.json ./
 
-# Installation des dépendances
-RUN npm ci --only=production && \
+# Installation des dépendances (utiliser npm install au lieu de npm ci)
+RUN npm install --only=production && \
     npm cache clean --force
 
 # Création d'un utilisateur non-root pour la sécurité
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+    adduser -S nodejs -u 1001
 
 # Copie du code source
-COPY --chown=nextjs:nodejs . .
+COPY --chown=nodejs:nodejs . .
 
 # Exposition du port
 EXPOSE 3000
@@ -36,7 +36,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 # Utilisation de l'utilisateur non-root
-USER nextjs
+USER nodejs
 
 # Script de healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
