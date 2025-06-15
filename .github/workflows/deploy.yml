@@ -37,14 +37,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'api/package-lock.json'
+          # Pas de cache pour le moment, on va le réactiver après
 
       - name: Install API dependencies
         working-directory: ./api
         run: |
           echo "📦 Installation des dépendances API..."
-          npm ci
+          # Utiliser npm install pour générer un package-lock.json valide
+          npm install
+          
+          # Vérifier que les dépendances sont installées
+          echo "✅ Dépendances installées:"
+          npm list --depth=0
 
       - name: Run API tests
         working-directory: ./api
@@ -92,6 +96,9 @@ jobs:
             echo "✅ Stats endpoint OK"
           else
             echo "❌ API n'a pas pu démarrer"
+            # Afficher les logs pour debug
+            echo "📋 Logs de l'API:"
+            jobs
             exit 1
           fi
           
