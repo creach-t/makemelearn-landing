@@ -132,6 +132,10 @@ jobs:
         run: |
           echo "🚀 Test de démarrage de l'API..."
           
+          # Créer le dossier logs pour les tests
+          mkdir -p logs
+          chmod 755 logs
+          
           # Démarrer l'API en arrière-plan
           npm start &
           API_PID=$!
@@ -171,8 +175,8 @@ jobs:
             fi
             
             # Test stats endpoint
-            echo "Testing /api/stats/public endpoint..."
-            if curl -f -s http://localhost:3001/api/stats/public; then
+            echo "Testing /stats/public endpoint..."
+            if curl -f -s http://localhost:3001/stats/public; then
               echo "✅ Stats endpoint OK"
             else
               echo "❌ Stats endpoint failed"
@@ -290,6 +294,7 @@ jobs:
 
             # Créer les dossiers si nécessaire
             mkdir -p "$BACKUP_DIR"
+            mkdir -p "$PROJECT_DIR/logs"  # AJOUT: Créer le dossier logs sur l'hôte
 
             # Aller dans le dossier du projet ou le créer
             if [ ! -d "$PROJECT_DIR" ]; then
@@ -309,46 +314,99 @@ jobs:
               echo "✅ .env sauvegardé"
             fi
 
-            # Sauvegarder la base de données si elle existe
-            if docker compose ps -q postgres 2>/dev/null | grep -q .; then
-              echo "💾 Sauvegarde de la base de données..."
-              docker compose exec -T postgres pg_dump -U makemelearn_user makemelearn > "$BACKUP_DIR/db_backup_$DATE.sql" 2>/dev/null || echo "⚠️ Backup DB échoué (normal si première installation)"
+            # AJOUT: Sauvegarde des logs
+            if [ -d "logs" ] && [ "$(ls -A logs)" ]; then
+              echo "📋 Sauvegarde des logs..."
+              tar -czf "$BACKUP_DIR/logs_backup_$DATE.tar.gz" logs/
+              echo "✅ Logs sauvegardés"
             fi
 
-            # Arrêter les services
+            # Arrêter les services avec timeout
             echo "⏹️ Arrêt des services..."
-            docker compose down --remove-orphans 2>/dev/null || echo "ℹ️ Aucun service à arrêter"
+            timeout 60 docker compose down --remove-orphans 2>/dev/null || {
+              echo "⚠️ Arrêt forcé des containers..."
+              docker compose kill 2>/dev/null || true
+              docker compose rm -f 2>/dev/null || true
+            }
 
             # Mettre à jour le code
             echo "📥 Mise à jour du code..."
             git stash --include-untracked 2>/dev/null || true
             git fetch origin main
             git reset --hard origin/main
+            git clean -fd  # AJOUT: Nettoyer les fichiers non trackés
 
             # Vérifier/créer le fichier .env
             if [ ! -f ".env" ]; then
               echo "⚠️ Fichier .env manquant, copie depuis l'exemple..."
               cp .env.example .env
               echo "🔧 ATTENTION: Configurez le fichier .env avec vos vraies valeurs!"
-              echo "🔧 Utilisation de la configuration par défaut pour ce déploiement"
             fi
+
+            # Créer les dossiers nécessaires avec les bonnes permissions
+            echo "📁 Création des dossiers nécessaires..."
+            mkdir -p logs
+            chmod 755 logs
+            mkdir -p data  # Au cas où vous auriez des données persistantes
 
             # Créer le network Traefik si nécessaire
             echo "🌐 Vérification du network Traefik..."
             docker network create traefik-public 2>/dev/null || echo "ℹ️ Network traefik-public existe déjà"
 
-            # Démarrer les services
-            echo "🔄 Démarrage des services..."
-            docker compose pull 2>/dev/null || echo "⚠️ Pull failed, continuing..."
-            docker compose up -d --build
+            # Nettoyer les images obsolètes
+            echo "🧹 Nettoyage des images obsolètes..."
+            docker image prune -f --filter "until=24h" 2>/dev/null || true
 
-            # Attendre que les services soient prêts
+            # Construire et démarrer les services
+            echo "🏗️ Construction et démarrage des services..."
+            docker compose pull 2>/dev/null || echo "⚠️ Pull failed, using cached images..."
+            
+            # Build avec no-cache pour l'API pour s'assurer que les changements sont pris en compte
+            docker compose build --no-cache api
+            docker compose build frontend  # Cache OK pour le frontend
+            
+            # Démarrer les services
+            docker compose up -d
+
+            # Attendre que les services soient prêts avec retry intelligent
             echo "⏳ Attente que les services soient prêts..."
-            sleep 30
+            
+            # Fonction de test avec retry
+            test_service() {
+              local service=$1
+              local url=$2
+              local max_attempts=30
+              local attempt=1
+              
+              echo "🔄 Test du service $service..."
+              while [ $attempt -le $max_attempts ]; do
+                if curl -f -s -m 5 "$url" >/dev/null 2>&1; then
+                  echo "✅ $service prêt (tentative $attempt)"
+                  return 0
+                fi
+                echo "⏳ $service pas encore prêt (tentative $attempt/$max_attempts)..."
+                sleep 2
+                ((attempt++))
+              done
+              echo "❌ $service n'a pas démarré dans les temps"
+              return 1
+            }
+
+            # Tester les services
+            test_service "API" "http://localhost:3000/health" || {
+              echo "❌ API failed to start"
+              echo "📋 API Logs:"
+              docker compose logs api --tail 50
+              exit 1
+            }
 
             # Vérifier les services
-            echo "🔍 Vérification des services..."
+            echo "🔍 État final des services..."
             docker compose ps
+            
+            # Afficher les logs récents pour debug
+            echo "📋 Logs récents de l'API:"
+            docker compose logs api --tail 10
 
             echo "✅ Deployment terminé!"
             echo "🌐 Site: https://makemelearn.fr"
