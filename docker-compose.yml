@@ -10,15 +10,18 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://makemelearn_user:MakeMeLearn2025!SecurePass@host.docker.internal:5432/makemelearn
+      DATABASE_URL: postgresql://makemelearn_user:MakeMeLearn2025!SecurePass@postgres:5432/makemelearn
       CORS_ORIGIN: https://makemelearn.fr
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX_REQUESTS: 100
+    depends_on:
+      - postgres
     networks:
       - traefik-public
+      - makemelearn-internal
     restart: unless-stopped
     labels:
-      # Traefik configuration pour l'API sur /api/
+      # Traefik configuration pour l'API sur makemelearn.fr/api/
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
 
@@ -28,6 +31,7 @@ services:
       - "traefik.http.routers.makemelearn-api.tls=true"
       - "traefik.http.routers.makemelearn-api.tls.certresolver=myresolver"
       - "traefik.http.services.makemelearn-api.loadbalancer.server.port=3000"
+      - "traefik.http.routers.makemelearn-api.priority=10"  # Priorité élevée pour /api/
 
       # Middleware pour supprimer /api/ du path avant d'envoyer à l'API
       - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
@@ -37,6 +41,26 @@ services:
       - "traefik.http.routers.makemelearn-api-insecure.rule=Host(`makemelearn.fr`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.makemelearn-api-insecure.entrypoints=web"
       - "traefik.http.routers.makemelearn-api-insecure.middlewares=redirect-to-https"
+
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: makemelearn_postgres
+    environment:
+      POSTGRES_DB: makemelearn
+      POSTGRES_USER: makemelearn_user
+      POSTGRES_PASSWORD: MakeMeLearn2025!SecurePass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - makemelearn-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U makemelearn_user -d makemelearn"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Frontend statique
   frontend:
@@ -75,6 +99,12 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
+volumes:
+  postgres_data:
+    driver: local
+
 networks:
   traefik-public:
     external: true
+  makemelearn-internal:
+    driver: bridge
