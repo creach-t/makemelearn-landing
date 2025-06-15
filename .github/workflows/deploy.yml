@@ -304,7 +304,7 @@ jobs:
 
             # Créer les dossiers si nécessaire
             mkdir -p "$BACKUP_DIR"
-            mkdir -p "$PROJECT_DIR/logs"  # AJOUT: Créer le dossier logs sur l'hôte
+            mkdir -p "$PROJECT_DIR/logs"
 
             # Aller dans le dossier du projet ou le créer
             if [ ! -d "$PROJECT_DIR" ]; then
@@ -324,7 +324,7 @@ jobs:
               echo "✅ .env sauvegardé"
             fi
 
-            # AJOUT: Sauvegarde des logs
+            # Sauvegarde des logs
             if [ -d "logs" ] && [ "$(ls -A logs)" ]; then
               echo "📋 Sauvegarde des logs..."
               tar -czf "$BACKUP_DIR/logs_backup_$DATE.tar.gz" logs/
@@ -344,7 +344,7 @@ jobs:
             git stash --include-untracked 2>/dev/null || true
             git fetch origin main
             git reset --hard origin/main
-            git clean -fd  # AJOUT: Nettoyer les fichiers non trackés
+            git clean -fd
 
             # Vérifier/créer le fichier .env
             if [ ! -f ".env" ]; then
@@ -357,7 +357,7 @@ jobs:
             echo "📁 Création des dossiers nécessaires..."
             mkdir -p logs
             chmod 755 logs
-            mkdir -p data  # Au cas où vous auriez des données persistantes
+            mkdir -p data
 
             # Créer le network Traefik si nécessaire
             echo "🌐 Vérification du network Traefik..."
@@ -373,42 +373,80 @@ jobs:
             
             # Build avec no-cache pour l'API pour s'assurer que les changements sont pris en compte
             docker compose build --no-cache api
-            docker compose build frontend  # Cache OK pour le frontend
+            docker compose build frontend
             
             # Démarrer les services
             docker compose up -d
 
-            # Attendre que les services soient prêts avec retry intelligent
+            # NOUVEAU: Utiliser la logique corrigée du script deploy.sh
             echo "⏳ Attente que les services soient prêts..."
-            
-            # Fonction de test avec retry
-            test_service() {
-              local service=$1
-              local url=$2
-              local max_attempts=30
-              local attempt=1
-              
-              echo "🔄 Test du service $service..."
-              while [ $attempt -le $max_attempts ]; do
-                if curl -f -s -m 5 "$url" >/dev/null 2>&1; then
-                  echo "✅ $service prêt (tentative $attempt)"
-                  return 0
-                fi
-                echo "⏳ $service pas encore prêt (tentative $attempt/$max_attempts)..."
-                sleep 2
-                ((attempt++))
-              done
-              echo "❌ $service n'a pas démarré dans les temps"
-              return 1
-            }
+            sleep 10
 
-            # Tester les services
-            test_service "API" "http://localhost:3000/health" || {
-              echo "❌ API failed to start"
-              echo "📋 API Logs:"
-              docker compose logs api --tail 50
+            echo "🔄 Vérification des containers..."
+            
+            # Vérifier PostgreSQL
+            if ! docker compose ps postgres | grep -q "Up"; then
+              echo "❌ Container PostgreSQL n'est pas démarré"
               exit 1
-            }
+            fi
+            echo "✅ PostgreSQL: OK"
+
+            # Vérifier le frontend
+            if ! docker compose ps frontend | grep -q "Up"; then
+              echo "❌ Container Frontend n'est pas démarré"
+              exit 1
+            fi
+            echo "✅ Frontend: OK"
+
+            # Vérifier l'API avec la NOUVELLE méthode
+            echo "🔄 Test du service API..."
+            
+            # D'abord vérifier que le container API est up
+            if ! docker compose ps api | grep -q "Up"; then
+              echo "❌ Container API n'est pas démarré"
+              exit 1
+            fi
+
+            # Tester l'API directement dans le container (pas via l'URL externe)
+            max_attempts=30
+            attempt=1
+
+            while [ $attempt -le $max_attempts ]; do
+              echo "⏳ Test de l'API (tentative $attempt/$max_attempts)..."
+              
+              # Test direct dans le container - LA CLÉ DU FIX !
+              if docker compose exec -T api curl -f -s http://localhost:3000/health > /dev/null 2>&1; then
+                echo "✅ API répond correctement sur le port interne"
+                break
+              elif [ $attempt -eq $max_attempts ]; then
+                echo "❌ API n'a pas démarré dans les temps"
+                echo "📋 API Logs:"
+                docker compose logs api --tail 50
+                exit 1
+              else
+                echo "⏳ API pas encore prêt (tentative $attempt/$max_attempts)..."
+                sleep 2
+              fi
+
+              ((attempt++))
+            done
+
+            # Vérifier qu'il n'y a pas d'erreurs fatales
+            if docker compose logs --tail=50 api | grep -i "fatal\|cannot\|failed.*start"; then
+              echo "⚠️ Erreurs détectées dans les logs de l'API"
+            else
+              echo "✅ Pas d'erreurs fatales détectées"
+            fi
+
+            # Test optionnel de l'URL externe (ne fait pas échouer le déploiement)
+            echo "🌐 Test optionnel de l'URL externe..."
+            if curl -f -s --max-time 10 "https://makemelearn.fr" > /dev/null 2>&1; then
+              echo "✅ Site accessible via https://makemelearn.fr"
+            else
+              echo "⚠️ Site pas encore accessible via l'URL externe (normal si Traefik n'est pas encore configuré)"
+            fi
+
+            echo "✅ Déploiement vérifié avec succès"
 
             # Vérifier les services
             echo "🔍 État final des services..."
