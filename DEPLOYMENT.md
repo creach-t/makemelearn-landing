@@ -1,146 +1,135 @@
-# Guide de Déploiement MakeMeLearn
+# Guide de Déploiement MakeMeLearn Simplifié
 
-Ce guide explique comment déployer le système complet MakeMeLearn avec Docker, PostgreSQL et Traefik.
+**🎯 TOUT SUR `makemelearn.fr` - Architecture unifiée**
+
+Ce guide explique comment déployer le système complet MakeMeLearn avec Docker, PostgreSQL et Traefik sur un seul domaine.
 
 ## 📋 Prérequis
 
 - Serveur avec Docker et Docker Compose installés
-- Traefik déjà configuré et lancé (avec network `traefik`)
-- Nom de domaine pointant vers votre serveur
-- Sous-domaine API configuré
+- Traefik déjà configuré avec network `traefik-public`
+- Domaine `makemelearn.fr` pointant vers votre serveur
 
-## 🌐 Configuration DNS
+## 🌐 Configuration DNS Simplifiée
 
-Assurez-vous que vos domaines pointent vers votre serveur :
+Configurez seulement ces enregistrements DNS :
 
 ```
-makemelearn.fr        A    192.168.1.100
-www.makemelearn.fr    A    192.168.1.100
-inscription.makemelearn.fr  A    192.168.1.100
+makemelearn.fr        A    [IP_DE_VOTRE_SERVEUR]
+www.makemelearn.fr    A    [IP_DE_VOTRE_SERVEUR]
 ```
 
-## 🚀 Déploiement Rapide
+**✅ Plus besoin de sous-domaine `inscription` !**
 
-### 1. Cloner le repository
+## 🏗️ Architecture Unifiée
+
+```
+https://makemelearn.fr/          → Frontend (HTML/CSS/JS)
+https://makemelearn.fr/api/      → API Backend (Node.js)
+https://makemelearn.fr/api/health → Health Check
+```
+
+## 🚀 Déploiement Automatique avec CI/CD
+
+### 1. Configuration des secrets GitHub
+
+Dans votre repository GitHub, ajoutez ces secrets (`Settings > Secrets and variables > Actions`) :
+
+```
+SERVER_HOST=votre-ip-serveur
+SERVER_USER=votre-username-ssh
+SERVER_SSH_KEY=votre-clé-privée-ssh
+SERVER_PORT=22
+```
+
+### 2. Préparation du serveur
 
 ```bash
+# Connectez-vous à votre serveur
+ssh user@votre-serveur
+
+# Créer les dossiers
+mkdir -p ~/projects
+cd ~/projects
+
+# Cloner le repository
 git clone https://github.com/creach-t/makemelearn-landing.git
 cd makemelearn-landing
-```
 
-### 2. Configuration des variables d'environnement
-
-```bash
-# Copier le fichier d'exemple
+# Copier et configurer l'environnement
 cp .env.example .env
-
-# Éditer avec vos valeurs
-nano .env
+nano .env  # Configurer vos valeurs
 ```
 
-**Variables importantes à modifier :**
+### 3. Configuration minimale .env
 
 ```env
-# Mot de passe PostgreSQL (générez un mot de passe fort)
-POSTGRES_PASSWORD=votre-mot-de-passe-tres-securise
+# Base de données - Changez le mot de passe !
+DATABASE_URL=postgresql://makemelearn_user:VOTRE_MOT_DE_PASSE_SECURISE@postgres:5432/makemelearn
+POSTGRES_PASSWORD=VOTRE_MOT_DE_PASSE_SECURISE
 
-# Token de maintenance (générez un token aléatoire)
-MAINTENANCE_TOKEN=votre-token-de-maintenance-securise
+# CORS simplifié
+CORS_ORIGIN=https://makemelearn.fr
 
-# CORS Origins (ajustez selon vos domaines)
-CORS_ORIGIN=https://makemelearn.fr,https://inscription.makemelearn.fr
+# Token de maintenance (générez-en un)
+MAINTENANCE_TOKEN=votre-token-securise-de-32-caracteres
+
+# Environnement
+NODE_ENV=production
+PORT=3000
 ```
 
-### 3. Lancer les services
+### 4. Déploiement initial
 
 ```bash
-# Créer le network Traefik si nécessaire
-docker network create traefik
+# Créer le network Traefik
+docker network create traefik-public
 
 # Lancer les services
-docker-compose up -d
+docker compose up -d
 
 # Vérifier les logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
-### 4. Vérification
+### 5. Vérification
 
 ```bash
-# Vérifier que tous les services sont up
-docker-compose ps
+# Frontend
+curl -I https://makemelearn.fr
 
-# Tester la santé de l'API
-curl https://inscription.makemelearn.fr/health
+# API Health
+curl https://makemelearn.fr/api/health
 
-# Tester le frontend
-curl https://makemelearn.fr
+# API Stats
+curl https://makemelearn.fr/api/stats/public
 ```
 
-## 🔧 Configuration Avancée
+## 🔄 Déploiement Automatique
 
-### Configuration PostgreSQL
+**Votre CI/CD est maintenant configuré !** À chaque push sur `main` :
 
-La base de données est automatiquement initialisée avec le script `database/init.sql`. Vous pouvez :
+1. ✅ **Tests automatiques** de l'API et du frontend
+2. ✅ **Build** de l'image Docker
+3. ✅ **Déploiement** sur votre serveur
+4. ✅ **Vérifications** post-déploiement
+5. ✅ **Notification** du statut
 
-```bash
-# Se connecter à PostgreSQL
-docker-compose exec postgres psql -U makemelearn_user -d makemelearn
-
-# Voir les tables créées
-\dt
-
-# Voir les statistiques
-SELECT * FROM registration_stats;
-```
-
-### Configuration Traefik
-
-Exemple de configuration Traefik (dans votre `traefik.yml`) :
+### Workflow CI/CD
 
 ```yaml
-entrypoints:
-  web:
-    address: ":80"
-    http:
-      redirections:
-        entrypoint:
-          to: websecure
-          scheme: https
-  websecure:
-    address: ":443"
+# Le workflow est déjà configuré dans .github/workflows/deploy.yml
+# Il va automatiquement :
+on:
+  push:
+    branches: [main]  # Déploie à chaque push sur main
 
-certificatesresolvers:
-  letsencrypt:
-    acme:
-      email: admin@makemelearn.fr
-      storage: /data/acme.json
-      httpchallenge:
-        entrypoint: web
-```
-
-### Sauvegarde PostgreSQL
-
-```bash
-# Script de sauvegarde automatique
-cat << 'EOF' > backup-postgres.sh
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_NAME="makemelearn_backup_$DATE.sql"
-
-docker-compose exec -T postgres pg_dump -U makemelearn_user makemelearn > "$BACKUP_NAME"
-gzip "$BACKUP_NAME"
-
-# Garder seulement les 7 dernières sauvegardes
-find . -name "makemelearn_backup_*.sql.gz" -mtime +7 -delete
-
-echo "Backup created: $BACKUP_NAME.gz"
-EOF
-
-chmod +x backup-postgres.sh
-
-# Ajouter au crontab pour sauvegarde quotidienne
-echo "0 2 * * * /path/to/backup-postgres.sh" | crontab -
+jobs:
+  test-api      # Tests de l'API avec PostgreSQL
+  test-frontend # Validation HTML/CSS/JS
+  build         # Build des images Docker
+  deploy        # Déploiement SSH vers votre serveur
+  post-tests    # Vérification que tout fonctionne
 ```
 
 ## 📊 Monitoring
@@ -148,227 +137,207 @@ echo "0 2 * * * /path/to/backup-postgres.sh" | crontab -
 ### Health Checks
 
 ```bash
-# API Health Check
-curl https://inscription.makemelearn.fr/health
+# Santé globale
+curl https://makemelearn.fr/api/health
 
-# Detailed Health Check
-curl https://inscription.makemelearn.fr/health/detailed
+# Santé détaillée (avec auth)
+curl -H "Authorization: Bearer $MAINTENANCE_TOKEN" \
+  https://makemelearn.fr/api/health/detailed
 
-# Métriques Prometheus
-curl https://inscription.makemelearn.fr/health/metrics
-```
-
-### Logs
-
-```bash
-# Logs de l'API
-docker-compose logs -f api
-
-# Logs PostgreSQL
-docker-compose logs -f postgres
-
-# Logs Nginx
-docker-compose logs -f frontend
-```
-
-### Statistiques
-
-```bash
 # Statistiques publiques
-curl https://inscription.makemelearn.fr/api/stats/public
-
-# Statistiques de croissance
-curl https://inscription.makemelearn.fr/api/stats/growth
+curl https://makemelearn.fr/api/stats/public
 ```
 
-## 🔒 Sécurité
-
-### Certificats SSL
-
-Les certificats sont automatiquement générés par Traefik via Let's Encrypt.
-
-### Rate Limiting
-
-L'API a des limitations intégrées :
-- 100 requêtes par 15 minutes (général)
-- 5 inscriptions par heure par IP
-
-### Headers de Sécurité
-
-Nginx ajoute automatiquement les headers de sécurité :
-- `X-Frame-Options: SAMEORIGIN`
-- `X-XSS-Protection: 1; mode=block`
-- `X-Content-Type-Options: nosniff`
-- `Strict-Transport-Security`
-
-## 🔄 Mise à Jour
-
-### Déploiement continu
+### Logs en temps réel
 
 ```bash
-# Script de mise à jour
-cat << 'EOF' > update.sh
+# API
+docker compose logs -f api
+
+# Base de données
+docker compose logs -f postgres
+
+# Frontend
+docker compose logs -f frontend
+
+# Tout
+docker compose logs -f
+```
+
+## 🔧 Gestion des Services
+
+### Redémarrage
+
+```bash
+# Redémarrer tout
+docker compose restart
+
+# Redémarrer seulement l'API
+docker compose restart api
+
+# Mise à jour avec rebuild
+docker compose up -d --build
+```
+
+### Sauvegarde automatique
+
+```bash
+# Script de sauvegarde
+cat << 'EOF' > ~/backup-makemelearn.sh
 #!/bin/bash
-echo "🔄 Mise à jour MakeMeLearn..."
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="$HOME/backups/makemelearn"
+mkdir -p "$BACKUP_DIR"
 
-# Pull du code
-git pull origin main
+# Sauvegarde base de données
+docker compose -f ~/projects/makemelearn-landing/docker-compose.yml \
+  exec -T postgres pg_dump -U makemelearn_user makemelearn > \
+  "$BACKUP_DIR/makemelearn_$DATE.sql"
 
-# Rebuild et restart
-docker-compose build --no-cache api
-docker-compose up -d
+# Compresser
+gzip "$BACKUP_DIR/makemelearn_$DATE.sql"
 
-# Vérification
-sleep 10
-docker-compose ps
-curl -f https://inscription.makemelearn.fr/health || echo "❌ Health check failed"
+# Garder 7 dernières sauvegardes
+find "$BACKUP_DIR" -name "makemelearn_*.sql.gz" -mtime +7 -delete
 
-echo "✅ Mise à jour terminée"
+echo "✅ Backup créé: makemelearn_$DATE.sql.gz"
 EOF
 
-chmod +x update.sh
-```
+chmod +x ~/backup-makemelearn.sh
 
-### Maintenance
-
-```bash
-# Déclencher la maintenance (nettoyage DB)
-curl -X POST https://inscription.makemelearn.fr/health/maintenance \
-  -H "Authorization: Bearer ${MAINTENANCE_TOKEN}"
-
-# Redémarrer les services
-docker-compose restart
+# Crontab pour sauvegarde quotidienne à 2h
+echo "0 2 * * * $HOME/backup-makemelearn.sh" | crontab -
 ```
 
 ## 🐛 Dépannage
 
-### Problèmes Courants
+### Problèmes courants
 
 **1. Services qui ne démarrent pas**
 ```bash
 # Vérifier les logs
-docker-compose logs
+docker compose logs
 
 # Vérifier l'espace disque
 df -h
 
-# Vérifier le network Traefik
-docker network ls | grep traefik
-```
-
-**2. Base de données inaccessible**
-```bash
-# Vérifier PostgreSQL
-docker-compose exec postgres pg_isready -U makemelearn_user
-
-# Recréer le volume si nécessaire
-docker-compose down -v
-docker-compose up -d
-```
-
-**3. Certificats SSL non générés**
-```bash
-# Vérifier les logs Traefik
-docker logs traefik
-
-# Vérifier la configuration DNS
-nslookup makemelearn.fr
-```
-
-**4. CORS Errors**
-```bash
-# Vérifier la configuration CORS dans .env
-grep CORS_ORIGIN .env
-
-# Redémarrer l'API
-docker-compose restart api
-```
-
-### Commandes Utiles
-
-```bash
-# Voir l'utilisation des ressources
-docker stats
-
-# Nettoyer les images inutilisées
+# Nettoyer Docker
 docker system prune -f
+```
 
-# Voir les connexions à la base
-docker-compose exec postgres psql -U makemelearn_user -d makemelearn -c "SELECT * FROM pg_stat_activity;"
+**2. API non accessible**
+```bash
+# Vérifier le routing Traefik
+docker compose logs api | grep -i traefik
 
-# Redémarrer uniquement l'API
-docker-compose restart api
+# Vérifier les labels
+docker inspect makemelearn_api | grep -A 20 Labels
 
-# Voir les dernières inscriptions
-docker-compose exec postgres psql -U makemelearn_user -d makemelearn -c "SELECT email, created_at FROM registrations ORDER BY created_at DESC LIMIT 10;"
+# Tester en direct
+docker compose exec api curl localhost:3000/health
+```
+
+**3. Base de données inaccessible**
+```bash
+# Se connecter à PostgreSQL
+docker compose exec postgres psql -U makemelearn_user -d makemelearn
+
+# Vérifier les connexions
+docker compose exec postgres psql -U makemelearn_user -d makemelearn -c "SELECT * FROM pg_stat_activity;"
+```
+
+**4. Frontend non accessible**
+```bash
+# Vérifier nginx
+docker compose logs frontend
+
+# Tester nginx directement
+docker compose exec frontend nginx -t
 ```
 
 ## 📈 Optimisations
 
 ### Performance
 
-1. **Optimisation PostgreSQL** (`postgresql.conf`) :
-```
-shared_buffers = 256MB
-max_connections = 100
-effective_cache_size = 1GB
-```
-
-2. **Optimisation Nginx** (déjà configuré) :
-- Compression gzip
-- Cache des assets statiques
-- Keep-alive connections
-
-3. **Monitoring avec Prometheus** :
+1. **Monitoring avec Grafana** (optionnel)
 ```yaml
 # docker-compose.override.yml
 version: '3.8'
 services:
-  prometheus:
-    image: prom/prometheus
+  grafana:
+    image: grafana/grafana
     ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 ```
 
-### Scalabilité
+2. **Cache Redis** (pour plus tard)
+```yaml
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+```
 
-Pour une utilisation en production intensive :
+## 🔒 Sécurité
 
-1. **Load Balancer** : Utilisez plusieurs instances de l'API
-2. **Cache Redis** : Ajoutez Redis pour les sessions
-3. **CDN** : Utilisez un CDN pour les assets statiques
-4. **Base de données séparée** : Utilisez une instance PostgreSQL dédiée
+### SSL automatique
+- Traefik gère automatiquement Let's Encrypt
+- Certificats renouvelés automatiquement
 
-## 📞 Support
+### Firewall basique
+```bash
+# UFW (Ubuntu)
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
+```
 
-En cas de problème :
+## 📝 Checklist de Déploiement
 
-1. Vérifiez les logs : `docker-compose logs`
-2. Consultez la documentation API : `https://inscription.makemelearn.fr/`
-3. Contactez : hello@makemelearn.fr
+- [ ] DNS configuré (makemelearn.fr pointant vers le serveur)
+- [ ] Traefik installé avec network `traefik-public`
+- [ ] Repository cloné sur le serveur
+- [ ] Fichier `.env` configuré avec vrais mots de passe
+- [ ] Secrets GitHub configurés pour CI/CD
+- [ ] Services lancés : `docker compose up -d`
+- [ ] Tests passants :
+  - [ ] https://makemelearn.fr (frontend)
+  - [ ] https://makemelearn.fr/api/health (API)
+  - [ ] https://makemelearn.fr/api/stats/public (stats)
+- [ ] Sauvegarde automatique configurée
+- [ ] CI/CD fonctionnel (push test sur main)
 
-## 🔗 Liens Utiles
+## 🎉 C'est parti !
 
-- **Frontend** : https://makemelearn.fr
-- **API** : https://inscription.makemelearn.fr
-- **Health Check** : https://inscription.makemelearn.fr/health
-- **Statistiques** : https://inscription.makemelearn.fr/api/stats/public
+Votre MakeMeLearn est maintenant :
+- **🌐 En ligne** : https://makemelearn.fr
+- **🔧 API opérationnelle** : https://makemelearn.fr/api/
+- **📊 Monitoring** : https://makemelearn.fr/api/health
+- **🚀 CI/CD automatique** : Push sur main = déploiement auto
+
+### URLs importantes
+- **Site principal** : https://makemelearn.fr
+- **API Health** : https://makemelearn.fr/api/health  
+- **Statistiques** : https://makemelearn.fr/api/stats/public
 - **Repository** : https://github.com/creach-t/makemelearn-landing
+
+**Support** : hello@makemelearn.fr
 
 ---
 
-## 🎯 Checklist de Déploiement
+## 🚀 Test de votre CI/CD
 
-- [ ] DNS configuré (makemelearn.fr et inscription.makemelearn.fr)
-- [ ] Traefik installé et configuré
-- [ ] Variables d'environnement configurées (.env)
-- [ ] Services lancés (`docker-compose up -d`)
-- [ ] Health checks passants
-- [ ] Certificats SSL générés
-- [ ] Sauvegarde automatique configurée
-- [ ] Monitoring en place
-- [ ] Tests d'inscription fonctionnels
+Pour tester que tout fonctionne :
 
-**Votre installation MakeMeLearn est prête ! 🚀**
+1. Faites un petit changement dans votre code
+2. Commitez et poussez sur `main`
+3. Allez dans `Actions` sur GitHub
+4. Regardez le déploiement automatique se faire
+5. Vérifiez que vos changements apparaissent sur https://makemelearn.fr
+
+**🎯 Votre architecture unifiée MakeMeLearn est prête !**
