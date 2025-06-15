@@ -109,10 +109,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes principales
+// Routes principales - SANS préfixe /api car Traefik le supprime avec stripprefix
 app.use('/health', healthRoutes);
-app.use('/api/registrations', registrationLimiter, registrationRoutes);
-app.use('/api/stats', statsRoutes);
+app.use('/registrations', registrationLimiter, registrationRoutes);
+app.use('/stats', statsRoutes);
 
 // Route racine avec informations API
 app.get('/', (req, res) => {
@@ -122,11 +122,12 @@ app.get('/', (req, res) => {
     description: 'API pour la gestion des inscriptions anticipées',
     endpoints: {
       health: '/health',
-      registrations: '/api/registrations',
-      stats: '/api/stats'
+      registrations: '/registrations',
+      stats: '/stats'
     },
     documentation: 'https://makemelearn.fr/api-docs',
-    support: 'hello@makemelearn.fr'
+    support: 'hello@makemelearn.fr',
+    note: 'Routes configurées pour Traefik stripprefix middleware'
   });
 });
 
@@ -157,6 +158,7 @@ async function startServer() {
       logger.info(`🌍 Environnement: ${process.env.NODE_ENV}`);
       logger.info(`📊 Base de données: ${process.env.DATABASE_URL ? 'Configurée' : 'Non configurée'}`);
       logger.info(`🔒 CORS origins: ${process.env.CORS_ORIGIN || 'Défaut'}`);
+      logger.info('📋 Routes configurées sans préfixe /api (Traefik stripprefix)');
     });
   } catch (error) {
     logger.error('Erreur lors du démarrage du serveur:', error);
