@@ -1,1 +1,225 @@
-/**\n * Form Component\n * Composant réutilisable pour les formulaires\n */\n\nexport class FormComponent {\n    constructor(formConfig) {\n        this.config = formConfig;\n        this.formId = formConfig.id;\n        this.isSubmitting = false;\n    }\n\n    render() {\n        return `\n            <form class=\"${this.config.className || 'form'}\" id=\"${this.formId}\">\n                ${this.renderFields()}\n                ${this.renderSubmitButton()}\n            </form>\n        `;\n    }\n\n    renderFields() {\n        return this.config.fields.map(field => {\n            switch (field.type) {\n                case 'email':\n                case 'text':\n                    return this.renderInputField(field);\n                case 'select':\n                    return this.renderSelectField(field);\n                case 'textarea':\n                    return this.renderTextareaField(field);\n                default:\n                    return '';\n            }\n        }).join('');\n    }\n\n    renderInputField(field) {\n        if (field.grouped) {\n            return `\n                <input \n                    type=\"${field.type}\" \n                    id=\"${field.id}\" \n                    name=\"${field.name}\"\n                    placeholder=\"${field.placeholder || ''}\"\n                    ${field.required ? 'required' : ''}\n                    class=\"${field.className || ''}\"\n                >\n            `;\n        }\n\n        return `\n            <div class=\"form-group\">\n                ${field.label ? `<label for=\"${field.id}\">${field.label}</label>` : ''}\n                <input \n                    type=\"${field.type}\" \n                    id=\"${field.id}\" \n                    name=\"${field.name}\"\n                    placeholder=\"${field.placeholder || ''}\"\n                    ${field.required ? 'required' : ''}\n                    class=\"${field.className || ''}\"\n                >\n            </div>\n        `;\n    }\n\n    renderSelectField(field) {\n        return `\n            <div class=\"form-group\">\n                ${field.label ? `<label for=\"${field.id}\">${field.label}</label>` : ''}\n                <select id=\"${field.id}\" name=\"${field.name}\" ${field.required ? 'required' : ''}>\n                    <option value=\"\">${field.placeholder || 'Choisissez une option'}</option>\n                    ${field.options.map(option => \n                        `<option value=\"${option.value}\">${option.text}</option>`\n                    ).join('')}\n                </select>\n            </div>\n        `;\n    }\n\n    renderTextareaField(field) {\n        return `\n            <div class=\"form-group\">\n                ${field.label ? `<label for=\"${field.id}\">${field.label}</label>` : ''}\n                <textarea \n                    id=\"${field.id}\" \n                    name=\"${field.name}\"\n                    rows=\"${field.rows || 4}\"\n                    placeholder=\"${field.placeholder || ''}\"\n                    ${field.required ? 'required' : ''}\n                ></textarea>\n            </div>\n        `;\n    }\n\n    renderSubmitButton() {\n        const button = this.config.submitButton;\n        return `\n            <button type=\"submit\" class=\"${button.className || 'btn btn-primary'}\">\n                ${button.icon ? `<svg class=\"btn-icon\" viewBox=\"0 0 20 20\" fill=\"currentColor\">${button.icon}</svg>` : ''}\n                <span class=\"button-text\">${button.text}</span>\n            </button>\n        `;\n    }\n\n    mount(selector) {\n        const element = document.querySelector(selector) || document.getElementById(selector);\n        if (element) {\n            element.innerHTML = this.render();\n            this.attachEventListeners();\n        }\n    }\n\n    attachEventListeners() {\n        const form = document.getElementById(this.formId);\n        if (form) {\n            form.addEventListener('submit', (e) => this.handleSubmit(e));\n        }\n    }\n\n    async handleSubmit(e) {\n        e.preventDefault();\n        \n        if (this.isSubmitting) return;\n        \n        const formData = this.getFormData();\n        const isValid = this.validateForm(formData);\n        \n        if (!isValid) return;\n\n        this.setLoadingState(true);\n        \n        try {\n            if (this.config.onSubmit) {\n                await this.config.onSubmit(formData);\n            }\n            this.setSuccessState();\n        } catch (error) {\n            this.setErrorState(error.message);\n        }\n    }\n\n    getFormData() {\n        const form = document.getElementById(this.formId);\n        const formData = new FormData(form);\n        const data = {};\n        \n        for (let [key, value] of formData.entries()) {\n            data[key] = value;\n        }\n        \n        return data;\n    }\n\n    validateForm(data) {\n        // Validation basique - peut être étendue\n        for (const field of this.config.fields) {\n            if (field.required && !data[field.name]) {\n                this.showFieldError(field.id, `${field.label || field.name} est requis`);\n                return false;\n            }\n        }\n        return true;\n    }\n\n    showFieldError(fieldId, message) {\n        const field = document.getElementById(fieldId);\n        if (field) {\n            field.style.borderColor = 'rgba(239, 68, 68, 0.5)';\n            // Ajouter message d'erreur si nécessaire\n        }\n    }\n\n    setLoadingState(loading) {\n        this.isSubmitting = loading;\n        const button = document.querySelector(`#${this.formId} button[type=\"submit\"]`);\n        const buttonText = button?.querySelector('.button-text');\n        \n        if (button && buttonText) {\n            button.disabled = loading;\n            if (loading) {\n                buttonText.textContent = this.config.submitButton.loadingText || 'Envoi en cours...';\n                button.classList.add('loading');\n            } else {\n                buttonText.textContent = this.config.submitButton.text;\n                button.classList.remove('loading');\n            }\n        }\n    }\n\n    setSuccessState() {\n        const button = document.querySelector(`#${this.formId} button[type=\"submit\"]`);\n        const buttonText = button?.querySelector('.button-text');\n        \n        if (button && buttonText) {\n            buttonText.textContent = this.config.submitButton.successText || 'Envoyé !';\n            button.style.background = 'linear-gradient(120deg, #10B981, #059669)';\n            \n            setTimeout(() => {\n                this.resetForm();\n            }, 3000);\n        }\n    }\n\n    setErrorState(message) {\n        this.setLoadingState(false);\n        // Afficher le message d'erreur\n        console.error('Form submission error:', message);\n    }\n\n    resetForm() {\n        const form = document.getElementById(this.formId);\n        const button = form?.querySelector('button[type=\"submit\"]');\n        const buttonText = button?.querySelector('.button-text');\n        \n        if (form) form.reset();\n        if (button && buttonText) {\n            buttonText.textContent = this.config.submitButton.text;\n            button.style.background = '';\n            button.disabled = false;\n        }\n        \n        this.isSubmitting = false;\n    }\n}
+/**
+ * Form Component
+ * Composant réutilisable pour les formulaires
+ */
+
+export class FormComponent {
+    constructor(formConfig) {
+        this.config = formConfig;
+        this.formId = formConfig.id;
+        this.isSubmitting = false;
+    }
+
+    render() {
+        return `
+            <form class="${this.config.className || 'form'}" id="${this.formId}">
+                ${this.renderFields()}
+                ${this.renderSubmitButton()}
+            </form>
+        `;
+    }
+
+    renderFields() {
+        return this.config.fields.map(field => {
+            switch (field.type) {
+                case 'email':
+                case 'text':
+                    return this.renderInputField(field);
+                case 'select':
+                    return this.renderSelectField(field);
+                case 'textarea':
+                    return this.renderTextareaField(field);
+                default:
+                    return '';
+            }
+        }).join('');
+    }
+
+    renderInputField(field) {
+        if (field.grouped) {
+            return `
+                <input 
+                    type="${field.type}" 
+                    id="${field.id}" 
+                    name="${field.name}"
+                    placeholder="${field.placeholder || ''}"
+                    ${field.required ? 'required' : ''}
+                    class="${field.className || ''}"
+                >
+            `;
+        }
+
+        return `
+            <div class="form-group">
+                ${field.label ? `<label for="${field.id}">${field.label}</label>` : ''}
+                <input 
+                    type="${field.type}" 
+                    id="${field.id}" 
+                    name="${field.name}"
+                    placeholder="${field.placeholder || ''}"
+                    ${field.required ? 'required' : ''}
+                    class="${field.className || ''}"
+                >
+            </div>
+        `;
+    }
+
+    renderSelectField(field) {
+        return `
+            <div class="form-group">
+                ${field.label ? `<label for="${field.id}">${field.label}</label>` : ''}
+                <select id="${field.id}" name="${field.name}" ${field.required ? 'required' : ''}>
+                    <option value="">${field.placeholder || 'Choisissez une option'}</option>
+                    ${field.options.map(option => 
+                        `<option value="${option.value}">${option.text}</option>`
+                    ).join('')}
+                </select>
+            </div>
+        `;
+    }
+
+    renderTextareaField(field) {
+        return `
+            <div class="form-group">
+                ${field.label ? `<label for="${field.id}">${field.label}</label>` : ''}
+                <textarea 
+                    id="${field.id}" 
+                    name="${field.name}"
+                    rows="${field.rows || 4}"
+                    placeholder="${field.placeholder || ''}"
+                    ${field.required ? 'required' : ''}
+                ></textarea>
+            </div>
+        `;
+    }
+
+    renderSubmitButton() {
+        const button = this.config.submitButton;
+        return `
+            <button type="submit" class="${button.className || 'btn btn-primary'}">
+                ${button.icon ? `<svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">${button.icon}</svg>` : ''}
+                <span class="button-text">${button.text}</span>
+            </button>
+        `;
+    }
+
+    mount(selector) {
+        const element = document.querySelector(selector) || document.getElementById(selector);
+        if (element) {
+            element.innerHTML = this.render();
+            this.attachEventListeners();
+        }
+    }
+
+    attachEventListeners() {
+        const form = document.getElementById(this.formId);
+        if (form) {
+            form.addEventListener('submit', (e) => this.handleSubmit(e));
+        }
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+        
+        if (this.isSubmitting) return;
+        
+        const formData = this.getFormData();
+        const isValid = this.validateForm(formData);
+        
+        if (!isValid) return;
+
+        this.setLoadingState(true);
+        
+        try {
+            if (this.config.onSubmit) {
+                await this.config.onSubmit(formData);
+            }
+            this.setSuccessState();
+        } catch (error) {
+            this.setErrorState(error.message);
+        }
+    }
+
+    getFormData() {
+        const form = document.getElementById(this.formId);
+        const formData = new FormData(form);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        
+        return data;
+    }
+
+    validateForm(data) {
+        // Validation basique - peut être étendue
+        for (const field of this.config.fields) {
+            if (field.required && !data[field.name]) {
+                this.showFieldError(field.id, `${field.label || field.name} est requis`);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            // Ajouter message d'erreur si nécessaire
+        }
+    }
+
+    setLoadingState(loading) {
+        this.isSubmitting = loading;
+        const button = document.querySelector(`#${this.formId} button[type="submit"]`);
+        const buttonText = button?.querySelector('.button-text');
+        
+        if (button && buttonText) {
+            button.disabled = loading;
+            if (loading) {
+                buttonText.textContent = this.config.submitButton.loadingText || 'Envoi en cours...';
+                button.classList.add('loading');
+            } else {
+                buttonText.textContent = this.config.submitButton.text;
+                button.classList.remove('loading');
+            }
+        }
+    }
+
+    setSuccessState() {
+        const button = document.querySelector(`#${this.formId} button[type="submit"]`);
+        const buttonText = button?.querySelector('.button-text');
+        
+        if (button && buttonText) {
+            buttonText.textContent = this.config.submitButton.successText || 'Envoyé !';
+            button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
+            
+            setTimeout(() => {
+                this.resetForm();
+            }, 3000);
+        }
+    }
+
+    setErrorState(message) {
+        this.setLoadingState(false);
+        // Afficher le message d'erreur
+        console.error('Form submission error:', message);
+    }
+
+    resetForm() {
+        const form = document.getElementById(this.formId);
+        const button = form?.querySelector('button[type="submit"]');
+        const buttonText = button?.querySelector('.button-text');
+        
+        if (form) form.reset();
+        if (button && buttonText) {
+            buttonText.textContent = this.config.submitButton.text;
+            button.style.background = '';
+            button.disabled = false;
+        }
+        
+        this.isSubmitting = false;
+    }
+}
