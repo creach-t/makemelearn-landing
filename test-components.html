@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Components - MakeMeLearn</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        .test-section {
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .test-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .test-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10B981;
+        }
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+        .status.info {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Component Test -->
+    <div id="header-component">
+        <div class="component-loading">Chargement du header...</div>
+    </div>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h1><span class="gradient-text">🧪 Test des Composants</span></h1>
+                <p>Interface de test pour valider les composants modulaires</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                
+                <!-- Test Header -->
+                <div class="test-section">
+                    <h2 class="test-title">📋 Header Component</h2>
+                    <p class="test-description">Test de la navigation responsive avec menu mobile</p>
+                    
+                    <div class="test-controls">
+                        <button class="test-btn" onclick="testMobileMenu()">Toggle Menu Mobile</button>
+                        <button class="test-btn" onclick="testNavigation()">Test Navigation</button>
+                        <button class="test-btn" onclick="reloadHeader()">Recharger Header</button>
+                    </div>
+                    
+                    <div id="header-status" class="status info">
+                        ✅ Header chargé - Navigation active
+                    </div>
+                </div>
+
+                <!-- Test Forms -->
+                <div class="test-section">
+                    <h2 class="test-title">📝 Form Component</h2>
+                    <p class="test-description">Test des formulaires avec validation et états</p>
+                    
+                    <div class="test-controls">
+                        <button class="test-btn" onclick="testValidation()">Test Validation</button>
+                        <button class="test-btn" onclick="testSubmission()">Test Soumission</button>
+                        <button class="test-btn" onclick="resetForms()">Reset Formulaires</button>
+                    </div>
+                    
+                    <!-- Formulaire de test simple -->
+                    <div style="max-width: 500px; margin: 20px 0;">
+                        <h3 style="color: #ffffff; margin-bottom: 15px;">Formulaire de Test</h3>
+                        <div id="testForm"></div>
+                    </div>
+                    
+                    <div id="form-status" class="status info">
+                        ⏳ Formulaire en cours de chargement...
+                    </div>
+                </div>
+
+                <!-- Test Responsive -->
+                <div class="test-section">
+                    <h2 class="test-title">📱 Responsive Design</h2>
+                    <p class="test-description">Test de l'adaptation mobile et des breakpoints</p>
+                    
+                    <div class="test-controls">
+                        <button class="test-btn" onclick="simulateMobile()">Simuler Mobile</button>
+                        <button class="test-btn" onclick="simulateTablet()">Simuler Tablette</button>
+                        <button class="test-btn" onclick="simulateDesktop()">Simuler Desktop</button>
+                        <button class="test-btn" onclick="resetViewport()">Reset Viewport</button>
+                    </div>
+                    
+                    <div id="responsive-status" class="status info">
+                        🖥️ Mode Desktop actuel
+                    </div>
+                </div>
+
+                <!-- Test Accessibilité -->
+                <div class="test-section">
+                    <h2 class="test-title">♿ Accessibilité</h2>
+                    <p class="test-description">Test de la navigation clavier et des états de focus</p>
+                    
+                    <div class="test-controls">
+                        <button class="test-btn" onclick="enableKeyboardNav()">Activer Navigation Clavier</button>
+                        <button class="test-btn" onclick="testFocusStates()">Test États Focus</button>
+                        <button class="test-btn" onclick="testScreenReader()">Simuler Lecteur d'Écran</button>
+                    </div>
+                    
+                    <div id="accessibility-status" class="status info">
+                        ⌨️ Navigation clavier disponible (Tab pour tester)
+                    </div>
+                </div>
+
+                <!-- Test Performance -->
+                <div class="test-section">
+                    <h2 class="test-title">⚡ Performance</h2>
+                    <p class="test-description">Monitoring du chargement et des performances</p>
+                    
+                    <div class="test-controls">
+                        <button class="test-btn" onclick="measureLoadTime()">Mesurer Temps de Chargement</button>
+                        <button class="test-btn" onclick="testComponentMount()">Test Montage Composants</button>
+                        <button class="test-btn" onclick="clearPerformanceData()">Vider Cache</button>
+                    </div>
+                    
+                    <div id="performance-status" class="status info">
+                        📊 Performance monitoring actif
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Component Test -->
+    <div id="footer-component">
+        <div class="component-loading">Chargement du footer...</div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script>
+        // ===== FONCTIONS DE TEST =====
+
+        // Test Header
+        function testMobileMenu() {
+            const toggle = document.getElementById('mobileMenuToggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (toggle) {
+                toggle.click();
+                updateStatus('header-status', 'Menu mobile ' + (navLinks?.classList.contains('active') ? 'ouvert' : 'fermé'), 'success');
+            } else {
+                updateStatus('header-status', 'Menu mobile non trouvé', 'error');
+            }
+        }
+
+        function testNavigation() {
+            const links = document.querySelectorAll('.nav-links a');
+            updateStatus('header-status', `${links.length} liens de navigation trouvés`, 'success');
+        }
+
+        function reloadHeader() {
+            location.reload();
+        }
+
+        // Test Forms
+        function testValidation() {
+            const inputs = document.querySelectorAll('#testForm input, #testForm select, #testForm textarea');
+            let validCount = 0;
+            
+            inputs.forEach(input => {
+                if (input.checkValidity()) validCount++;
+            });
+            
+            updateStatus('form-status', `${validCount}/${inputs.length} champs valides`, validCount === inputs.length ? 'success' : 'error');
+        }
+
+        function testSubmission() {
+            const form = document.querySelector('#testForm form');
+            if (form) {
+                updateStatus('form-status', 'Test de soumission lancé...', 'info');
+                // Simuler la soumission
+                setTimeout(() => {
+                    updateStatus('form-status', 'Soumission simulée réussie', 'success');
+                }, 2000);
+            }
+        }
+
+        function resetForms() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => form.reset());
+            updateStatus('form-status', 'Formulaires réinitialisés', 'success');
+        }
+
+        // Test Responsive
+        function simulateMobile() {
+            document.body.style.width = '375px';
+            document.body.style.margin = '0 auto';
+            updateStatus('responsive-status', '📱 Mode Mobile (375px)', 'success');
+        }
+
+        function simulateTablet() {
+            document.body.style.width = '768px';
+            document.body.style.margin = '0 auto';
+            updateStatus('responsive-status', '📱 Mode Tablette (768px)', 'success');
+        }
+
+        function simulateDesktop() {
+            document.body.style.width = '1200px';
+            document.body.style.margin = '0 auto';
+            updateStatus('responsive-status', '🖥️ Mode Desktop (1200px)', 'success');
+        }
+
+        function resetViewport() {
+            document.body.style.width = '';
+            document.body.style.margin = '';
+            updateStatus('responsive-status', '🖥️ Viewport normal restauré', 'success');
+        }
+
+        // Test Accessibilité
+        function enableKeyboardNav() {
+            document.body.classList.add('keyboard-nav');
+            updateStatus('accessibility-status', '⌨️ Navigation clavier activée', 'success');
+        }
+
+        function testFocusStates() {
+            const focusableElements = document.querySelectorAll('a, button, input, select, textarea');
+            updateStatus('accessibility-status', `${focusableElements.length} éléments focusables trouvés`, 'success');
+        }
+
+        function testScreenReader() {
+            const srElements = document.querySelectorAll('.sr-only, [aria-label], [aria-describedby]');
+            updateStatus('accessibility-status', `${srElements.length} éléments accessibles aux lecteurs d'écran`, 'success');
+        }
+
+        // Test Performance
+        function measureLoadTime() {
+            if ('performance' in window) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                updateStatus('performance-status', `⚡ Temps de chargement: ${loadTime}ms`, loadTime < 2000 ? 'success' : 'error');
+            }
+        }
+
+        function testComponentMount() {
+            const components = document.querySelectorAll('#header-component, #footer-component');
+            let mountedCount = 0;
+            
+            components.forEach(comp => {
+                if (!comp.querySelector('.component-loading')) {
+                    mountedCount++;
+                }
+            });
+            
+            updateStatus('performance-status', `${mountedCount}/${components.length} composants montés`, 'success');
+        }
+
+        function clearPerformanceData() {
+            if ('performance' in window && performance.clearMarks) {
+                performance.clearMarks();
+                performance.clearMeasures();
+            }
+            updateStatus('performance-status', '🧹 Cache performance vidé', 'success');
+        }
+
+        // Utilitaire
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = `status ${type}`;
+            }
+        }
+
+        // Initialisation des tests
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Interface de test chargée');
+            
+            // Détecter le chargement des composants
+            setTimeout(() => {
+                const headerLoaded = !document.querySelector('#header-component .component-loading');
+                const footerLoaded = !document.querySelector('#footer-component .component-loading');
+                
+                if (headerLoaded) {
+                    updateStatus('header-status', '✅ Header chargé et fonctionnel', 'success');
+                }
+                
+                if (headerLoaded && footerLoaded) {
+                    updateStatus('performance-status', '🚀 Tous les composants chargés', 'success');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
