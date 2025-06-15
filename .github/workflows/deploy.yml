@@ -59,8 +59,8 @@ jobs:
         script: |
           echo "🚀 Starting deployment..."
           
-          # Aller dans le dossier du projet (MODIFIEZ CE CHEMIN)
-          cd /opt/makemelearn-landing || exit 1
+          # Aller dans le dossier du projet
+          cd ~/projects/makemelearn-landing || exit 1
           
           # Exécuter le script de déploiement
           ./deploy.sh
