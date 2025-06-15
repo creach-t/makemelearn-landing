@@ -59,26 +59,11 @@ jobs:
         script: |
           echo "🚀 Starting deployment..."
           
-          # Aller dans le dossier du projet
-          cd /path/to/your/makemelearn-landing || exit 1
+          # Aller dans le dossier du projet (MODIFIEZ CE CHEMIN)
+          cd /opt/makemelearn-landing || exit 1
           
-          # Sauvegarder la branche actuelle
-          git stash
-          
-          # Récupérer les dernières modifications
-          git fetch origin
-          git reset --hard origin/main
-          
-          # Redéployer les containers
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
-          
-          # Attendre que les services soient prêts
-          sleep 10
-          
-          # Vérifier que le site répond
-          curl -f https://makemelearn.fr || exit 1
+          # Exécuter le script de déploiement
+          ./deploy.sh
           
           echo "✅ Deployment successful!"
 
