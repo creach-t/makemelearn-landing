@@ -1,82 +1,212 @@
-# MakeMeLearn - Landing Page
+# MakeMeLearn - Landing Page & Backend System
 
-Une landing page moderne et professionnelle pour MakeMeLearn, la plateforme d'entraide créative entre autodidactes.
+Une plateforme complète pour MakeMeLearn, la communauté d'entraide créative entre autodidactes.
 
-## 🚀 Aperçu
+## 🚀 Vue d'ensemble
 
-MakeMeLearn est une communauté d'autodidactes créatifs qui s'entraident gratuitement sur des projets non-lucratifs. Cette landing page présente le concept, les fonctionnalités et permet aux visiteurs de s'inscrire pour un accès anticipé.
+MakeMeLearn est une communauté d'autodidactes créatifs qui s'entraident gratuitement sur des projets non-lucratifs. Ce repository contient :
 
-## ✨ Fonctionnalités
+- **Frontend** : Landing page moderne et responsive
+- **Backend API** : Système d'inscription avec PostgreSQL
+- **Infrastructure** : Configuration Docker et Traefik
+- **Monitoring** : Health checks et analytics
 
+## ✨ Fonctionnalités Complètes
+
+### Frontend
 - **Design Modern** : Interface sombre avec gradients et effets visuels
-- **Multi-pages** : Site complet avec navigation
+- **Multi-pages** : Site complet avec navigation (Accueil, À propos, FAQ, Contact, etc.)
 - **Responsive** : Optimisé pour tous les appareils
 - **Animations** : Effets de hover et transitions fluides
 - **Performance** : Code optimisé et chargement rapide
 - **Accessibilité** : Navigation clavier et bonnes pratiques
 - **SEO Ready** : Meta tags, sitemap, robots.txt
 
+### Backend API
+- **Inscriptions** : Système complet d'enregistrement d'emails
+- **Base de données** : PostgreSQL avec schéma optimisé
+- **Sécurité** : Rate limiting, validation, headers sécurisés
+- **Monitoring** : Health checks, métriques Prometheus
+- **Analytics** : Statistiques détaillées et tracking
+- **Logging** : Système de logs complet avec Winston
+- **Email** : Préparé pour la vérification d'emails (à implémenter)
+
+### Infrastructure
+- **Docker** : Containerisation complète
+- **Traefik** : Reverse proxy avec SSL automatique
+- **PostgreSQL** : Base de données avec initialisation automatique
+- **Nginx** : Serveur web optimisé pour le frontend
+- **CORS** : Configuration sécurisée pour API cross-origin
+
 ## 🛠️ Technologies
 
+### Frontend
 - **HTML5** : Structure sémantique moderne
 - **CSS3** : Flexbox, Grid, animations, variables CSS
-- **JavaScript ES6+** : Interactions et optimisations
+- **JavaScript ES6+** : Interactions et API integration
 - **Google Fonts** : Police Inter pour une typographie moderne
+
+### Backend
+- **Node.js** : Runtime JavaScript serveur
+- **Express.js** : Framework web rapide et minimaliste
+- **PostgreSQL** : Base de données relationnelle robuste
+- **Winston** : Système de logging avancé
+- **Helmet** : Sécurité HTTP
+- **Rate Limiting** : Protection contre les abus
+
+### Infrastructure
+- **Docker & Docker Compose** : Containerisation
+- **Traefik** : Reverse proxy et load balancer
+- **Nginx** : Serveur web haute performance
+- **Let's Encrypt** : Certificats SSL automatiques
 
 ## 📁 Structure du Projet
 
 ```
 makemelearn-landing/
-├── index.html              # Page d'accueil
-├── about.html               # À propos - histoire et valeurs
-├── how-it-works.html        # Guide détaillé du fonctionnement
-├── faq.html                 # Questions fréquentes
-├── contact.html             # Page de contact avec formulaire
-├── terms.html               # Conditions d'utilisation
-├── privacy.html             # Politique de confidentialité RGPD
-├── style.css                # Styles et animations
-├── script.js                # Interactions JavaScript
-├── sitemap.xml              # Plan du site pour SEO
-├── robots.txt               # Instructions moteurs de recherche
-└── README.md                # Documentation
+├── 🌐 Frontend
+│   ├── index.html              # Page d'accueil
+│   ├── about.html              # À propos
+│   ├── how-it-works.html       # Fonctionnement
+│   ├── faq.html                # Questions fréquentes
+│   ├── contact.html            # Contact
+│   ├── terms.html              # Conditions d'utilisation
+│   ├── privacy.html            # Politique de confidentialité
+│   ├── style.css               # Styles et animations
+│   ├── script.js               # JavaScript avec intégration API
+│   ├── sitemap.xml             # Plan du site
+│   └── robots.txt              # Instructions moteurs de recherche
+├── 🔧 Backend API
+│   ├── api/
+│   │   ├── Dockerfile          # Image Docker API
+│   │   ├── package.json        # Dépendances Node.js
+│   │   └── src/
+│   │       ├── server.js       # Serveur Express principal
+│   │       ├── config/
+│   │       │   └── database.js # Configuration PostgreSQL
+│   │       ├── routes/
+│   │       │   ├── registrations.js # Routes inscriptions
+│   │       │   ├── stats.js    # Routes statistiques
+│   │       │   └── health.js   # Routes monitoring
+│   │       ├── middleware/
+│   │       │   ├── errorHandler.js # Gestion d'erreurs
+│   │       │   └── requestLogger.js # Logging requêtes
+│   │       └── utils/
+│   │           └── logger.js   # Système de logs Winston
+├── 🗄️ Base de données
+│   └── database/
+│       └── init.sql            # Initialisation PostgreSQL
+├── 🐳 Infrastructure
+│   ├── docker-compose.yml      # Configuration services
+│   ├── nginx/
+│   │   └── nginx.conf          # Configuration Nginx
+│   └── .env.example            # Variables d'environnement
+├── 📚 Documentation
+│   ├── README.md               # Ce fichier
+│   └── DEPLOYMENT.md           # Guide de déploiement
+└── 🔧 Configuration
+    ├── .gitignore              # Fichiers ignorés Git
+    └── sitemap.xml             # Plan du site SEO
+```
+
+## 🚀 Installation & Déploiement
+
+### Déploiement Rapide avec Docker
+
+```bash
+# 1. Cloner le repository
+git clone https://github.com/creach-t/makemelearn-landing.git
+cd makemelearn-landing
+
+# 2. Configuration
+cp .env.example .env
+# Éditer .env avec vos valeurs
+
+# 3. Lancement
+docker-compose up -d
+
+# 4. Vérification
+curl https://makemelearn.fr
+curl https://inscription.makemelearn.fr/health
+```
+
+### Développement Local
+
+```bash
+# Frontend (serveur statique)
+python -m http.server 8000
+# ou
+npx serve .
+
+# Backend (développement)
+cd api
+npm install
+npm run dev
+
+# Base de données locale
+docker run -d --name postgres \
+  -e POSTGRES_DB=makemelearn \
+  -e POSTGRES_USER=makemelearn_user \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 postgres:15-alpine
 ```
 
 ## 🎯 Pages et Contenu
 
-### Page d'Accueil (`index.html`)
+### 🏠 Page d'Accueil (`index.html`)
 - Hero section avec proposition de valeur
 - Processus en 4 étapes
 - Fonctionnalités principales
 - Statistiques du marché
 - Vision et mission
-- Formulaire d'inscription anticipée
+- **Formulaire d'inscription fonctionnel avec API**
 
-### À Propos (`about.html`)
+### ℹ️ À Propos (`about.html`)
 - Histoire du projet
 - Mission et valeurs
 - Équipe
 - Statistiques clés
 
-### Comment ça marche (`how-it-works.html`)
+### ⚙️ Comment ça marche (`how-it-works.html`)
 - Deux types de demandes expliqués
 - Processus détaillé étape par étape
 - Exemples concrets
 - Règles de la communauté
 
-### FAQ (`faq.html`)
+### ❓ FAQ (`faq.html`)
 - 12 questions fréquentes
 - Réponses détaillées
 - Call-to-action vers contact
 
-### Contact (`contact.html`)
+### 📞 Contact (`contact.html`)
 - Formulaire de contact complet
 - Informations de contact
 - Temps de réponse
 - Réseaux sociaux
 
-### Pages Légales
+### 📋 Pages Légales
 - **Conditions d'utilisation** : Règles, projets autorisés/interdits
 - **Politique de confidentialité** : Conforme RGPD
+
+## 🔗 API Endpoints
+
+### Inscriptions
+- `POST /api/registrations` - Créer une inscription
+- `GET /api/registrations/verify/:token` - Vérifier un email
+- `POST /api/registrations/resend-verification` - Renvoyer vérification
+- `DELETE /api/registrations/unsubscribe/:email` - Se désinscrire
+
+### Statistiques
+- `GET /api/stats/public` - Statistiques publiques
+- `GET /api/stats/growth` - Données de croissance
+- `POST /api/stats/track` - Tracker un événement
+
+### Monitoring
+- `GET /health` - Health check simple
+- `GET /health/detailed` - Health check détaillé
+- `GET /health/metrics` - Métriques Prometheus
+- `GET /health/readiness` - Readiness probe
+- `GET /health/liveness` - Liveness probe
 
 ## 🎨 Design System
 
@@ -93,36 +223,12 @@ makemelearn-landing/
 ### Composants
 - Cards avec hover effects
 - Boutons avec animations
-- Formulaires interactifs
+- Formulaires interactifs avec API
 - Navigation sticky
+- Système de notifications
 - Icônes SVG intégrées
 
-## 🚀 Installation
-
-1. **Cloner le repository**
-```bash
-git clone https://github.com/creach-t/makemelearn-landing.git
-cd makemelearn-landing
-```
-
-2. **Lancer un serveur local**
-```bash
-# Python
-python -m http.server 8000
-
-# Node.js
-npx serve .
-
-# PHP
-php -S localhost:8000
-```
-
-3. **Ouvrir dans le navigateur**
-```
-http://localhost:8000
-```
-
-## 📱 Responsive Breakpoints
+## 📱 Responsive Design
 
 - **Mobile** : < 768px
 - **Tablet** : 768px - 1024px
@@ -130,126 +236,106 @@ http://localhost:8000
 
 ## ⚡ Optimisations
 
-### Performance
+### Performance Frontend
 - CSS organisé et modulaire
-- JavaScript avec debouncing/throttling
+- JavaScript avec API moderne (Fetch)
 - Images SVG optimisées
 - Chargement différé des animations
 - Intersection Observer pour animations
 
-### SEO
+### Performance Backend
+- Connection pooling PostgreSQL
+- Rate limiting intelligent
+- Compression gzip
+- Headers de cache optimisés
+- Logging asynchrone
+
+### SEO & Accessibilité
 - Meta tags descriptifs sur toutes les pages
 - Structure HTML sémantique
-- Sitemap.xml complet
-- Robots.txt configuré
-- Open Graph ready
-
-### Accessibilité
-- Navigation clavier complète
 - Contraste suffisant (WCAG)
-- Focus visible
-- Respect des préférences utilisateur
-- Labels de formulaires
+- Navigation clavier complète
+- Sitemap.xml et robots.txt
 
-## 🔧 Personnalisation
+## 🔒 Sécurité
 
-### Couleurs
-Modifier les variables CSS dans `style.css` :
-```css
-:root {
-  --primary: #667eea;
-  --secondary: #764ba2;
-  --accent: #f093fb;
-  --background: #0B1426;
-}
+### Frontend
+- Headers de sécurité (CSP, HSTS, etc.)
+- Validation côté client
+- Sanitisation des entrées
+- Protection XSS
+
+### Backend
+- Rate limiting par IP
+- Validation avec express-validator
+- Headers sécurisés avec Helmet
+- Logs de sécurité détaillés
+- Protection contre les injections SQL
+- Gestion sécurisée des erreurs
+
+## 📊 Analytics & Monitoring
+
+### Tracking Frontend
+- Événements utilisateur
+- Performance de chargement
+- Erreurs JavaScript
+- Interactions formulaires
+
+### Monitoring Backend
+- Health checks automatiques
+- Métriques Prometheus
+- Logs structurés avec Winston
+- Statistiques de base de données
+- Alertes de performance
+
+## 🔧 Configuration
+
+### Variables d'Environnement
+```env
+NODE_ENV=production
+DATABASE_URL=postgresql://user:pass@host:port/db
+CORS_ORIGIN=https://makemelearn.fr,https://inscription.makemelearn.fr
+POSTGRES_PASSWORD=secure-password
+MAINTENANCE_TOKEN=secure-token
 ```
 
-### Contenu
-Éditer directement dans les fichiers HTML :
-- Titres et descriptions
-- Statistiques
-- Liens de navigation
-- Formulaires
+### Personnalisation Facile
+- Couleurs via variables CSS
+- Contenu modifiable dans HTML
+- Configuration API centralisée
+- Paramètres Docker flexibles
 
-### Navigation
-Ajouter de nouvelles pages dans tous les footers :
-```html
-<div class="footer-section">
-    <h4>MakeMeLearn</h4>
-    <a href="nouvelle-page.html">Nouvelle Page</a>
-</div>
-```
+## 🚀 Déploiement Production
 
-## 📊 Analytics
+Consultez le [Guide de Déploiement](DEPLOYMENT.md) pour :
+- Configuration DNS et SSL
+- Optimisations de sécurité
+- Monitoring et alertes
+- Sauvegardes automatiques
+- Mise à jour continue
 
-Le code inclut des hooks pour :
-- Tracking des clics boutons
-- Visibilité des sections
-- Soumissions de formulaires
-- Événements personnalisés
-- Gestion d'erreurs
+## 📈 Roadmap
 
-## 🌟 Fonctionnalités Avancées
+### Phase 1 (Actuelle) ✅
+- [x] Landing page complète
+- [x] API d'inscription fonctionnelle
+- [x] Base de données PostgreSQL
+- [x] Déploiement Docker
+- [x] Monitoring de base
 
-### JavaScript
-- Gestion complète des formulaires
-- Intersection Observer pour animations
-- Navigation smooth scroll
-- Gestion tactile mobile
-- Préférences accessibilité
-- État actif de navigation
+### Phase 2 (Prochainement)
+- [ ] Vérification d'emails par SMTP
+- [ ] Dashboard admin
+- [ ] API de contact fonctionnelle
+- [ ] Système de newsletter
+- [ ] Analytics avancées
 
-### CSS
-- Custom scrollbar
-- Gradient backgrounds
-- Backdrop filters
-- Transform animations
-- Grid/Flexbox layouts
-- Responsive typography
-
-### Formulaires
-- Validation en temps réel
-- États de chargement animés
-- Retours visuels
-- Reset automatique
-- Gestion d'erreurs
-
-## 🚀 Déploiement
-
-### GitHub Pages
-1. Activer GitHub Pages dans les settings
-2. Sélectionner la branch `main`
-3. Le site sera disponible à : `https://creach-t.github.io/makemelearn-landing/`
-
-### Netlify
-1. Connecter le repository
-2. Build settings : Aucun (site statique)
-3. Deploy automatique sur push
-
-### Vercel
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-### Serveur traditionnel
-1. Upload tous les fichiers via FTP
-2. Pointer le domaine vers le dossier
-3. Configurer HTTPS
-
-## 🔍 SEO
-
-### Fichiers SEO inclus
-- `sitemap.xml` : Plan du site complet
-- `robots.txt` : Instructions pour crawlers
-- Meta tags sur toutes les pages
-- Schema.org markup ready
-
-### Performance Web
-- Lighthouse score 95+
-- Core Web Vitals optimisés
-- Images optimisées
-- CSS/JS minifiés prêts
+### Phase 3 (Futur)
+- [ ] Authentification utilisateurs
+- [ ] Profils autodidactes
+- [ ] Système de projets
+- [ ] Messagerie interne
+- [ ] Mobile app (PWA)
 
 ## 🤝 Contribution
 
@@ -259,34 +345,34 @@ vercel --prod
 4. Push la branche (`git push origin feature/amazing-feature`)
 5. Ouvrir une Pull Request
 
-## 🐛 Bugs et Suggestions
+## 🐛 Support & Issues
 
-Utilisez les [GitHub Issues](https://github.com/creach-t/makemelearn-landing/issues) pour :
-- Signaler des bugs
-- Proposer des améliorations
-- Demander de nouvelles fonctionnalités
+- **Issues GitHub** : [Signaler un bug](https://github.com/creach-t/makemelearn-landing/issues)
+- **Email** : hello@makemelearn.fr
+- **Documentation** : Consultez le [Guide de Déploiement](DEPLOYMENT.md)
 
 ## 📝 Licence
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 📧 Contact
+## 📞 Contact
 
 - **Email** : hello@makemelearn.fr
 - **GitHub** : [@creach-t](https://github.com/creach-t)
 - **Website** : [makemelearn.fr](https://makemelearn.fr)
+- **API** : [inscription.makemelearn.fr](https://inscription.makemelearn.fr)
 
-## 🎯 Roadmap
+## 🏆 Statut du Projet
 
-- [ ] Mode sombre/clair
-- [ ] Animations 3D avec Three.js
-- [ ] Blog intégré
-- [ ] Système de notifications
-- [ ] PWA (Progressive Web App)
-- [ ] Multi-langues (EN, ES)
+- **Version** : 1.0.0
+- **Statut** : Production Ready 🚀
+- **Dernière mise à jour** : Juin 2025
+- **Tests** : ✅ Frontend | ✅ Backend | ✅ Infrastructure
 
 ---
 
 ⭐ **Star ce projet si vous l'aimez !**
 
-![MakeMeLearn Screenshot](https://via.placeholder.com/800x400/0B1426/667eea?text=MakeMeLearn+Landing+Page)
+**Rejoignez la communauté MakeMeLearn et apprenons ensemble !** 🚀
+
+![MakeMeLearn Architecture](https://via.placeholder.com/800x400/0B1426/667eea?text=MakeMeLearn+Full+Stack+Architecture)
