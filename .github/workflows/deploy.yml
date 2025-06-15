@@ -174,13 +174,23 @@ jobs:
               exit 1
             fi
             
-            # Test stats endpoint
-            echo "Testing /stats/public endpoint..."
-            if curl -f -s http://localhost:3001/stats/public; then
+            # Test stats endpoint (URL CORRIGÉE)
+            echo "Testing /api/stats/public endpoint..."
+            if curl -f -s http://localhost:3001/api/stats/public; then
               echo "✅ Stats endpoint OK"
             else
               echo "❌ Stats endpoint failed"
               exit 1
+            fi
+            
+            # Test track endpoint
+            echo "Testing /api/stats/track endpoint..."
+            if curl -f -s -X POST http://localhost:3001/api/stats/track \
+                -H "Content-Type: application/json" \
+                -d '{"event":"test_event","value":1}'; then
+              echo "✅ Track endpoint OK"
+            else
+              echo "⚠️ Track endpoint failed (non-blocking)"
             fi
             
             echo "🎉 Tous les tests d'endpoints sont passés!"
