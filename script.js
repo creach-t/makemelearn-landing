@@ -1,8 +1,42 @@
+// ===== API CONFIGURATION =====
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api' 
+    : 'https://inscription.makemelearn.fr/api';
+
+// ===== API UTILITY FUNCTIONS =====
+async function apiRequest(endpoint, options = {}) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'omit' // Pas de cookies pour cette API
+    };
+    
+    const finalOptions = { ...defaultOptions, ...options };
+    
+    try {
+        const response = await fetch(url, finalOptions);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('API Request Error:', error);
+        throw error;
+    }
+}
+
 // ===== FORM HANDLING =====
-// Newsletter signup form
+// Newsletter signup form with real API integration
 const signupForm = document.getElementById('signupForm');
 if (signupForm) {
-    signupForm.addEventListener('submit', function(e) {
+    signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('emailInput').value;
         
@@ -19,8 +53,24 @@ if (signupForm) {
             `;
             button.disabled = true;
             
-            // Success state
-            setTimeout(() => {
+            try {
+                // Appel API réel
+                const result = await apiRequest('/registrations', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: email,
+                        source: 'landing_page',
+                        metadata: {
+                            page: window.location.pathname,
+                            referrer: document.referrer,
+                            userAgent: navigator.userAgent,
+                            language: navigator.language,
+                            timestamp: new Date().toISOString()
+                        }
+                    })
+                });
+                
+                // Success state
                 button.innerHTML = `
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5 9.293 10.793a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
@@ -29,19 +79,57 @@ if (signupForm) {
                 `;
                 button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
                 
-                // Reset state
+                // Track successful signup
+                trackEvent('signup_success', { email: email, source: 'landing_page' });
+                
+                // Show success message
+                showNotification('Merci ! Votre inscription a été confirmée. Bienvenue dans la communauté MakeMeLearn !', 'success');
+                
+                // Reset form
                 setTimeout(() => {
                     button.innerHTML = originalContent;
                     button.style.background = 'linear-gradient(120deg, #667eea, #764ba2)';
                     button.disabled = false;
                     document.getElementById('emailInput').value = '';
                 }, 3000);
-            }, 1500);
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                
+                // Error state
+                button.innerHTML = `
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    Erreur d'inscription
+                `;
+                button.style.background = 'linear-gradient(120deg, #EF4444, #DC2626)';
+                
+                // Show error message
+                let errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+                if (error.message.includes('déjà inscrite') || error.message.includes('already exists')) {
+                    errorMessage = 'Cette adresse email est déjà inscrite ! Merci de faire partie de la communauté.';
+                } else if (error.message.includes('invalide')) {
+                    errorMessage = 'Adresse email invalide. Veuillez vérifier votre saisie.';
+                }
+                
+                showNotification(errorMessage, 'error');
+                
+                // Track failed signup
+                trackEvent('signup_error', { email: email, error: error.message });
+                
+                // Reset button
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.style.background = 'linear-gradient(120deg, #667eea, #764ba2)';
+                    button.disabled = false;
+                }, 3000);
+            }
         }
     });
 }
 
-// Contact form
+// Contact form (keeping original simulation for now)
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
@@ -67,6 +155,9 @@ if (contactForm) {
             `;
             button.disabled = true;
             
+            // Track contact form submission
+            trackEvent('contact_form_submit', formData);
+            
             // Simulate form submission
             setTimeout(() => {
                 button.innerHTML = `
@@ -76,6 +167,8 @@ if (contactForm) {
                     Message envoyé !
                 `;
                 button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
+                
+                showNotification('Message envoyé avec succès ! Nous vous répondrons sous 24-48h.', 'success');
                 
                 // Reset form and button
                 setTimeout(() => {
@@ -88,6 +181,156 @@ if (contactForm) {
         }
     });
 }
+
+// ===== NOTIFICATION SYSTEM =====
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Add styles if not already added
+    if (!document.querySelector('#notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                max-width: 400px;
+                padding: 16px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                animation: slideInRight 0.3s ease-out;
+            }
+            .notification-success {
+                background: linear-gradient(135deg, #10B981, #059669);
+                color: white;
+            }
+            .notification-error {
+                background: linear-gradient(135deg, #EF4444, #DC2626);
+                color: white;
+            }
+            .notification-info {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+            }
+            .notification-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            .notification-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0.8;
+            }
+            .notification-close:hover {
+                opacity: 1;
+            }
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.remove();
+    });
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// ===== ANALYTICS & TRACKING =====
+async function trackEvent(eventName, data = {}) {
+    try {
+        await apiRequest('/stats/track', {
+            method: 'POST',
+            body: JSON.stringify({
+                event: eventName,
+                value: 1,
+                metadata: {
+                    ...data,
+                    url: window.location.href,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent
+                }
+            })
+        });
+        console.log('Event tracked:', eventName, data);
+    } catch (error) {
+        console.warn('Failed to track event:', eventName, error);
+        // Don't show error to user, just log it
+    }
+}
+
+// Track button clicks
+document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const buttonText = this.textContent.trim();
+        console.log('Button clicked:', buttonText);
+        
+        // Track specific actions
+        if (buttonText.includes('Rejoindre')) {
+            trackEvent('button_join_community', { button_text: buttonText });
+        } else if (buttonText.includes('Contact')) {
+            trackEvent('button_contact', { button_text: buttonText });
+        } else if (buttonText.includes('Découvrir')) {
+            trackEvent('button_discover_concept', { button_text: buttonText });
+        }
+    });
+});
+
+// Track section visibility
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const sectionName = entry.target.id || entry.target.className.split(' ')[0] || 'unknown';
+            console.log('Section viewed:', sectionName);
+            trackEvent('section_viewed', { section: sectionName });
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('section').forEach(section => {
+    sectionObserver.observe(section);
+});
 
 // ===== SMOOTH SCROLLING =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -191,37 +434,6 @@ function throttle(func, delay) {
     };
 }
 
-// ===== ANALYTICS & TRACKING =====
-// Track button clicks
-document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Analytics tracking can be added here
-        console.log('Button clicked:', this.textContent.trim());
-        
-        // Track specific actions
-        if (this.textContent.includes('Rejoindre')) {
-            console.log('User interested in joining community');
-        }
-        if (this.textContent.includes('Contact')) {
-            console.log('User wants to contact us');
-        }
-    });
-});
-
-// Track section visibility
-const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            // Analytics tracking can be added here
-            console.log('Section viewed:', entry.target.id || entry.target.className);
-        }
-    });
-}, { threshold: 0.5 });
-
-document.querySelectorAll('section').forEach(section => {
-    sectionObserver.observe(section);
-});
-
 // ===== PAGE SPECIFIC FUNCTIONALITY =====
 
 // How it works page - highlight sections
@@ -260,7 +472,7 @@ if (window.location.pathname.includes('contact')) {
 // ===== ERROR HANDLING =====
 window.addEventListener('error', function(e) {
     console.error('JavaScript error:', e.error);
-    // Error tracking can be added here
+    trackEvent('javascript_error', { error: e.error.message, filename: e.filename, lineno: e.lineno });
 });
 
 // ===== ACCESSIBILITY ENHANCEMENTS =====
@@ -334,8 +546,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update active navigation link
     updateActiveNavLink();
     
-    // Initialize any third-party libraries here
-    // Example: Analytics, chat widgets, etc.
+    // Track page load
+    trackEvent('page_load', { 
+        page: window.location.pathname,
+        referrer: document.referrer,
+        userAgent: navigator.userAgent
+    });
     
     // Add loading complete class
     document.body.classList.add('loaded');
@@ -345,6 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('load', function() {
             const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
             console.log('Page load time:', loadTime + 'ms');
+            trackEvent('page_performance', { load_time: loadTime });
         });
     }
 });
