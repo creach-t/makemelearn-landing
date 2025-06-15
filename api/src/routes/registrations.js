@@ -38,7 +38,7 @@ const validateRegistration = [
     .withMessage('Métadonnées doivent être un objet')
 ];
 
-// POST /api/registrations - Créer une nouvelle inscription
+// POST /registrations - Créer une nouvelle inscription
 router.post('/', validateRegistration, async (req, res) => {
   const startTime = Date.now();
   
@@ -97,6 +97,8 @@ router.post('/', validateRegistration, async (req, res) => {
 
     // Générer un token de vérification
     const verificationToken = uuidv4();
+    
+    // Métadonnées enrichies avec les informations de la requête
     const enhancedMetadata = {
       ...metadata,
       registrationIp: ip,
@@ -104,12 +106,12 @@ router.post('/', validateRegistration, async (req, res) => {
       registrationTime: new Date().toISOString()
     };
 
-    // Insérer la nouvelle inscription
+    // Insérer la nouvelle inscription - REQUÊTE CORRIGÉE POUR LE SCHÉMA
     const result = await db.query(`
-      INSERT INTO registrations (email, ip_address, user_agent, source, metadata, verification_token, verification_sent_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO registrations (email, source, metadata, verification_token)
+      VALUES ($1, $2, $3, $4)
       RETURNING id, email, created_at, source
-    `, [email, ip, userAgent, source, JSON.stringify(enhancedMetadata), verificationToken, new Date()]);
+    `, [email, source, JSON.stringify(enhancedMetadata), verificationToken]);
 
     const newUser = result.rows[0];
 
@@ -166,7 +168,7 @@ router.post('/', validateRegistration, async (req, res) => {
   }
 });
 
-// GET /api/registrations/verify/:token - Vérifier un email
+// GET /registrations/verify/:token - Vérifier un email
 router.get('/verify/:token', async (req, res) => {
   try {
     const { token } = req.params;
@@ -233,7 +235,7 @@ router.get('/verify/:token', async (req, res) => {
   }
 });
 
-// POST /api/registrations/resend-verification - Renvoyer un email de vérification
+// POST /registrations/resend-verification - Renvoyer un email de vérification
 router.post('/resend-verification', [
   body('email').isEmail().normalizeEmail()
 ], async (req, res) => {
@@ -249,7 +251,7 @@ router.post('/resend-verification', [
     const { email } = req.body;
 
     const result = await db.query(
-      'SELECT id, is_verified, verification_attempts FROM registrations WHERE email = $1',
+      'SELECT id, is_verified FROM registrations WHERE email = $1',
       [email]
     );
 
@@ -266,20 +268,6 @@ router.post('/resend-verification', [
       return res.status(400).json({
         error: 'Cet email est déjà vérifié',
         code: 'ALREADY_VERIFIED'
-      });
-    }
-
-    // Limite du nombre de tentatives
-    if (user.verification_attempts >= 5) {
-      logger.logSecurity('Too many verification attempts', {
-        email,
-        attempts: user.verification_attempts,
-        ip: req.ip
-      });
-
-      return res.status(429).json({
-        error: 'Trop de tentatives de vérification. Contactez le support.',
-        code: 'TOO_MANY_ATTEMPTS'
       });
     }
 
@@ -310,7 +298,7 @@ router.post('/resend-verification', [
   }
 });
 
-// DELETE /api/registrations/unsubscribe/:email - Se désinscrire
+// DELETE /registrations/unsubscribe/:email - Se désinscrire
 router.delete('/unsubscribe/:email', async (req, res) => {
   try {
     const email = validator.normalizeEmail(req.params.email);
@@ -371,8 +359,7 @@ async function resendVerificationEmail(userId, email) {
   
   await db.query(`
     UPDATE registrations 
-    SET verification_token = $1, verification_sent_at = CURRENT_TIMESTAMP, 
-        verification_attempts = verification_attempts + 1
+    SET verification_token = $1, updated_at = CURRENT_TIMESTAMP
     WHERE id = $2
   `, [newToken, userId]);
 
