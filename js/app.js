@@ -1,1 +1,376 @@
-/**\n * App JavaScript modulaire\n * Point d'entrée principal pour l'application\n */\n\nimport { HeaderComponent } from './components/header.js';\nimport { FooterComponent } from './components/footer.js';\nimport { FormComponent } from './components/form.js';\nimport { componentLoader } from './components/loader.js';\n\nclass App {\n    constructor() {\n        this.components = {\n            header: null,\n            footer: null,\n            forms: new Map()\n        };\n        \n        this.init();\n    }\n\n    async init() {\n        try {\n            // Enregistrer les composants\n            this.registerComponents();\n            \n            // Charger les composants de base\n            await this.loadBaseComponents();\n            \n            // Initialiser la page spécifique\n            this.initPageSpecific();\n            \n            // Attacher les événements globaux\n            this.attachGlobalEventListeners();\n            \n            console.log('✅ MakeMeLearn - Application initialisée');\n        } catch (error) {\n            console.error('❌ Erreur lors de l\\'initialisation:', error);\n        }\n    }\n\n    registerComponents() {\n        componentLoader.register('header', HeaderComponent);\n        componentLoader.register('footer', FooterComponent);\n        componentLoader.register('form', FormComponent);\n    }\n\n    async loadBaseComponents() {\n        // Charger header et footer sur toutes les pages\n        this.components.header = await componentLoader.load('header', 'header-component');\n        this.components.footer = await componentLoader.load('footer', 'footer-component');\n    }\n\n    initPageSpecific() {\n        const currentPage = this.getCurrentPage();\n        \n        switch (currentPage) {\n            case 'index.html':\n            case '':\n                this.initHomePage();\n                break;\n            case 'contact.html':\n                this.initContactPage();\n                break;\n            case 'faq.html':\n                this.initFaqPage();\n                break;\n            case 'how-it-works.html':\n                this.initHowItWorksPage();\n                break;\n            case 'about.html':\n                this.initAboutPage();\n                break;\n            default:\n                console.log(`Page spécifique non configurée: ${currentPage}`);\n        }\n    }\n\n    getCurrentPage() {\n        const path = window.location.pathname;\n        return path.split('/').pop() || 'index.html';\n    }\n\n    initHomePage() {\n        console.log('🏠 Initialisation de la page d\\'accueil');\n        \n        // Formulaire d'inscription newsletter\n        const signupConfig = {\n            id: 'signupForm',\n            className: 'signup-form',\n            fields: [\n                {\n                    type: 'email',\n                    id: 'emailInput',\n                    name: 'email',\n                    placeholder: 'Votre adresse email',\n                    required: true,\n                    grouped: true\n                }\n            ],\n            submitButton: {\n                text: 'Rejoindre les pionniers',\n                loadingText: 'Inscription en cours...',\n                successText: 'Inscription confirmée !',\n                className: 'btn btn-primary',\n                icon: '<path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5 9.293 10.793a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z\" clip-rule=\"evenodd\" />'\n            },\n            onSubmit: async (data) => {\n                // Simuler l'envoi\n                await new Promise(resolve => setTimeout(resolve, 1500));\n                console.log('Newsletter signup:', data);\n            }\n        };\n\n        this.components.forms.set('signup', new FormComponent(signupConfig));\n        this.components.forms.get('signup').mount('#signupForm');\n\n        // Initialiser les animations et interactions spécifiques\n        this.initHomeAnimations();\n    }\n\n    initContactPage() {\n        console.log('📧 Initialisation de la page contact');\n        \n        const contactConfig = {\n            id: 'contactForm',\n            className: 'contact-form',\n            fields: [\n                {\n                    type: 'text',\n                    id: 'name',\n                    name: 'name',\n                    label: 'Nom',\n                    required: true\n                },\n                {\n                    type: 'email',\n                    id: 'email',\n                    name: 'email',\n                    label: 'Email',\n                    required: true\n                },\n                {\n                    type: 'select',\n                    id: 'subject',\n                    name: 'subject',\n                    label: 'Sujet',\n                    placeholder: 'Choisissez un sujet',\n                    required: true,\n                    options: [\n                        { value: 'question', text: 'Question générale' },\n                        { value: 'suggestion', text: 'Suggestion d\\'amélioration' },\n                        { value: 'partenariat', text: 'Partenariat' },\n                        { value: 'probleme', text: 'Signaler un problème' },\n                        { value: 'presse', text: 'Demande presse' },\n                        { value: 'autre', text: 'Autre' }\n                    ]\n                },\n                {\n                    type: 'textarea',\n                    id: 'message',\n                    name: 'message',\n                    label: 'Message',\n                    placeholder: 'Décrivez votre demande...',\n                    rows: 6,\n                    required: true\n                }\n            ],\n            submitButton: {\n                text: 'Envoyer le message',\n                loadingText: 'Envoi en cours...',\n                successText: 'Message envoyé !',\n                className: 'btn btn-primary',\n                icon: '<path d=\"M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z\"/><path d=\"M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z\"/>'\n            },\n            onSubmit: async (data) => {\n                // Simuler l'envoi\n                await new Promise(resolve => setTimeout(resolve, 2000));\n                console.log('Contact form submission:', data);\n            }\n        };\n\n        this.components.forms.set('contact', new FormComponent(contactConfig));\n        this.components.forms.get('contact').mount('#contactForm');\n    }\n\n    initFaqPage() {\n        console.log('❓ Initialisation de la page FAQ');\n        this.initFaqInteractions();\n    }\n\n    initHowItWorksPage() {\n        console.log('⚙️ Initialisation de la page Comment ça marche');\n        this.initFlowCardHovers();\n    }\n\n    initAboutPage() {\n        console.log('ℹ️ Initialisation de la page À propos');\n        this.initStatHovers();\n    }\n\n    initHomeAnimations() {\n        // Observer pour les animations d'entrée\n        const observerOptions = {\n            threshold: 0.1,\n            rootMargin: '0px 0px -50px 0px'\n        };\n\n        const observer = new IntersectionObserver((entries) => {\n            entries.forEach(entry => {\n                if (entry.isIntersecting) {\n                    entry.target.classList.add('fade-in');\n                }\n            });\n        }, observerOptions);\n\n        // Observer les éléments animables\n        document.querySelectorAll('.feature-card, .process-step, .stat-item').forEach(el => {\n            observer.observe(el);\n        });\n    }\n\n    initFaqInteractions() {\n        document.querySelectorAll('.faq-item').forEach(item => {\n            item.addEventListener('click', () => {\n                item.style.transform = 'scale(1.02)';\n                setTimeout(() => {\n                    item.style.transform = 'scale(1)';\n                }, 200);\n            });\n        });\n    }\n\n    initFlowCardHovers() {\n        const flowCards = document.querySelectorAll('.flow-card');\n        flowCards.forEach(card => {\n            card.addEventListener('mouseenter', () => {\n                card.style.borderColor = 'rgba(102, 126, 234, 0.4)';\n            });\n            \n            card.addEventListener('mouseleave', () => {\n                card.style.borderColor = 'rgba(255, 255, 255, 0.08)';\n            });\n        });\n    }\n\n    initStatHovers() {\n        document.querySelectorAll('.stat-item').forEach(stat => {\n            stat.addEventListener('mouseenter', () => {\n                stat.style.transform = 'scale(1.05) translateY(-5px)';\n                stat.style.transition = 'all 0.3s ease';\n            });\n            \n            stat.addEventListener('mouseleave', () => {\n                stat.style.transform = 'scale(1) translateY(0)';\n            });\n        });\n    }\n\n    attachGlobalEventListeners() {\n        // Smooth scrolling pour les liens d'ancrage\n        document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {\n            anchor.addEventListener('click', (e) => {\n                e.preventDefault();\n                const target = document.querySelector(anchor.getAttribute('href'));\n                if (target) {\n                    target.scrollIntoView({\n                        behavior: 'smooth',\n                        block: 'start'\n                    });\n                }\n            });\n        });\n\n        // Gestion du focus clavier\n        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Tab') {\n                document.body.classList.add('keyboard-nav');\n            }\n        });\n\n        document.addEventListener('mousedown', () => {\n            document.body.classList.remove('keyboard-nav');\n        });\n\n        // Escape pour fermer les modales/overlays\n        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Escape') {\n                const activeElement = document.activeElement;\n                if (activeElement && activeElement.blur) {\n                    activeElement.blur();\n                }\n            }\n        });\n    }\n}\n\n// Initialiser l'application quand le DOM est prêt\ndocument.addEventListener('DOMContentLoaded', () => {\n    new App();\n});\n\n// Performance monitoring\nif ('performance' in window) {\n    window.addEventListener('load', () => {\n        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;\n        console.log(`⚡ Page chargée en ${loadTime}ms`);\n    });\n}
+/**
+ * App JavaScript modulaire
+ * Point d'entrée principal pour l'application
+ */
+
+import { HeaderComponent } from '../components/header.js';
+import { FooterComponent } from '../components/footer.js';
+import { FormComponent } from '../components/form.js';
+import { componentLoader } from '../components/loader.js';
+
+class App {
+    constructor() {
+        this.components = {
+            header: null,
+            footer: null,
+            forms: new Map()
+        };
+        
+        this.init();
+    }
+
+    async init() {
+        try {
+            // Enregistrer les composants
+            this.registerComponents();
+            
+            // Charger les composants de base
+            await this.loadBaseComponents();
+            
+            // Initialiser la page spécifique
+            this.initPageSpecific();
+            
+            // Attacher les événements globaux
+            this.attachGlobalEventListeners();
+            
+            console.log('✅ MakeMeLearn - Application initialisée');
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'initialisation:', error);
+        }
+    }
+
+    registerComponents() {
+        componentLoader.register('header', HeaderComponent);
+        componentLoader.register('footer', FooterComponent);
+        componentLoader.register('form', FormComponent);
+    }
+
+    async loadBaseComponents() {
+        // Charger header et footer sur toutes les pages
+        this.components.header = await componentLoader.load('header', 'header-component');
+        this.components.footer = await componentLoader.load('footer', 'footer-component');
+    }
+
+    initPageSpecific() {
+        const currentPage = this.getCurrentPage();
+        
+        switch (currentPage) {
+            case 'index.html':
+            case 'index-modular.html':
+            case '':
+                this.initHomePage();
+                break;
+            case 'contact.html':
+            case 'contact-modular.html':
+                this.initContactPage();
+                break;
+            case 'faq.html':
+                this.initFaqPage();
+                break;
+            case 'how-it-works.html':
+                this.initHowItWorksPage();
+                break;
+            case 'about.html':
+                this.initAboutPage();
+                break;
+            case 'test-components.html':
+                this.initTestPage();
+                break;
+            default:
+                console.log(`Page spécifique non configurée: ${currentPage}`);
+        }
+    }
+
+    getCurrentPage() {
+        const path = window.location.pathname;
+        return path.split('/').pop() || 'index.html';
+    }
+
+    initHomePage() {
+        console.log('🏠 Initialisation de la page d\'accueil');
+        
+        // Formulaire d'inscription newsletter
+        const signupConfig = {
+            id: 'signupForm',
+            className: 'signup-form',
+            fields: [
+                {
+                    type: 'email',
+                    id: 'emailInput',
+                    name: 'email',
+                    placeholder: 'Votre adresse email',
+                    required: true,
+                    grouped: true
+                }
+            ],
+            submitButton: {
+                text: 'Rejoindre les pionniers',
+                loadingText: 'Inscription en cours...',
+                successText: 'Inscription confirmée !',
+                className: 'btn btn-primary',
+                icon: '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5 9.293 10.793a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />'
+            },
+            onSubmit: async (data) => {
+                // Simuler l'envoi
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                console.log('Newsletter signup:', data);
+            }
+        };
+
+        this.components.forms.set('signup', new FormComponent(signupConfig));
+        this.components.forms.get('signup').mount('#signupForm');
+
+        // Initialiser les animations et interactions spécifiques
+        this.initHomeAnimations();
+    }
+
+    initContactPage() {
+        console.log('📧 Initialisation de la page contact');
+        
+        const contactConfig = {
+            id: 'contactForm',
+            className: 'contact-form',
+            fields: [
+                {
+                    type: 'text',
+                    id: 'name',
+                    name: 'name',
+                    label: 'Nom',
+                    required: true
+                },
+                {
+                    type: 'email',
+                    id: 'email',
+                    name: 'email',
+                    label: 'Email',
+                    required: true
+                },
+                {
+                    type: 'select',
+                    id: 'subject',
+                    name: 'subject',
+                    label: 'Sujet',
+                    placeholder: 'Choisissez un sujet',
+                    required: true,
+                    options: [
+                        { value: 'question', text: 'Question générale' },
+                        { value: 'suggestion', text: 'Suggestion d\'amélioration' },
+                        { value: 'partenariat', text: 'Partenariat' },
+                        { value: 'probleme', text: 'Signaler un problème' },
+                        { value: 'presse', text: 'Demande presse' },
+                        { value: 'autre', text: 'Autre' }
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    id: 'message',
+                    name: 'message',
+                    label: 'Message',
+                    placeholder: 'Décrivez votre demande...',
+                    rows: 6,
+                    required: true
+                }
+            ],
+            submitButton: {
+                text: 'Envoyer le message',
+                loadingText: 'Envoi en cours...',
+                successText: 'Message envoyé !',
+                className: 'btn btn-primary',
+                icon: '<path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>'
+            },
+            onSubmit: async (data) => {
+                // Simuler l'envoi
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                console.log('Contact form submission:', data);
+            }
+        };
+
+        this.components.forms.set('contact', new FormComponent(contactConfig));
+        this.components.forms.get('contact').mount('#contactForm');
+    }
+
+    initTestPage() {
+        console.log('🧪 Initialisation de la page de test');
+        
+        // Formulaire de test simple pour la page de test
+        const testConfig = {
+            id: 'testForm',
+            className: 'form',
+            fields: [
+                {
+                    type: 'text',
+                    id: 'testName',
+                    name: 'name',
+                    label: 'Nom de test',
+                    required: true
+                },
+                {
+                    type: 'email',
+                    id: 'testEmail',
+                    name: 'email',
+                    label: 'Email de test',
+                    required: true
+                }
+            ],
+            submitButton: {
+                text: 'Tester',
+                loadingText: 'Test en cours...',
+                successText: 'Test réussi !',
+                className: 'btn btn-primary'
+            },
+            onSubmit: async (data) => {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.log('Test form submission:', data);
+                
+                // Mettre à jour le statut du test
+                const statusElement = document.getElementById('form-status');
+                if (statusElement) {
+                    statusElement.textContent = '✅ Formulaire testé avec succès';
+                    statusElement.className = 'status success';
+                }
+            }
+        };
+
+        setTimeout(() => {
+            this.components.forms.set('test', new FormComponent(testConfig));
+            this.components.forms.get('test').mount('#testForm');
+            
+            // Mettre à jour le statut
+            const statusElement = document.getElementById('form-status');
+            if (statusElement) {
+                statusElement.textContent = '✅ Formulaire de test chargé';
+                statusElement.className = 'status success';
+            }
+        }, 500);
+    }
+
+    initFaqPage() {
+        console.log('❓ Initialisation de la page FAQ');
+        this.initFaqInteractions();
+    }
+
+    initHowItWorksPage() {
+        console.log('⚙️ Initialisation de la page Comment ça marche');
+        this.initFlowCardHovers();
+    }
+
+    initAboutPage() {
+        console.log('ℹ️ Initialisation de la page À propos');
+        this.initStatHovers();
+    }
+
+    initHomeAnimations() {
+        // Observer pour les animations d'entrée
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    // Pour les nouvelles classes d'animation
+                    if (entry.target.classList.contains('fade-in-up')) {
+                        entry.target.classList.add('visible');
+                    }
+                    if (entry.target.classList.contains('scale-in')) {
+                        entry.target.classList.add('visible');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observer les éléments animables
+        document.querySelectorAll('.feature-card, .process-step, .stat-item, .fade-in-up, .scale-in').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    initFaqInteractions() {
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    item.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    }
+
+    initFlowCardHovers() {
+        const flowCards = document.querySelectorAll('.flow-card');
+        flowCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = 'rgba(102, 126, 234, 0.4)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            });
+        });
+    }
+
+    initStatHovers() {
+        document.querySelectorAll('.stat-item').forEach(stat => {
+            stat.addEventListener('mouseenter', () => {
+                stat.style.transform = 'scale(1.05) translateY(-5px)';
+                stat.style.transition = 'all 0.3s ease';
+            });
+            
+            stat.addEventListener('mouseleave', () => {
+                stat.style.transform = 'scale(1) translateY(0)';
+            });
+        });
+    }
+
+    attachGlobalEventListeners() {
+        // Smooth scrolling pour les liens d'ancrage
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Gestion du focus clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-nav');
+            }
+        });
+
+        document.addEventListener('mousedown', () => {
+            document.body.classList.remove('keyboard-nav');
+        });
+
+        // Escape pour fermer les modales/overlays
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const activeElement = document.activeElement;
+                if (activeElement && activeElement.blur) {
+                    activeElement.blur();
+                }
+            }
+        });
+    }
+}
+
+// Initialiser l'application quand le DOM est prêt
+document.addEventListener('DOMContentLoaded', () => {
+    new App();
+});
+
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', () => {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        console.log(`⚡ Page chargée en ${loadTime}ms`);
+    });
+}
