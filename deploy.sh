@@ -43,7 +43,7 @@ check_requirements() {
         error "Docker n'est pas démarré"
     fi
 
-    # Vérifier que docker-compose est disponible
+    # Vérifier que docker compose est disponible
     if ! command -v docker compose &> /dev/null; then
         error "docker compose n'est pas installé"
     fi
@@ -63,13 +63,13 @@ backup_current() {
     cd "$PROJECT_DIR"
 
     # Créer un backup de la base de données si elle existe
-    if docker-compose ps | grep -q "makemelearn_api"; then
+    if docker compose ps | grep -q "makemelearn_api"; then
         log "Sauvegarde de la base de données..."
         # Ajouter ici la commande de backup de votre DB si nécessaire
     fi
 
     # Sauvegarder les containers actuels
-    docker-compose down --remove-orphans
+    docker compose down --remove-orphans
 
     log "✅ Sauvegarde terminée"
 }
@@ -102,8 +102,8 @@ deploy_containers() {
     cd "$PROJECT_DIR"
 
     # Construire et démarrer les containers
-    docker-compose pull
-    docker-compose up -d --build
+    docker compose pull
+    docker compose up -d --build
 
     log "✅ Containers déployés"
 }
@@ -116,7 +116,7 @@ verify_deployment() {
     sleep 15
 
     # Vérifier que les containers sont en cours d'exécution
-    if ! docker-compose ps | grep -q "Up"; then
+    if ! docker compose ps | grep -q "Up"; then
         error "Les containers ne sont pas démarrés correctement"
     fi
 
@@ -142,7 +142,7 @@ verify_deployment() {
 
     # Vérifier les logs pour des erreurs
     log "Vérification des logs..."
-    if docker-compose logs --tail=50 | grep -i "error\|fatal"; then
+    if docker compose logs --tail=50 | grep -i "error\|fatal"; then
         warn "Des erreurs ont été détectées dans les logs"
     fi
 
