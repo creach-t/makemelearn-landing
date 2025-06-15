@@ -6,7 +6,7 @@
 set -e  # Exit on any error
 
 # Configuration
-PROJECT_DIR="/path/to/your/makemelearn-landing"
+PROJECT_DIR="$HOME/projects/makemelearn-landing"
 DOMAIN="makemelearn.fr"
 COMPOSE_FILE="docker-compose.yml"
 
