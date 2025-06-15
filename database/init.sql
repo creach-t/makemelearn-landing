@@ -1,33 +1,41 @@
--- Création de la base de données MakeMeLearn
--- Script d'initialisation PostgreSQL
+-- Script d'initialisation de la base de données MakeMeLearn
+-- Ce script est exécuté automatiquement lors de la création du container PostgreSQL
 
--- Extension pour UUID
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Table des inscriptions anticipées
+-- Création de la table des inscriptions
 CREATE TABLE IF NOT EXISTS registrations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(255) NOT NULL UNIQUE,
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    source VARCHAR(100) DEFAULT 'website',
+    metadata JSONB DEFAULT '{}',
+    is_verified BOOLEAN DEFAULT false,
+    verification_token VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    ip_address INET,
-    user_agent TEXT,
-    source VARCHAR(100) DEFAULT 'landing_page',
-    is_verified BOOLEAN DEFAULT FALSE,
-    verification_token VARCHAR(255),
-    verification_sent_at TIMESTAMP WITH TIME ZONE,
-    verification_attempts INTEGER DEFAULT 0,
-    unsubscribed_at TIMESTAMP WITH TIME ZONE,
-    metadata JSONB DEFAULT '{}'::jsonb
+    unsubscribed_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
--- Index pour optimiser les recherches
+-- Création d'index pour optimiser les performances
 CREATE INDEX IF NOT EXISTS idx_registrations_email ON registrations(email);
-CREATE INDEX IF NOT EXISTS idx_registrations_created_at ON registrations(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_registrations_verified ON registrations(is_verified);
+CREATE INDEX IF NOT EXISTS idx_registrations_created_at ON registrations(created_at);
 CREATE INDEX IF NOT EXISTS idx_registrations_source ON registrations(source);
+CREATE INDEX IF NOT EXISTS idx_registrations_is_verified ON registrations(is_verified);
+CREATE INDEX IF NOT EXISTS idx_registrations_unsubscribed ON registrations(unsubscribed_at) WHERE unsubscribed_at IS NULL;
 
--- Fonction pour mettre à jour updated_at automatiquement
+-- Création de la table des statistiques
+CREATE TABLE IF NOT EXISTS stats (
+    id SERIAL PRIMARY KEY,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value INTEGER DEFAULT 0,
+    date DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(metric_name, date)
+);
+
+-- Index pour les statistiques
+CREATE INDEX IF NOT EXISTS idx_stats_metric_date ON stats(metric_name, date);
+CREATE INDEX IF NOT EXISTS idx_stats_date ON stats(date);
+
+-- Fonction pour mettre à jour automatiquement updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -36,103 +44,79 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Trigger pour mettre à jour updated_at
-CREATE TRIGGER update_registrations_updated_at 
-    BEFORE UPDATE ON registrations 
-    FOR EACH ROW 
+-- Trigger pour mettre à jour updated_at automatiquement
+DROP TRIGGER IF EXISTS update_registrations_updated_at ON registrations;
+CREATE TRIGGER update_registrations_updated_at
+    BEFORE UPDATE ON registrations
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Table des statistiques (pour tracking anonyme)
-CREATE TABLE IF NOT EXISTS stats (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    date DATE NOT NULL DEFAULT CURRENT_DATE,
-    metric_name VARCHAR(100) NOT NULL,
-    metric_value INTEGER DEFAULT 0,
-    metadata JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Index pour les stats
-CREATE UNIQUE INDEX IF NOT EXISTS idx_stats_date_metric ON stats(date, metric_name);
-
--- Fonction pour incrémenter les stats
-CREATE OR REPLACE FUNCTION increment_stat(
-    metric VARCHAR(100),
-    increment_by INTEGER DEFAULT 1,
-    stat_date DATE DEFAULT CURRENT_DATE
-)
-RETURNS VOID AS $$
+-- Fonction pour incrémenter les statistiques
+CREATE OR REPLACE FUNCTION increment_stat(stat_name VARCHAR(100), increment_value INTEGER DEFAULT 1)
+RETURNS void AS $$
 BEGIN
-    INSERT INTO stats (date, metric_name, metric_value)
-    VALUES (stat_date, metric, increment_by)
-    ON CONFLICT (date, metric_name)
+    INSERT INTO stats (metric_name, metric_value, date)
+    VALUES (stat_name, increment_value, CURRENT_DATE)
+    ON CONFLICT (metric_name, date)
     DO UPDATE SET 
-        metric_value = stats.metric_value + increment_by,
-        updated_at = CURRENT_TIMESTAMP;
+        metric_value = stats.metric_value + increment_value,
+        created_at = CURRENT_TIMESTAMP;
 END;
 $$ language 'plpgsql';
 
--- Vues utiles pour les statistiques
+-- Vue pour les statistiques d'inscription
 CREATE OR REPLACE VIEW registration_stats AS
 SELECT 
     DATE(created_at) as date,
     COUNT(*) as daily_registrations,
     COUNT(*) FILTER (WHERE is_verified = true) as verified_registrations,
-    COUNT(DISTINCT SUBSTRING(email FROM '@(.*)$')) as unique_domains
+    COUNT(DISTINCT source) as unique_sources
 FROM registrations 
+WHERE unsubscribed_at IS NULL
 GROUP BY DATE(created_at)
 ORDER BY date DESC;
 
--- Vue pour les tendances hebdomadaires
-CREATE OR REPLACE VIEW weekly_stats AS
-SELECT 
-    DATE_TRUNC('week', created_at) as week_start,
-    COUNT(*) as weekly_registrations,
-    COUNT(*) FILTER (WHERE is_verified = true) as weekly_verified,
-    COUNT(DISTINCT source) as sources_count
-FROM registrations 
-GROUP BY DATE_TRUNC('week', created_at)
-ORDER BY week_start DESC;
+-- Insertion de quelques statistiques par défaut
+INSERT INTO stats (metric_name, metric_value, date) VALUES 
+    ('page_views', 0, CURRENT_DATE),
+    ('api_calls', 0, CURRENT_DATE),
+    ('registrations', 0, CURRENT_DATE)
+ON CONFLICT (metric_name, date) DO NOTHING;
 
--- Insertion de données initiales pour les stats
-INSERT INTO stats (date, metric_name, metric_value, metadata) VALUES
-(CURRENT_DATE, 'page_views', 0, '{"description": "Vues de la page d\'accueil"}'),
-(CURRENT_DATE, 'signup_attempts', 0, '{"description": "Tentatives d\'inscription"}'),
-(CURRENT_DATE, 'signup_success', 0, '{"description": "Inscriptions réussies"}'),
-(CURRENT_DATE, 'unique_visitors', 0, '{"description": "Visiteurs uniques estimés"}')
-ON CONFLICT (date, metric_name) DO NOTHING;
-
--- Politique de nettoyage automatique (optionnel)
--- Supprimer les inscriptions non vérifiées après 90 jours
-CREATE OR REPLACE FUNCTION cleanup_old_unverified_registrations()
-RETURNS INTEGER AS $$
-DECLARE
-    deleted_count INTEGER;
+-- Fonction de nettoyage des anciennes données (à exécuter périodiquement)
+CREATE OR REPLACE FUNCTION cleanup_old_data()
+RETURNS void AS $$
 BEGIN
+    -- Nettoyer les statistiques de plus de 1 an
+    DELETE FROM stats 
+    WHERE date < CURRENT_DATE - INTERVAL '1 year';
+    
+    -- Nettoyer les tokens de vérification expirés (plus de 7 jours)
+    UPDATE registrations 
+    SET verification_token = NULL 
+    WHERE verification_token IS NOT NULL 
+    AND created_at < CURRENT_TIMESTAMP - INTERVAL '7 days';
+    
+    -- Supprimer définitivement les inscriptions désabonnées depuis plus de 30 jours
     DELETE FROM registrations 
-    WHERE is_verified = false 
-    AND created_at < (CURRENT_TIMESTAMP - INTERVAL '90 days');
-    
-    GET DIAGNOSTICS deleted_count = ROW_COUNT;
-    
-    -- Log du nettoyage
-    INSERT INTO stats (date, metric_name, metric_value, metadata)
-    VALUES (CURRENT_DATE, 'cleanup_deleted', deleted_count, '{"description": "Nettoyage automatique"}')
-    ON CONFLICT (date, metric_name) 
-    DO UPDATE SET metric_value = stats.metric_value + deleted_count;
-    
-    RETURN deleted_count;
+    WHERE unsubscribed_at IS NOT NULL 
+    AND unsubscribed_at < CURRENT_TIMESTAMP - INTERVAL '30 days';
 END;
 $$ language 'plpgsql';
 
--- Commentaires pour documentation
-COMMENT ON TABLE registrations IS 'Table des inscriptions anticipées pour MakeMeLearn';
-COMMENT ON COLUMN registrations.email IS 'Adresse email unique de l''utilisateur';
-COMMENT ON COLUMN registrations.metadata IS 'Données supplémentaires en format JSON (préférences, origine, etc.)';
-COMMENT ON COLUMN registrations.source IS 'Source de l''inscription (landing_page, social_media, etc.)';
+-- Commentaires sur les tables
+COMMENT ON TABLE registrations IS 'Table des inscriptions anticipées à MakeMeLearn';
+COMMENT ON TABLE stats IS 'Table des statistiques diverses de la plateforme';
+COMMENT ON COLUMN registrations.source IS 'Source de l''inscription (landing_page, social, etc.)';
+COMMENT ON COLUMN registrations.metadata IS 'Métadonnées JSON avec informations additionnelles';
+COMMENT ON COLUMN registrations.verification_token IS 'Token pour vérifier l''email (si implémenté)';
 
-COMMENT ON TABLE stats IS 'Table des statistiques générales de la plateforme';
-COMMENT ON FUNCTION increment_stat IS 'Fonction pour incrémenter une métrique de façon atomique';
-
--- Affichage des tables créées
-\dt
+-- Affichage du résumé de l'initialisation
+DO $$
+BEGIN
+    RAISE NOTICE '✅ Base de données MakeMeLearn initialisée avec succès';
+    RAISE NOTICE '📊 Tables créées: registrations, stats';
+    RAISE NOTICE '🔧 Fonctions créées: increment_stat, cleanup_old_data';
+    RAISE NOTICE '📈 Vue créée: registration_stats';
+    RAISE NOTICE '🌐 Prêt pour makemelearn.fr';
+END $$;
