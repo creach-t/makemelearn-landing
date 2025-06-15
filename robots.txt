@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://creach-t.github.io/makemelearn-landing/sitemap.xml
+Sitemap: https://makemelearn.fr/sitemap.xml
 
 # Crawl delay (optional)
 Crawl-delay: 1
