@@ -13,10 +13,10 @@ export class FooterComponent {
             {
                 title: 'MakeMeLearn',
                 links: [
-                    { href: 'index.html', text: 'Accueil' },
-                    { href: 'about.html', text: 'À propos' },
-                    { href: 'how-it-works.html', text: 'Comment ça marche' },
-                    { href: 'faq.html', text: 'FAQ' }
+                    { href: 'index-modular.html', text: 'Accueil' },
+                    { href: 'about-modular.html', text: 'À propos' },
+                    { href: 'how-it-works-modular.html', text: 'Comment ça marche' },
+                    { href: 'faq-modular.html', text: 'FAQ' }
                 ]
             },
             {
@@ -31,14 +31,14 @@ export class FooterComponent {
             {
                 title: 'Légal',
                 links: [
-                    { href: 'terms.html', text: 'Conditions d\'utilisation' },
-                    { href: 'privacy.html', text: 'Politique de confidentialité' }
+                    { href: 'terms-modular.html', text: 'Conditions d\'utilisation' },
+                    { href: 'privacy-modular.html', text: 'Politique de confidentialité' }
                 ]
             },
             {
                 title: 'Contact',
                 links: [
-                    { href: 'contact.html', text: 'Nous contacter' },
+                    { href: 'contact-modular.html', text: 'Nous contacter' },
                     { href: 'mailto:hello@makemelearn.fr', text: 'hello@makemelearn.fr', external: true }
                 ]
             }
