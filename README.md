@@ -16,6 +16,7 @@ MakeMeLearn est une communauté d'autodidactes créatifs qui s'entraident gratui
 **Version** : 1.0.0 - **Production Ready** 🚀
 
 ### Dernières Corrections (Juin 2025)
+
 - ✅ **Routes API** : Correction du routing Traefik (/api/ -> routes internes)
 - ✅ **Base de données** : Fix du schéma PostgreSQL pour les inscriptions
 - ✅ **CI/CD** : Mise à jour des tests pour les nouvelles routes
@@ -23,6 +24,7 @@ MakeMeLearn est une communauté d'autodidactes créatifs qui s'entraident gratui
 - ✅ **Analytics** : Tracking des événements utilisateur opérationnel
 
 ### Tests de Fonctionnalité
+
 ```bash
 # ✅ Frontend accessible
 curl https://makemelearn.fr
@@ -39,6 +41,7 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 ## ✨ Fonctionnalités Complètes
 
 ### Frontend
+
 - **Design Modern** : Interface sombre avec gradients et effets visuels
 - **Multi-pages** : Site complet avec navigation (Accueil, À propos, FAQ, Contact, etc.)
 - **Responsive** : Optimisé pour tous les appareils
@@ -49,6 +52,7 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 - **Analytics intégré** : Tracking en temps réel des événements utilisateur
 
 ### Backend API
+
 - **Inscriptions** : Système complet d'enregistrement d'emails ✅ FONCTIONNEL
 - **Base de données** : PostgreSQL avec schéma optimisé ✅ OPÉRATIONNEL
 - **Sécurité** : Rate limiting, validation, headers sécurisés
@@ -58,6 +62,7 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 - **Email** : Préparé pour la vérification d'emails (à implémenter)
 
 ### Infrastructure
+
 - **Docker** : Containerisation complète ✅ DÉPLOYÉ
 - **Traefik** : Reverse proxy avec SSL automatique ✅ CONFIGURÉ
 - **PostgreSQL** : Base de données avec initialisation automatique ✅ FONCTIONNEL
@@ -67,12 +72,14 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 ## 🛠️ Technologies
 
 ### Frontend
+
 - **HTML5** : Structure sémantique moderne
 - **CSS3** : Flexbox, Grid, animations, variables CSS
 - **JavaScript ES6+** : Interactions et API integration ✅ MODERNE
 - **Google Fonts** : Police Inter pour une typographie moderne
 
 ### Backend
+
 - **Node.js** : Runtime JavaScript serveur
 - **Express.js** : Framework web rapide et minimaliste
 - **PostgreSQL** : Base de données relationnelle robuste
@@ -81,6 +88,7 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 - **Rate Limiting** : Protection contre les abus
 
 ### Infrastructure
+
 - **Docker & Docker Compose** : Containerisation
 - **Traefik** : Reverse proxy et load balancer
 - **Nginx** : Serveur web haute performance
@@ -92,12 +100,12 @@ curl -X POST https://makemelearn.fr/api/registrations -H "Content-Type: applicat
 makemelearn-landing/
 ├── 🌐 Frontend
 │   ├── index.html              # Page d'accueil avec formulaire d'inscription
-│   ├── about.html              # À propos
-│   ├── how-it-works.html       # Fonctionnement
-│   ├── faq.html                # Questions fréquentes
-│   ├── contact.html            # Contact
-│   ├── terms.html              # Conditions d'utilisation
-│   ├── privacy.html            # Politique de confidentialité
+│   ├── pages/about.html              # À propos
+│   ├── pages/how-it-works.html       # Fonctionnement
+│   ├── pages/faq.html                # Questions fréquentes
+│   ├── pages/contact.html            # Contact
+│   ├── pages/terms.html              # Conditions d'utilisation
+│   ├── pages/privacy.html            # Politique de confidentialité
 │   ├── style.css               # Styles et animations
 │   ├── script.js               # JavaScript avec intégration API ✅ FONCTIONNEL
 │   ├── sitemap.xml             # Plan du site
@@ -184,6 +192,7 @@ docker run -d --name postgres \
 ## 🎯 Pages et Contenu
 
 ### 🏠 Page d'Accueil (`index.html`)
+
 - Hero section avec proposition de valeur
 - Processus en 4 étapes
 - Fonctionnalités principales
@@ -191,36 +200,42 @@ docker run -d --name postgres \
 - Vision et mission
 - **✅ Formulaire d'inscription fonctionnel avec API backend**
 
-### ℹ️ À Propos (`about.html`)
+### ℹ️ À Propos (`pages/about.html`)
+
 - Histoire du projet
 - Mission et valeurs
 - Équipe
 - Statistiques clés
 
-### ⚙️ Comment ça marche (`how-it-works.html`)
+### ⚙️ Comment ça marche (`pages/how-it-works.html`)
+
 - Deux types de demandes expliqués
 - Processus détaillé étape par étape
 - Exemples concrets
 - Règles de la communauté
 
-### ❓ FAQ (`faq.html`)
+### ❓ FAQ (`pages/faq.html`)
+
 - 12 questions fréquentes
 - Réponses détaillées
 - Call-to-action vers contact
 
-### 📞 Contact (`contact.html`)
+### 📞 Contact (`pages/contact.html`)
+
 - Formulaire de contact complet
 - Informations de contact
 - Temps de réponse
 - Réseaux sociaux
 
 ### 📋 Pages Légales
+
 - **Conditions d'utilisation** : Règles, projets autorisés/interdits
 - **Politique de confidentialité** : Conforme RGPD
 
 ## 🔗 API Endpoints ✅ TOUS FONCTIONNELS
 
 ### Architecture Routing
+
 ```
 Frontend Call → Traefik → API Container
 /api/health   → strip /api → /health
@@ -229,18 +244,21 @@ Frontend Call → Traefik → API Container
 ```
 
 ### Inscriptions
+
 - `POST /api/registrations` - Créer une inscription ✅ OPÉRATIONNEL
 - `GET /api/registrations/verify/:token` - Vérifier un email
 - `POST /api/registrations/resend-verification` - Renvoyer vérification
 - `DELETE /api/registrations/unsubscribe/:email` - Se désinscrire
 
 ### Statistiques ✅ TRACKING ACTIF
+
 - `GET /api/stats/public` - Statistiques publiques ✅ FONCTIONNEL
 - `GET /api/stats/growth` - Données de croissance
 - `POST /api/stats/track` - Tracker un événement ✅ ACTIF
   - Events trackés : `page_load`, `section_viewed`, `button_click`, `signup_success`
 
 ### Monitoring ✅ HEALTH CHECKS ACTIFS
+
 - `GET /api/health` - Health check simple ✅ RÉPOND "healthy"
 - `GET /api/health/detailed` - Health check détaillé
 - `GET /api/health/metrics` - Métriques Prometheus
@@ -250,6 +268,7 @@ Frontend Call → Traefik → API Container
 ## 📊 Voir les Inscriptions
 
 ### Option 1 : Base de données directe
+
 ```bash
 # Connexion à PostgreSQL
 docker-compose exec postgres psql -U makemelearn_user -d makemelearn
@@ -259,6 +278,7 @@ SELECT id, email, source, is_verified, created_at FROM registrations ORDER BY cr
 ```
 
 ### Option 2 : API Statistics
+
 ```bash
 # Stats publiques (anonymisées)
 curl https://makemelearn.fr/api/stats/public
@@ -268,6 +288,7 @@ curl https://makemelearn.fr/api/stats/growth
 ```
 
 ### Option 3 : Dashboard Admin (à implémenter)
+
 - Interface web pour voir les inscriptions
 - Filtres par source, date, statut
 - Statistiques en temps réel
@@ -276,16 +297,19 @@ curl https://makemelearn.fr/api/stats/growth
 ## 🎨 Design System
 
 ### Couleurs
+
 - **Primaire** : `#667eea` → `#764ba2` (Gradient)
 - **Secondaire** : `#f093fb`
 - **Fond** : `#0B1426`
 - **Texte** : `#ffffff` avec variations d'opacité
 
 ### Typographie
+
 - **Font** : Inter (400, 500, 600, 700, 800, 900)
 - **Échelle** : Responsive avec `clamp()`
 
 ### Composants
+
 - Cards avec hover effects
 - Boutons avec animations
 - Formulaires interactifs avec API ✅ FONCTIONNELS
@@ -302,6 +326,7 @@ curl https://makemelearn.fr/api/stats/growth
 ## ⚡ Optimisations
 
 ### Performance Frontend
+
 - CSS organisé et modulaire
 - JavaScript avec API moderne (Fetch) ✅ INTÉGRÉ
 - Images SVG optimisées
@@ -309,6 +334,7 @@ curl https://makemelearn.fr/api/stats/growth
 - Intersection Observer pour animations ✅ TRACKING SECTIONS
 
 ### Performance Backend
+
 - Connection pooling PostgreSQL ✅ CONFIGURÉ
 - Rate limiting intelligent ✅ ACTIF
 - Compression gzip
@@ -316,6 +342,7 @@ curl https://makemelearn.fr/api/stats/growth
 - Logging asynchrone ✅ WINSTON
 
 ### SEO & Accessibilité
+
 - Meta tags descriptifs sur toutes les pages
 - Structure HTML sémantique
 - Contraste suffisant (WCAG)
@@ -325,12 +352,14 @@ curl https://makemelearn.fr/api/stats/growth
 ## 🔒 Sécurité
 
 ### Frontend
+
 - Headers de sécurité (CSP, HSTS, etc.)
 - Validation côté client ✅ ACTIVE
 - Sanitisation des entrées
 - Protection XSS
 
 ### Backend ✅ SÉCURISÉ
+
 - Rate limiting par IP ✅ CONFIGURÉ
 - Validation avec express-validator ✅ ACTIF
 - Headers sécurisés avec Helmet ✅ DÉPLOYÉ
@@ -341,6 +370,7 @@ curl https://makemelearn.fr/api/stats/growth
 ## 📊 Analytics & Monitoring ✅ OPÉRATIONNEL
 
 ### Tracking Frontend ✅ ACTIF
+
 - Événements utilisateur (clics, navigation, sections vues)
 - Performance de chargement
 - Erreurs JavaScript
@@ -348,6 +378,7 @@ curl https://makemelearn.fr/api/stats/growth
 - Inscriptions réussies/échouées
 
 ### Monitoring Backend ✅ FONCTIONNEL
+
 - Health checks automatiques
 - Métriques base de données
 - Logs structurés avec Winston
@@ -355,23 +386,25 @@ curl https://makemelearn.fr/api/stats/growth
 - Tracking API calls
 
 ### Événements Trackés
+
 ```javascript
 // Événements automatiques
-'page_load'           // Chargement de page
-'section_viewed'      // Sections vues (scroll)
-'page_performance'    // Temps de chargement
+"page_load"; // Chargement de page
+"section_viewed"; // Sections vues (scroll)
+"page_performance"; // Temps de chargement
 
 // Événements d'interaction
-'button_join_community'    // Clic inscription
-'button_contact'          // Clic contact
-'button_discover_concept' // Clic découvrir
-'signup_success'         // Inscription réussie
-'signup_error'          // Erreur inscription
+"button_join_community"; // Clic inscription
+"button_contact"; // Clic contact
+"button_discover_concept"; // Clic découvrir
+"signup_success"; // Inscription réussie
+"signup_error"; // Erreur inscription
 ```
 
 ## 🔧 Configuration
 
 ### Variables d'Environnement
+
 ```env
 NODE_ENV=production
 DATABASE_URL=postgresql://user:pass@host:port/db
@@ -383,6 +416,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 ```
 
 ### Routing Traefik ✅ CONFIGURÉ
+
 ```yaml
 # Frontend: makemelearn.fr → Nginx container
 # API: makemelearn.fr/api/* → API container (strip /api prefix)
@@ -391,6 +425,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 ## 🚀 Déploiement Production ✅ OPÉRATIONNEL
 
 Le projet est déployé et fonctionnel :
+
 - **Frontend** : https://makemelearn.fr ✅ ACCESSIBLE
 - **API** : https://makemelearn.fr/api/ ✅ FONCTIONNELLE
 - **Base de données** : PostgreSQL container ✅ OPÉRATIONNELLE
@@ -398,11 +433,12 @@ Le projet est déployé et fonctionnel :
 - **Monitoring** : Health checks ✅ OPÉRATIONNELS
 
 ### Services Docker Actifs
+
 ```bash
 # Vérifier l'état
 docker-compose ps
 # ✅ postgres    Up (healthy)
-# ✅ api         Up (healthy)  
+# ✅ api         Up (healthy)
 # ✅ frontend    Up (healthy)
 ```
 
@@ -411,6 +447,7 @@ Consultez le [Guide de Déploiement](DEPLOYMENT.md) pour plus de détails.
 ## 📈 Roadmap
 
 ### Phase 1 (Actuelle) ✅ COMPLÈTE
+
 - [x] Landing page complète
 - [x] API d'inscription fonctionnelle
 - [x] Base de données PostgreSQL opérationnelle
@@ -420,6 +457,7 @@ Consultez le [Guide de Déploiement](DEPLOYMENT.md) pour plus de détails.
 - [x] Correction des routes API et schéma DB
 
 ### Phase 2 (Prochainement)
+
 - [ ] Vérification d'emails par SMTP
 - [ ] Dashboard admin pour voir les inscriptions
 - [ ] API de contact fonctionnelle
@@ -427,6 +465,7 @@ Consultez le [Guide de Déploiement](DEPLOYMENT.md) pour plus de détails.
 - [ ] Analytics avancées avec graphiques
 
 ### Phase 3 (Futur)
+
 - [ ] Authentification utilisateurs
 - [ ] Profils autodidactes
 - [ ] Système de projets
@@ -436,15 +475,19 @@ Consultez le [Guide de Déploiement](DEPLOYMENT.md) pour plus de détails.
 ## 🛠️ Dernières Corrections Techniques
 
 ### Problèmes Résolus (Juin 2025)
+
 1. **Routes API 404** ✅ RÉSOLU
+
    - Problème : Double préfixe `/api/` (Traefik strip + routes Express)
    - Solution : Routes Express sans préfixe `/api`
 
 2. **Inscriptions 500 Error** ✅ RÉSOLU
+
    - Problème : Incompatibilité schéma DB vs code API
    - Solution : Mise à jour registrations.js pour correspondre au schéma
 
 3. **CI/CD Tests** ✅ CORRIGÉ
+
    - Problème : Tests avec anciennes routes
    - Solution : Mise à jour tests pour nouvelles routes
 
@@ -486,6 +529,7 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 - **Monitoring** : ✅ Health Checks | ✅ Analytics | ✅ Logging
 
 ### Tests de Fonctionnement
+
 ```bash
 # Tous ces tests passent ✅
 curl https://makemelearn.fr                          # 200 OK

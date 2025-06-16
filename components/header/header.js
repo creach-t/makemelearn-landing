@@ -22,24 +22,24 @@ export class HeaderComponent {
         active: ["index.html", "index.html", ""],
       },
       {
-        href: "about-modular.html",
+        href: "pages/about.html",
         text: "À propos",
-        active: ["about.html", "about-modular.html"],
+        active: ["pages/about.html", "pages/about.html"],
       },
       {
-        href: "how-it-works-modular.html",
+        href: "pages/how-it-works.html",
         text: "Comment ça marche",
-        active: ["how-it-works.html", "how-it-works-modular.html"],
+        active: ["pages/how-it-works.html", "pages/how-it-works.html"],
       },
       {
-        href: "faq-modular.html",
+        href: "pages/faq.html",
         text: "FAQ",
-        active: ["faq.html", "faq-modular.html"],
+        active: ["pages/faq.html", "pages/faq.html"],
       },
       {
-        href: "contact-modular.html",
+        href: "pages/contact.html",
         text: "Contact",
-        active: ["contact.html", "contact-modular.html"],
+        active: ["pages/contact.html", "pages/contact.html"],
       },
     ];
   }
