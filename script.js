@@ -129,10 +129,10 @@ if (signupForm) {
     });
 }
 
-// Contact form (keeping original simulation for now)
+// Contact form with real API integration
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const formData = {
@@ -155,11 +155,30 @@ if (contactForm) {
             `;
             button.disabled = true;
 
-            // Track contact form submission
-            trackEvent('contact_form_submit', formData);
+            try {
+                // Track contact form submission attempt
+                trackEvent('contact_form_submit', formData);
 
-            // Simulate form submission
-            setTimeout(() => {
+                // Real API call to send email
+                const result = await apiRequest('/contact', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: formData.name,
+                        email: formData.email,
+                        subject: formData.subject,
+                        message: formData.message,
+                        metadata: {
+                            page: window.location.pathname,
+                            referrer: document.referrer,
+                            userAgent: navigator.userAgent,
+                            language: navigator.language,
+                            timestamp: new Date().toISOString(),
+                            source: 'landing_contact_form'
+                        }
+                    })
+                });
+
+                // Success state
                 button.innerHTML = `
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5 9.293 10.793a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
@@ -168,7 +187,15 @@ if (contactForm) {
                 `;
                 button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
 
+                // Show success notification
                 showNotification('Message envoyé avec succès ! Nous vous répondrons sous 24-48h.', 'success');
+
+                // Track successful contact form submission
+                trackEvent('contact_form_success', { 
+                    subject: formData.subject, 
+                    email: formData.email,
+                    message_id: result.messageId || 'unknown'
+                });
 
                 // Reset form and button
                 setTimeout(() => {
@@ -177,7 +204,46 @@ if (contactForm) {
                     button.disabled = false;
                     contactForm.reset();
                 }, 3000);
-            }, 2000);
+
+            } catch (error) {
+                console.error('Contact form error:', error);
+
+                // Error state
+                button.innerHTML = `
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    Erreur d'envoi
+                `;
+                button.style.background = 'linear-gradient(120deg, #EF4444, #DC2626)';
+
+                // Show error message with more specific feedback
+                let errorMessage = 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer ou nous contacter directement à hello@makemelearn.fr';
+                
+                if (error.message.includes('rate limit') || error.message.includes('trop de requêtes')) {
+                    errorMessage = 'Trop de messages envoyés récemment. Veuillez patienter quelques minutes avant de réessayer.';
+                } else if (error.message.includes('validation') || error.message.includes('invalide')) {
+                    errorMessage = 'Veuillez vérifier que tous les champs sont correctement remplis.';
+                } else if (error.message.includes('network') || error.message.includes('fetch')) {
+                    errorMessage = 'Problème de connexion. Vérifiez votre connexion internet et réessayez.';
+                }
+
+                showNotification(errorMessage, 'error');
+
+                // Track failed contact form submission
+                trackEvent('contact_form_error', { 
+                    error: error.message, 
+                    subject: formData.subject,
+                    email: formData.email 
+                });
+
+                // Reset button
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.style.background = 'linear-gradient(120deg, #667eea, #764ba2)';
+                    button.disabled = false;
+                }, 3000);
+            }
         }
     });
 }
