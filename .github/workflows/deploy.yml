@@ -339,20 +339,57 @@ jobs:
               exit 1
             fi
             
-            # Vérifier que les champs requis sont présents
-            required_fields=("name" "email" "subject" "message")
-            missing_fields=()
+            # 🚀 ARCHITECTURE MODULAIRE: Nouveau test adapté à l'injection JS
+            echo "🔍 Vérification de l'architecture modulaire du formulaire..."
             
-            for field in "${required_fields[@]}"; do
-              if ! grep -q "id=\"$field\"" pages/contact.html; then
-                missing_fields+=("$field")
+            # Vérifier que le script d'initialisation est inclus
+            if grep -q "contact-form-init.js" pages/contact.html; then
+              echo "✅ Script d'initialisation du formulaire trouvé"
+              
+              # Vérifier que le script d'initialisation existe
+              if [ -f "js/contact-form-init.js" ]; then
+                echo "✅ Fichier contact-form-init.js trouvé"
+                
+                # Vérifier que le script crée les champs requis
+                required_fields=("name" "email" "subject" "message")
+                missing_fields=()
+                
+                for field in "${required_fields[@]}"; do
+                  if ! grep -q "id=\"$field\"" js/contact-form-init.js; then
+                    missing_fields+=("$field")
+                  fi
+                done
+                
+                if [ ${#missing_fields[@]} -eq 0 ]; then
+                  echo "✅ Tous les champs requis trouvés dans le script d'initialisation"
+                else
+                  echo "❌ Champs manquants dans contact-form-init.js: ${missing_fields[*]}"
+                  exit 1
+                fi
+                
+                # Vérifier la configuration du composant
+                if [ -f "components/form/contact-form.js" ]; then
+                  echo "✅ Configuration du composant de formulaire trouvée"
+                  
+                  # Vérifier que la configuration contient les champs requis
+                  for field in "${required_fields[@]}"; do
+                    if ! grep -q "\"$field\"" components/form/contact-form.js; then
+                      echo "❌ Champ $field manquant dans la configuration du composant"
+                      exit 1
+                    fi
+                  done
+                  echo "✅ Configuration du composant validée"
+                else
+                  echo "⚠️ Fichier de configuration du composant non trouvé (utilisation du fallback)"
+                fi
+                
+              else
+                echo "❌ Fichier contact-form-init.js manquant"
+                exit 1
               fi
-            done
-            
-            if [ ${#missing_fields[@]} -eq 0 ]; then
-              echo "✅ Tous les champs requis trouvés dans le formulaire"
+              
             else
-              echo "❌ Champs manquants: ${missing_fields[*]}"
+              echo "❌ Script d'initialisation du formulaire non inclus dans contact.html"
               exit 1
             fi
             
