@@ -12,6 +12,7 @@ const db = require('./config/database');
 const registrationRoutes = require('./routes/registrations');
 const statsRoutes = require('./routes/stats');
 const healthRoutes = require('./routes/health');
+const contactRoutes = require('./routes/contact');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { requestLogger } = require('./middleware/requestLogger');
 
@@ -23,7 +24,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = process.env.CORS_ORIGIN 
       ? process.env.CORS_ORIGIN.split(',')
-      : ['https://makemelearn.fr', 'https://inscription.makemelearn.fr'];
+      : ['https://makemelearn.fr', 'https://inscription.makemelearn.fr', 'https://creach-t.github.io'];
     
     // Permettre les requêtes sans origin (ex: Postman, curl)
     if (!origin) return callback(null, true);
@@ -71,6 +72,19 @@ const registrationLimiter = rateLimit({
   }
 });
 
+// Rate limiting spécifique pour le contact
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: parseInt(process.env.RATE_LIMIT_CONTACT) || 5, // Maximum 5 messages par heure par IP
+  message: {
+    error: 'Trop de messages envoyés récemment. Veuillez patienter une heure avant de réessayer.',
+    code: 'CONTACT_LIMIT_EXCEEDED'
+  },
+  keyGenerator: (req) => {
+    return `contact_${req.ip}`;
+  }
+});
+
 // Middlewares de sécurité
 app.use(helmet({
   contentSecurityPolicy: {
@@ -104,7 +118,7 @@ app.use(limiter);
 
 // Headers personnalisés
 app.use((req, res, next) => {
-  res.setHeader('X-API-Version', '1.0.0');
+  res.setHeader('X-API-Version', '1.1.0');
   res.setHeader('X-Powered-By', 'MakeMeLearn');
   next();
 });
@@ -113,17 +127,25 @@ app.use((req, res, next) => {
 app.use('/health', healthRoutes);
 app.use('/registrations', registrationLimiter, registrationRoutes);
 app.use('/stats', statsRoutes);
+app.use('/contact', contactLimiter, contactRoutes);
 
 // Route racine avec informations API
 app.get('/', (req, res) => {
   res.json({
     name: 'MakeMeLearn API',
-    version: '1.0.0',
-    description: 'API pour la gestion des inscriptions anticipées',
+    version: '1.1.0',
+    description: 'API complète pour MakeMeLearn - Newsletter, Contact et Analytics',
     endpoints: {
       health: '/health',
       registrations: '/registrations',
-      stats: '/stats'
+      stats: '/stats',
+      contact: '/contact'
+    },
+    features: {
+      newsletter: 'enabled',
+      contact_form: 'enabled',
+      analytics: 'enabled',
+      email_service: process.env.EMAIL_PROVIDER || 'nodemailer'
     },
     documentation: 'https://makemelearn.fr/api-docs',
     support: 'hello@makemelearn.fr',
@@ -157,7 +179,9 @@ async function startServer() {
       logger.info(`🚀 Serveur MakeMeLearn API démarré sur le port ${PORT}`);
       logger.info(`🌍 Environnement: ${process.env.NODE_ENV}`);
       logger.info(`📊 Base de données: ${process.env.DATABASE_URL ? 'Configurée' : 'Non configurée'}`);
+      logger.info(`📧 Email provider: ${process.env.EMAIL_PROVIDER || 'nodemailer'}`);
       logger.info(`🔒 CORS origins: ${process.env.CORS_ORIGIN || 'Défaut'}`);
+      logger.info('📋 Routes disponibles: /health, /registrations, /stats, /contact');
       logger.info('📋 Routes configurées sans préfixe /api (Traefik stripprefix)');
     });
   } catch (error) {
