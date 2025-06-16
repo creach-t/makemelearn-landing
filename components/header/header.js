@@ -6,6 +6,7 @@
 export class HeaderComponent {
   constructor() {
     this.currentPage = this.getCurrentPage();
+    this.isInSubfolder = this.checkIfInSubfolder();
   }
 
   getCurrentPage() {
@@ -14,32 +15,45 @@ export class HeaderComponent {
     return page === "" ? "index.html" : page;
   }
 
+  checkIfInSubfolder() {
+    const path = window.location.pathname;
+    // Vérifie si on est dans le dossier pages/ ou un sous-dossier
+    return path.includes('/pages/') || path.split('/').length > 2;
+  }
+
+  getBasePath() {
+    // Si on est dans un sous-dossier, remonter d'un niveau
+    return this.isInSubfolder ? '../' : '';
+  }
+
   getNavItems() {
+    const basePath = this.getBasePath();
+    
     return [
       {
-        href: "index.html",
+        href: `${basePath}index.html`,
         text: "Accueil",
-        active: ["index.html", "index.html", ""],
+        active: ["index.html", ""],
       },
       {
-        href: "pages/about.html",
+        href: `${basePath}pages/about.html`,
         text: "À propos",
-        active: ["pages/about.html", "pages/about.html"],
+        active: ["about.html"],
       },
       {
-        href: "pages/how-it-works.html",
+        href: `${basePath}pages/how-it-works.html`,
         text: "Comment ça marche",
-        active: ["pages/how-it-works.html", "pages/how-it-works.html"],
+        active: ["how-it-works.html"],
       },
       {
-        href: "pages/faq.html",
+        href: `${basePath}pages/faq.html`,
         text: "FAQ",
-        active: ["pages/faq.html", "pages/faq.html"],
+        active: ["faq.html"],
       },
       {
-        href: "pages/contact.html",
+        href: `${basePath}pages/contact.html`,
         text: "Contact",
-        active: ["pages/contact.html", "pages/contact.html"],
+        active: ["contact.html"],
       },
     ];
   }
@@ -55,12 +69,17 @@ export class HeaderComponent {
       .join("");
   }
 
+  renderLogo() {
+    const basePath = this.getBasePath();
+    return `<a href="${basePath}index.html">MakeMeLearn</a>`;
+  }
+
   render() {
     return `
             <header>
                 <nav class="container">
                     <div class="logo">
-                        <a href="index.html">MakeMeLearn</a>
+                        ${this.renderLogo()}
                     </div>
                     <ul class="nav-links">
                         ${this.renderNavLinks()}
