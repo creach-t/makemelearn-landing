@@ -6,17 +6,31 @@
 export class FooterComponent {
   constructor() {
     this.currentYear = new Date().getFullYear();
+    this.isInSubfolder = this.checkIfInSubfolder();
+  }
+
+  checkIfInSubfolder() {
+    const path = window.location.pathname;
+    // Vérifie si on est dans le dossier pages/ ou un sous-dossier
+    return path.includes('/pages/') || path.split('/').length > 2;
+  }
+
+  getBasePath() {
+    // Si on est dans un sous-dossier, remonter d'un niveau
+    return this.isInSubfolder ? '../' : '';
   }
 
   getFooterSections() {
+    const basePath = this.getBasePath();
+    
     return [
       {
         title: "MakeMeLearn",
         links: [
-          { href: "index.html", text: "Accueil" },
-          { href: "pages/about.html", text: "À propos" },
-          { href: "pages/how-it-works.html", text: "Comment ça marche" },
-          { href: "pages/faq.html", text: "FAQ" },
+          { href: `${basePath}index.html`, text: "Accueil" },
+          { href: `${basePath}pages/about.html`, text: "À propos" },
+          { href: `${basePath}pages/how-it-works.html`, text: "Comment ça marche" },
+          { href: `${basePath}pages/faq.html`, text: "FAQ" },
         ],
       },
       {
@@ -35,14 +49,14 @@ export class FooterComponent {
       {
         title: "Légal",
         links: [
-          { href: "pages/terms.html", text: "Conditions d'utilisation" },
-          { href: "pages/privacy.html", text: "Politique de confidentialité" },
+          { href: `${basePath}pages/terms.html`, text: "Conditions d'utilisation" },
+          { href: `${basePath}pages/privacy.html`, text: "Politique de confidentialité" },
         ],
       },
       {
         title: "Contact",
         links: [
-          { href: "pages/contact.html", text: "Nous contacter" },
+          { href: `${basePath}pages/contact.html`, text: "Nous contacter" },
           {
             href: "mailto:hello@makemelearn.fr",
             text: "hello@makemelearn.fr",
