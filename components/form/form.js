@@ -236,9 +236,8 @@ export class FormComponent {
 
   setLoadingState(loading) {
     this.isSubmitting = loading;
-    const button = document.querySelector(
-      `#${this.formId} button[type="submit"]`
-    );
+    const container = document.getElementById(this.formId);
+    const button = container?.querySelector('button[type="submit"]');
     const buttonText = button?.querySelector(".button-text");
 
     if (button && buttonText) {
@@ -255,9 +254,8 @@ export class FormComponent {
   }
 
   setSuccessState() {
-    const button = document.querySelector(
-      `#${this.formId} button[type="submit"]`
-    );
+    const container = document.getElementById(this.formId);
+    const button = container?.querySelector('button[type="submit"]');
     const buttonText = button?.querySelector(".button-text");
 
     if (button && buttonText) {
@@ -278,11 +276,16 @@ export class FormComponent {
   }
 
   resetForm() {
-    const form = document.getElementById(this.formId);
+    // Chercher le conteneur puis le form à l'intérieur
+    const container = document.getElementById(this.formId);
+    const form = container?.querySelector("form");
     const button = form?.querySelector('button[type="submit"]');
     const buttonText = button?.querySelector(".button-text");
 
-    if (form) form.reset();
+    if (form) {
+      form.reset();
+    }
+
     if (button && buttonText) {
       buttonText.textContent = this.config.submitButton.text;
       button.style.background = "";
