@@ -16,11 +16,31 @@ export class HeaderComponent {
 
     getNavItems() {
         return [
-            { href: 'index.html', text: 'Accueil', active: ['index.html', ''] },
-            { href: 'about.html', text: 'À propos', active: ['about.html'] },
-            { href: 'how-it-works.html', text: 'Comment ça marche', active: ['how-it-works.html'] },
-            { href: 'faq.html', text: 'FAQ', active: ['faq.html'] },
-            { href: 'contact.html', text: 'Contact', active: ['contact.html'] }
+            { 
+                href: 'index-modular.html', 
+                text: 'Accueil', 
+                active: ['index.html', 'index-modular.html', ''] 
+            },
+            { 
+                href: 'about-modular.html', 
+                text: 'À propos', 
+                active: ['about.html', 'about-modular.html'] 
+            },
+            { 
+                href: 'how-it-works-modular.html', 
+                text: 'Comment ça marche', 
+                active: ['how-it-works.html', 'how-it-works-modular.html'] 
+            },
+            { 
+                href: 'faq-modular.html', 
+                text: 'FAQ', 
+                active: ['faq.html', 'faq-modular.html'] 
+            },
+            { 
+                href: 'contact-modular.html', 
+                text: 'Contact', 
+                active: ['contact.html', 'contact-modular.html'] 
+            }
         ];
     }
 
@@ -38,7 +58,7 @@ export class HeaderComponent {
             <header>
                 <nav class="container">
                     <div class="logo">
-                        <a href="index.html">MakeMeLearn</a>
+                        <a href="index-modular.html">MakeMeLearn</a>
                     </div>
                     <ul class="nav-links">
                         ${this.renderNavLinks()}
@@ -79,6 +99,14 @@ export class HeaderComponent {
                 navLinks?.classList.remove('active');
                 mobileToggle?.classList.remove('active');
             });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('nav') && navLinks?.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileToggle?.classList.remove('active');
+            }
         });
     }
 }
