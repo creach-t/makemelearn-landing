@@ -51,21 +51,38 @@ const signupLimiter = rateLimit({
 // ===== EMAIL CONFIGURATION =====
 let emailService;
 
-if (process.env.EMAIL_PROVIDER === 'sendgrid') {
-  const sgMail = require('@sendgrid/mail');
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  emailService = sgMail;
-} else {
-  const nodemailer = require('nodemailer');
-  emailService = nodemailer.createTransporter({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
+try {
+  if (process.env.EMAIL_PROVIDER === 'sendgrid') {
+    const sgMail = require('@sendgrid/mail');
+    
+    if (!process.env.SENDGRID_API_KEY) {
+      console.warn('⚠️  SENDGRID_API_KEY not found. Contact form will not work properly.');
+    } else {
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      emailService = sgMail;
+      console.log('✅ SendGrid email service initialized');
     }
-  });
+  } else {
+    const nodemailer = require('nodemailer');
+    
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn('⚠️  SMTP credentials not found. Contact form will not work properly.');
+    } else {
+      emailService = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT) || 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+      console.log('✅ SMTP email service initialized');
+    }
+  }
+} catch (error) {
+  console.error('❌ Email service initialization failed:', error.message);
+  console.log('📧 Contact form will return errors until email is configured');
 }
 
 // ===== EMAIL TEMPLATES =====
@@ -204,6 +221,10 @@ function generateContactEmailTemplate(data) {
 
 // ===== EMAIL SENDING FUNCTION =====
 async function sendContactEmail(data) {
+  if (!emailService) {
+    throw new Error('Service email non configuré. Veuillez configurer SENDGRID_API_KEY ou SMTP credentials.');
+  }
+
   const emailHtml = generateContactEmailTemplate(data);
   
   if (process.env.EMAIL_PROVIDER === 'sendgrid') {
@@ -295,16 +316,17 @@ const registrationValidation = [
 // ===== API ROUTES =====
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    email_service: emailService ? 'configured' : 'not configured'
   });
 });
 
 // Contact form endpoint
-app.post('/api/contact', contactLimiter, contactValidation, async (req, res) => {
+app.post('/contact', contactLimiter, contactValidation, async (req, res) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
@@ -338,15 +360,26 @@ app.post('/api/contact', contactLimiter, contactValidation, async (req, res) => 
   } catch (error) {
     console.error('Contact form error:', error);
     
+    let errorMessage = 'Erreur lors de l\'envoi du message';
+    
+    // Provide more specific error messages
+    if (error.message.includes('Service email non configuré')) {
+      errorMessage = 'Service email temporairement indisponible. Veuillez réessayer plus tard ou nous contacter directement.';
+    } else if (error.message.includes('Invalid API key')) {
+      errorMessage = 'Configuration email incorrecte. Veuillez contacter l\'administrateur.';
+    } else if (error.message.includes('Authentication failed')) {
+      errorMessage = 'Erreur d\'authentification email. Veuillez réessayer plus tard.';
+    }
+    
     res.status(500).json({
-      error: 'Erreur lors de l\'envoi du message',
+      error: errorMessage,
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
 
 // Newsletter signup endpoint (placeholder)
-app.post('/api/registrations', signupLimiter, registrationValidation, async (req, res) => {
+app.post('/registrations', signupLimiter, registrationValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -379,7 +412,7 @@ app.post('/api/registrations', signupLimiter, registrationValidation, async (req
 });
 
 // Analytics tracking endpoint (placeholder)
-app.post('/api/stats/track', async (req, res) => {
+app.post('/stats/track', async (req, res) => {
   try {
     const { event, value, metadata } = req.body;
     
@@ -413,6 +446,11 @@ app.listen(PORT, () => {
   console.log(`🚀 MakeMeLearn API Server running on port ${PORT}`);
   console.log(`📧 Email provider: ${process.env.EMAIL_PROVIDER || 'nodemailer'}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  if (!emailService) {
+    console.log('⚠️  Warning: Email service not configured. Contact form will not work.');
+    console.log('   Configure SENDGRID_API_KEY or SMTP credentials in .env file');
+  }
 });
 
 module.exports = app;
