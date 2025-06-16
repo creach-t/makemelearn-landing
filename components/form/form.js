@@ -142,9 +142,15 @@ export class FormComponent {
   }
 
   attachEventListeners() {
-    const form = document.getElementById(this.formId);
+    const container = document.getElementById(this.formId);
+    const form = container?.querySelector("form");
+
     if (form) {
       form.addEventListener("submit", (e) => this.handleSubmit(e));
+    } else {
+      console.error(
+        `FormComponent: Cannot find form inside container "${this.formId}"`
+      );
     }
   }
 
