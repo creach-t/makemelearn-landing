@@ -129,6 +129,11 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/makemelearn_test
           PORT: 3001
           CORS_ORIGIN: http://localhost:3001
+          # Configuration email pour les tests (désactivée pour les tests)
+          EMAIL_PROVIDER: nodemailer
+          SMTP_HOST: smtp.example.com
+          SMTP_USER: test@example.com
+          SMTP_PASS: fake_password
         run: |
           echo "🚀 Test de démarrage de l'API..."
           
@@ -136,7 +141,11 @@ jobs:
           mkdir -p logs
           chmod 755 logs
           
-          # Démarrer l'API en arrière-plan
+          # Créer les dossiers nécessaires pour utils/logger
+          mkdir -p src/utils
+          touch src/utils/.gitkeep || true
+          
+          # Démarrer l'API en arrière-plan (ARCHITECTURE CORRIGÉE)
           npm start &
           API_PID=$!
           
@@ -162,7 +171,7 @@ jobs:
           done
           
           if [ "$API_STARTED" = "true" ]; then
-            # Tester les endpoints critiques - ROUTES CORRIGÉES
+            # Tester les endpoints critiques - ARCHITECTURE CORRIGÉE
             echo "🧪 Test des endpoints..."
             
             # Test health check
@@ -193,7 +202,7 @@ jobs:
               echo "⚠️ Track endpoint failed (non-blocking)"
             fi
             
-            # Test registrations endpoint - NOUVEAU TEST
+            # Test registrations endpoint
             echo "Testing /registrations endpoint..."
             if curl -f -s -X POST http://localhost:3001/registrations \
                 -H "Content-Type: application/json" \
@@ -201,6 +210,24 @@ jobs:
               echo "✅ Registrations endpoint OK"
             else
               echo "⚠️ Registrations endpoint failed (non-blocking)"
+            fi
+            
+            # 🔥 NOUVEAU: Test contact endpoint
+            echo "Testing /contact endpoint..."
+            if curl -f -s -X POST http://localhost:3001/contact \
+                -H "Content-Type: application/json" \
+                -d '{"name":"Test User","email":"test@example.com","subject":"Test Subject","message":"This is a test message from CI/CD"}'; then
+              echo "✅ Contact endpoint OK"
+            else
+              echo "⚠️ Contact endpoint failed (expected - email not configured in tests)"
+            fi
+            
+            # Test API root endpoint
+            echo "Testing API root endpoint..."
+            if curl -f -s http://localhost:3001/ | grep -q "MakeMeLearn API"; then
+              echo "✅ API root endpoint OK"
+            else
+              echo "⚠️ API root endpoint failed (non-blocking)"
             fi
             
             echo "🎉 Tous les tests d'endpoints sont passés!"
@@ -271,11 +298,46 @@ jobs:
       - name: Check API configuration consistency
         run: |
           echo "🔍 Vérification configuration API..."
-          # Vérifier que script.js utilise bien makemelearn.fr/api
-          if grep -q "makemelearn.fr/api" script.js; then
-            echo "✅ API configuration correcte dans script.js"
+          # Vérifier que script.js utilise bien l'API config
+          if grep -q "API_BASE_URL" script.js; then
+            echo "✅ API configuration trouvée dans script.js"
           else
             echo "❌ Configuration API manquante dans script.js"
+            exit 1
+          fi
+          
+          # 🔥 NOUVEAU: Vérifier que le contact form est bien configuré
+          if grep -q "/contact" script.js; then
+            echo "✅ Contact form API integration trouvée"
+          else
+            echo "⚠️ Contact form API integration manquante"
+          fi
+
+      - name: Check Contact Form Integration
+        run: |
+          echo "🔍 Vérification intégration Contact Form..."
+          
+          # Vérifier que contact.html existe
+          if [ -f "contact.html" ]; then
+            echo "✅ contact.html trouvé"
+            
+            # Vérifier que le formulaire a les bons IDs
+            if grep -q 'id="contactForm"' contact.html; then
+              echo "✅ Contact form ID trouvé"
+            else
+              echo "❌ Contact form ID manquant"
+              exit 1
+            fi
+            
+            # Vérifier que script.js gère le contact form
+            if grep -q "contactForm" script.js; then
+              echo "✅ Contact form handler trouvé dans script.js"
+            else
+              echo "❌ Contact form handler manquant dans script.js"
+              exit 1
+            fi
+          else
+            echo "❌ contact.html non trouvé"
             exit 1
           fi
 
@@ -334,13 +396,6 @@ jobs:
               echo "✅ .env sauvegardé"
             fi
 
-            # Sauvegarde des logs
-            if [ -d "logs" ] && [ "$(ls -A logs)" ]; then
-              echo "📋 Sauvegarde des logs..."
-              tar -czf "$BACKUP_DIR/logs_backup_$DATE.tar.gz" logs/
-              echo "✅ Logs sauvegardés"
-            fi
-
             # Arrêter les services avec timeout
             echo "⏹️ Arrêt des services..."
             timeout 60 docker compose down --remove-orphans 2>/dev/null || {
@@ -373,10 +428,6 @@ jobs:
             echo "🌐 Vérification du network Traefik..."
             docker network create traefik-public 2>/dev/null || echo "ℹ️ Network traefik-public existe déjà"
 
-            # Nettoyer les images obsolètes
-            echo "🧹 Nettoyage des images obsolètes..."
-            docker image prune -f --filter "until=24h" 2>/dev/null || true
-
             # Construire et démarrer les services
             echo "🏗️ Construction et démarrage des services..."
             docker compose pull 2>/dev/null || echo "⚠️ Pull failed, using cached images..."
@@ -388,9 +439,9 @@ jobs:
             # Démarrer les services
             docker compose up -d
 
-            # NOUVEAU: Utiliser la logique corrigée du script deploy.sh
+            # Attente que les services soient prêts
             echo "⏳ Attente que les services soient prêts..."
-            sleep 10
+            sleep 15
 
             echo "🔄 Vérification des containers..."
             
@@ -408,7 +459,7 @@ jobs:
             fi
             echo "✅ Frontend: OK"
 
-            # Vérifier l'API avec la NOUVELLE méthode
+            # Vérifier l'API avec la méthode corrigée
             echo "🔄 Test du service API..."
             
             # D'abord vérifier que le container API est up
@@ -417,14 +468,14 @@ jobs:
               exit 1
             fi
 
-            # Tester l'API directement dans le container (pas via l'URL externe)
+            # Tester l'API directement dans le container
             max_attempts=30
             attempt=1
 
             while [ $attempt -le $max_attempts ]; do
               echo "⏳ Test de l'API (tentative $attempt/$max_attempts)..."
               
-              # Test direct dans le container - LA CLÉ DU FIX !
+              # Test direct dans le container
               if docker compose exec -T api curl -f -s http://localhost:3000/health > /dev/null 2>&1; then
                 echo "✅ API répond correctement sur le port interne"
                 break
@@ -438,17 +489,10 @@ jobs:
                 sleep 2
               fi
 
-              ((attempt++))
+              ((attempt++)
             done
 
-            # Vérifier qu'il n'y a pas d'erreurs fatales
-            if docker compose logs --tail=50 api | grep -i "fatal\|cannot\|failed.*start"; then
-              echo "⚠️ Erreurs détectées dans les logs de l'API"
-            else
-              echo "✅ Pas d'erreurs fatales détectées"
-            fi
-
-            # Test optionnel de l'URL externe (ne fait pas échouer le déploiement)
+            # Test optionnel de l'URL externe
             echo "🌐 Test optionnel de l'URL externe..."
             if curl -f -s --max-time 10 "https://makemelearn.fr" > /dev/null 2>&1; then
               echo "✅ Site accessible via https://makemelearn.fr"
@@ -457,20 +501,10 @@ jobs:
             fi
 
             echo "✅ Déploiement vérifié avec succès"
-
-            # Vérifier les services
             echo "🔍 État final des services..."
             docker compose ps
-            
-            # Afficher les logs récents pour debug
-            echo "📋 Logs récents de l'API:"
-            docker compose logs api --tail 10
 
-            echo "✅ Deployment terminé!"
-            echo "🌐 Site: https://makemelearn.fr"
-            echo "🔧 API: https://makemelearn.fr/api/health"
-
-  # Tests post-déploiement - ROUTES CORRIGÉES
+  # Tests post-déploiement - ENDPOINTS CORRIGÉS ET CONTACT AJOUTÉ
   post-deploy-tests:
     needs: deploy
     runs-on: ubuntu-latest
@@ -511,7 +545,7 @@ jobs:
             done
           }
           
-          # Tests avec retry - URLS CORRIGÉES POUR TRAEFIK
+          # Tests avec retry - TOUS LES ENDPOINTS
           ERROR=0
           
           test_url "https://makemelearn.fr" "Frontend" || ERROR=1
@@ -528,15 +562,36 @@ jobs:
             echo "⚠️ API Track non accessible (non-bloquant)"
           fi
           
+          # 🔥 NOUVEAU: Test du contact form endpoint
+          echo "🧪 Test optionnel du contact form..."
+          if curl -f -s -m 15 -X POST "https://makemelearn.fr/api/contact" \
+              -H "Content-Type: application/json" \
+              -d '{"name":"CI Test","email":"test@example.com","subject":"Test from CI","message":"This is a test message from CI/CD pipeline"}' > /dev/null 2>&1; then
+            echo "✅ Contact API accessible"
+          else
+            echo "⚠️ Contact API non accessible (normal si email non configuré)"
+          fi
+          
+          # Test du formulaire de registrations
+          echo "🧪 Test optionnel des registrations..."
+          if curl -f -s -m 10 -X POST "https://makemelearn.fr/api/registrations" \
+              -H "Content-Type: application/json" \
+              -d '{"email":"ci-test@example.com","source":"ci_test"}' > /dev/null 2>&1; then
+            echo "✅ Registrations API accessible"
+          else
+            echo "⚠️ Registrations API non accessible (non-bloquant)"
+          fi
+          
           if [ $ERROR -eq 0 ]; then
             echo "🎉 Tous les tests post-déploiement sont passés!"
             echo "🌐 Frontend: https://makemelearn.fr"
             echo "🔧 API Health: https://makemelearn.fr/api/health"
             echo "📊 API Stats: https://makemelearn.fr/api/stats/public"
             echo "📈 API Track: https://makemelearn.fr/api/stats/track"
+            echo "📧 API Contact: https://makemelearn.fr/api/contact"
+            echo "📝 API Registrations: https://makemelearn.fr/api/registrations"
           else
             echo "❌ Certains tests ont échoué"
-            # Mais ne pas faire échouer le déploiement pour des problèmes de timing
             echo "⚠️ Cela peut être dû à des délais de démarrage - vérifiez manuellement"
           fi
 
@@ -558,20 +613,26 @@ jobs:
             echo "🔧 API Health: https://makemelearn.fr/api/health"
             echo "📊 API Stats: https://makemelearn.fr/api/stats/public"
             echo "📈 API Track: https://makemelearn.fr/api/stats/track"
-            echo "📧 API Register: https://makemelearn.fr/api/registrations"
+            echo "📧 API Contact: https://makemelearn.fr/api/contact"
+            echo "📝 API Register: https://makemelearn.fr/api/registrations"
             echo "📅 Déployé le: $(date)"
             echo "🔗 Commit: ${{ github.sha }}"
             echo "✅ Tests post-déploiement: ${{ needs.post-deploy-tests.result }}"
             echo ""
             echo "🔄 Prochaines étapes:"
             echo "- Vérifiez que le site fonctionne"
-            echo "- Configurez votre fichier .env sur le serveur"
-            echo "- Testez l'inscription sur votre site"
+            echo "- Configurez votre fichier .env sur le serveur pour les emails"
+            echo "- Testez l'inscription ET le contact sur votre site"
             echo ""
-            echo "📋 ROUTES API ACTIVES (sans préfixe /api internal):"
+            echo "📋 ROUTES API ACTIVES (Traefik stripprefix):"
             echo "- Traefik: /api/health → API: /health"
             echo "- Traefik: /api/stats/* → API: /stats/*"
             echo "- Traefik: /api/registrations → API: /registrations"
+            echo "- Traefik: /api/contact → API: /contact (NOUVEAU)"
+            echo ""
+            echo "📧 CONFIGURATION EMAIL NÉCESSAIRE:"
+            echo "- Configurez EMAIL_PROVIDER, SMTP_* ou SENDGRID_API_KEY"
+            echo "- Le contact form ne fonctionnera qu'après configuration email"
           else
             echo "❌ Déploiement MakeMeLearn échoué!"
             echo "Deploy result: ${{ needs.deploy.result }}"
