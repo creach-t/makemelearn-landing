@@ -8,6 +8,13 @@ import { FormComponent } from "../components/form/form.js";
 import { HeaderComponent } from "../components/header/header.js";
 import { componentLoader } from "../components/loader/loader.js";
 
+// ===== UTILITY FUNCTIONS =====
+function getBasePath() {
+  const path = window.location.pathname;
+  // Vérifie si on est dans un sous-dossier
+  return path.includes('/pages/') || path.split('/').length > 2 ? '../' : '';
+}
+
 // ===== API CONFIGURATION =====
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api'
@@ -216,22 +223,22 @@ class App {
       case "":
         this.initHomePage();
         break;
-      case "pages/contact.html":
+      case "contact.html":
         this.initContactPage();
         break;
-      case "pages/faq.html":
+      case "faq.html":
         this.initFaqPage();
         break;
-      case "pages/how-it-works.html":
+      case "how-it-works.html":
         this.initHowItWorksPage();
         break;
-      case "pages/about.html":
+      case "about.html":
         this.initAboutPage();
         break;
-      case "pages/terms.html":
+      case "terms.html":
         this.initTermsPage();
         break;
-      case "pages/privacy.html":
+      case "privacy.html":
         this.initPrivacyPage();
         break;
       case "test-components.html":
