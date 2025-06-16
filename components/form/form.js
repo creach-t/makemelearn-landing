@@ -108,6 +108,8 @@ export class FormComponent {
         if (element) {
             element.innerHTML = this.render();
             this.attachEventListeners();
+        } else {
+            console.error(`FormComponent: Cannot find element with selector "${selector}"`);
         }
     }
 
@@ -115,6 +117,8 @@ export class FormComponent {
         const form = document.getElementById(this.formId);
         if (form) {
             form.addEventListener('submit', (e) => this.handleSubmit(e));
+        } else {
+            console.error(`FormComponent: Cannot find form with id "${this.formId}"`);
         }
     }
 
@@ -123,103 +127,8 @@ export class FormComponent {
         
         if (this.isSubmitting) return;
         
-        const formData = this.getFormData();
-        const isValid = this.validateForm(formData);
-        
-        if (!isValid) return;
-
-        this.setLoadingState(true);
-        
         try {
-            if (this.config.onSubmit) {
-                await this.config.onSubmit(formData);
-            }
-            this.setSuccessState();
-        } catch (error) {
-            this.setErrorState(error.message);
-        }
-    }
-
-    getFormData() {
-        const form = document.getElementById(this.formId);
-        const formData = new FormData(form);
-        const data = {};
-        
-        for (let [key, value] of formData.entries()) {
-            data[key] = value;
-        }
-        
-        return data;
-    }
-
-    validateForm(data) {
-        // Validation basique - peut être étendue
-        for (const field of this.config.fields) {
-            if (field.required && !data[field.name]) {
-                this.showFieldError(field.id, `${field.label || field.name} est requis`);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    showFieldError(fieldId, message) {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-            // Ajouter message d'erreur si nécessaire
-        }
-    }
-
-    setLoadingState(loading) {
-        this.isSubmitting = loading;
-        const button = document.querySelector(`#${this.formId} button[type="submit"]`);
-        const buttonText = button?.querySelector('.button-text');
-        
-        if (button && buttonText) {
-            button.disabled = loading;
-            if (loading) {
-                buttonText.textContent = this.config.submitButton.loadingText || 'Envoi en cours...';
-                button.classList.add('loading');
-            } else {
-                buttonText.textContent = this.config.submitButton.text;
-                button.classList.remove('loading');
-            }
-        }
-    }
-
-    setSuccessState() {
-        const button = document.querySelector(`#${this.formId} button[type="submit"]`);
-        const buttonText = button?.querySelector('.button-text');
-        
-        if (button && buttonText) {
-            buttonText.textContent = this.config.submitButton.successText || 'Envoyé !';
-            button.style.background = 'linear-gradient(120deg, #10B981, #059669)';
+            const formData = this.getFormData();
+            if (!formData) return;
             
-            setTimeout(() => {
-                this.resetForm();
-            }, 3000);
-        }
-    }
-
-    setErrorState(message) {
-        this.setLoadingState(false);
-        // Afficher le message d'erreur
-        console.error('Form submission error:', message);
-    }
-
-    resetForm() {
-        const form = document.getElementById(this.formId);
-        const button = form?.querySelector('button[type="submit"]');
-        const buttonText = button?.querySelector('.button-text');
-        
-        if (form) form.reset();
-        if (button && buttonText) {
-            buttonText.textContent = this.config.submitButton.text;
-            button.style.background = '';
-            button.disabled = false;
-        }
-        
-        this.isSubmitting = false;
-    }
-}
+            
