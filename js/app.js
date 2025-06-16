@@ -65,13 +65,24 @@ class App {
                 this.initContactPage();
                 break;
             case 'faq.html':
+            case 'faq-modular.html':
                 this.initFaqPage();
                 break;
             case 'how-it-works.html':
+            case 'how-it-works-modular.html':
                 this.initHowItWorksPage();
                 break;
             case 'about.html':
+            case 'about-modular.html':
                 this.initAboutPage();
+                break;
+            case 'terms.html':
+            case 'terms-modular.html':
+                this.initTermsPage();
+                break;
+            case 'privacy.html':
+            case 'privacy-modular.html':
+                this.initPrivacyPage();
                 break;
             case 'test-components.html':
                 this.initTestPage();
@@ -259,6 +270,16 @@ class App {
         this.initStatHovers();
     }
 
+    initTermsPage() {
+        console.log('📄 Initialisation de la page Conditions d\'utilisation');
+        this.initScrollToTop();
+    }
+
+    initPrivacyPage() {
+        console.log('🔒 Initialisation de la page Politique de confidentialité');
+        this.initScrollToTop();
+    }
+
     initHomeAnimations() {
         // Observer pour les animations d'entrée
         const observerOptions = {
@@ -324,6 +345,48 @@ class App {
         });
     }
 
+    initScrollToTop() {
+        // Ajouter un bouton de retour en haut pour les pages longues
+        const scrollButton = document.createElement('button');
+        scrollButton.innerHTML = '↑';
+        scrollButton.className = 'scroll-to-top';
+        scrollButton.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        `;
+
+        document.body.appendChild(scrollButton);
+
+        // Afficher/masquer le bouton selon le scroll
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollButton.style.opacity = '1';
+            } else {
+                scrollButton.style.opacity = '0';
+            }
+        });
+
+        // Action du bouton
+        scrollButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
     attachGlobalEventListeners() {
         // Smooth scrolling pour les liens d'ancrage
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -357,6 +420,26 @@ class App {
                 if (activeElement && activeElement.blur) {
                     activeElement.blur();
                 }
+                
+                // Fermer le menu mobile si ouvert
+                const navLinks = document.querySelector('.nav-links');
+                const mobileToggle = document.getElementById('mobileMenuToggle');
+                if (navLinks?.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileToggle?.classList.remove('active');
+                }
+            }
+        });
+
+        // Amélioration de la navigation mobile
+        window.addEventListener('resize', () => {
+            const navLinks = document.querySelector('.nav-links');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            
+            // Fermer le menu mobile si on passe en desktop
+            if (window.innerWidth > 768 && navLinks?.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileToggle?.classList.remove('active');
             }
         });
     }
