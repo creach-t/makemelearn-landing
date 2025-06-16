@@ -7,9 +7,9 @@
     <meta name="description" content="Contactez l'équipe MakeMeLearn. Questions, suggestions, partenariats - nous sommes là pour vous aider.">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="fav/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="fav/favicon-16x16.png">
-    <link rel="apple-touch-icon" href="fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../fav/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="../fav/apple-touch-icon.png">
 
     <!-- Styles -->
     <link rel="stylesheet" href="../css/style.css">
@@ -43,7 +43,10 @@
                     <div class="contact-form-section">
                         <h2>Envoyez-nous un message</h2>
                         <!-- Form Component will be injected here -->
-                        <div id="contactForm"></div>
+                        <div id="contactForm">
+                            <!-- Le formulaire sera injecté ici par contact-form-init.js -->
+                            <div class="component-loading">Chargement du formulaire...</div>
+                        </div>
                     </div>
 
                     <!-- Contact Info -->
@@ -111,5 +114,6 @@
 
     <!-- Scripts -->
     <script type="module" src="../js/app.js"></script>
+    <script src="../js/contact-form-init.js"></script>
 </body>
 </html>
