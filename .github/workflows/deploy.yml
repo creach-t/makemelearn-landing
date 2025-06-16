@@ -284,15 +284,17 @@ jobs:
       - name: Check CSS syntax
         run: |
           echo "🔍 Validation CSS..."
-          if [ -f "style.css" ]; then
+          if find . -name "*.css" -not -path "./node_modules/*" | head -1 | read first_css; then
             # Compter les accolades pour vérifier la syntaxe de base
-            OPEN=$(grep -o "{" style.css | wc -l)
-            CLOSE=$(grep -o "}" style.css | wc -l)
+            OPEN=$(find . -name "*.css" -not -path "./node_modules/*" -exec grep -o "{" {} \; | wc -l)
+            CLOSE=$(find . -name "*.css" -not -path "./node_modules/*" -exec grep -o "}" {} \; | wc -l)
             if [ "$OPEN" -ne "$CLOSE" ]; then
               echo "❌ Erreur: accolades CSS non équilibrées ($OPEN ouvertures, $CLOSE fermetures)"
               exit 1
             fi
             echo "✅ CSS syntax OK ($OPEN/{$CLOSE} accolades)"
+          else
+            echo "⚠️ Aucun fichier CSS trouvé"
           fi
 
       - name: Check API configuration consistency
@@ -317,12 +319,12 @@ jobs:
         run: |
           echo "🔍 Vérification intégration Contact Form..."
           
-          # Vérifier que contact.html existe
-          if [ -f "contact.html" ]; then
-            echo "✅ contact.html trouvé"
+          # 🔧 CORRECTION: Vérifier que contact.html existe dans pages/
+          if [ -f "pages/contact.html" ]; then
+            echo "✅ pages/contact.html trouvé"
             
             # Vérifier que le formulaire a les bons IDs
-            if grep -q 'id="contactForm"' contact.html; then
+            if grep -q 'id="contactForm"' pages/contact.html; then
               echo "✅ Contact form ID trouvé"
             else
               echo "❌ Contact form ID manquant"
@@ -336,8 +338,28 @@ jobs:
               echo "❌ Contact form handler manquant dans script.js"
               exit 1
             fi
+            
+            # Vérifier que les champs requis sont présents
+            required_fields=("name" "email" "subject" "message")
+            missing_fields=()
+            
+            for field in "${required_fields[@]}"; do
+              if ! grep -q "id=\"$field\"" pages/contact.html; then
+                missing_fields+=("$field")
+              fi
+            done
+            
+            if [ ${#missing_fields[@]} -eq 0 ]; then
+              echo "✅ Tous les champs requis trouvés dans le formulaire"
+            else
+              echo "❌ Champs manquants: ${missing_fields[*]}"
+              exit 1
+            fi
+            
           else
-            echo "❌ contact.html non trouvé"
+            echo "❌ pages/contact.html non trouvé"
+            echo "📁 Structure du dossier pages:"
+            ls -la pages/ || echo "Dossier pages/ non trouvé"
             exit 1
           fi
 
@@ -350,6 +372,8 @@ jobs:
           find . -name "*.css" -not -path "./node_modules/*"
           echo "📄 Fichiers JS trouvés:"
           find . -name "*.js" -not -path "./node_modules/*" -not -path "./api/*"
+          echo "📁 Contenu du dossier pages:"
+          ls -la pages/ || echo "Dossier pages/ non trouvé"
 
   # Déploiement sur le serveur (seulement sur push vers main)
   deploy:
@@ -489,7 +513,7 @@ jobs:
                 sleep 2
               fi
 
-              ((attempt++)
+              ((attempt++))
             done
 
             # Test optionnel de l'URL externe
