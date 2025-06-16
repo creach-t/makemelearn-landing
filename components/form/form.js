@@ -138,6 +138,8 @@ export class FormComponent {
     if (element) {
       element.innerHTML = this.render();
       this.attachEventListeners();
+    } else {
+      console.error(`FormComponent: Cannot find element with selector "${selector}"`);
     }
   }
 
@@ -160,8 +162,9 @@ export class FormComponent {
     if (this.isSubmitting) return;
 
     const formData = this.getFormData();
+    if (!formData) return; // Arrêter si pas de données
+    
     const isValid = this.validateForm(formData);
-
     if (!isValid) return;
 
     this.setLoadingState(true);
