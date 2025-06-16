@@ -61,12 +61,12 @@ export const contactFormConfig = {
            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>`
   },
   onSubmit: async (formData) => {
-    // Simulation d'envoi vers l'API
+    // Configuration API corrigée
     const API_BASE_URL = window.location.hostname === "localhost" 
       ? "http://localhost:3000" 
-      : "https://api.makemelearn.fr";
+      : "https://makemelearn.fr/api";
     
-    const response = await fetch(`${API_BASE_URL}/api/contact`, {
+    const response = await fetch(`${API_BASE_URL}/contact`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
