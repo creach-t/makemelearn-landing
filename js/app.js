@@ -3,10 +3,10 @@
  * Point d'entrée principal pour l'application
  */
 
-import { FooterComponent } from "../components/footer.js";
-import { FormComponent } from "../components/form.js";
-import { HeaderComponent } from "../components/header.js";
-import { componentLoader } from "../components/loader.js";
+import { FooterComponent } from "../components/footer/index.js";
+import { FormComponent } from "../components/form/form.js";
+import { HeaderComponent } from "../components/header/header.js";
+import { componentLoader } from "../components/loader/loader.js";
 
 class App {
   constructor() {
@@ -62,32 +62,25 @@ class App {
 
     switch (currentPage) {
       case "index.html":
-      case "index.html":
       case "":
         this.initHomePage();
         break;
-      case "contact.html":
-      case "contact-modular.html":
+      case "pages/contact.html":
         this.initContactPage();
         break;
-      case "faq.html":
-      case "faq-modular.html":
+      case "pages/faq.html":
         this.initFaqPage();
         break;
-      case "how-it-works.html":
-      case "how-it-works-modular.html":
+      case "pages/how-it-works.html":
         this.initHowItWorksPage();
         break;
-      case "about.html":
-      case "about-modular.html":
+      case "pages/about.html":
         this.initAboutPage();
         break;
-      case "terms.html":
-      case "terms-modular.html":
+      case "pages/terms.html":
         this.initTermsPage();
         break;
-      case "privacy.html":
-      case "privacy-modular.html":
+      case "pages/privacy.html":
         this.initPrivacyPage();
         break;
       case "test-components.html":
