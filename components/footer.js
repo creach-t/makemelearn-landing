@@ -13,7 +13,7 @@ export class FooterComponent {
             {
                 title: 'MakeMeLearn',
                 links: [
-                    { href: 'index-modular.html', text: 'Accueil' },
+                    { href: 'index.html', text: 'Accueil' },
                     { href: 'about-modular.html', text: 'À propos' },
                     { href: 'how-it-works-modular.html', text: 'Comment ça marche' },
                     { href: 'faq-modular.html', text: 'FAQ' }
