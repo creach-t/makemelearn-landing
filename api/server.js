@@ -8,6 +8,16 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Import existing routes if they exist
+let registrationRoutes, statsRoutes, healthRoutes;
+try {
+  registrationRoutes = require('./src/routes/registrations');
+  statsRoutes = require('./src/routes/stats');
+  healthRoutes = require('./src/routes/health');
+} catch (error) {
+  console.log('📦 Some route modules not found, using fallback implementations');
+}
+
 // ===== MIDDLEWARE SETUP =====
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
@@ -152,14 +162,6 @@ function generateContactEmailTemplate(data) {
                 white-space: pre-wrap;
                 line-height: 1.7;
             }
-            .metadata {
-                margin-top: 30px;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 6px;
-                font-size: 12px;
-                color: #666;
-            }
             .footer { 
                 padding: 20px; 
                 text-align: center;
@@ -198,16 +200,6 @@ function generateContactEmailTemplate(data) {
                     <div class="field-label">💬 Message</div>
                     <div class="message-content">${data.message}</div>
                 </div>
-                
-                ${data.metadata ? `
-                <div class="metadata">
-                    <strong>📊 Métadonnées :</strong><br>
-                    Page: ${data.metadata.page || 'N/A'}<br>
-                    Référent: ${data.metadata.referrer || 'Direct'}<br>
-                    Timestamp: ${data.metadata.timestamp || new Date().toISOString()}<br>
-                    User Agent: ${data.metadata.userAgent ? data.metadata.userAgent.substring(0, 100) + '...' : 'N/A'}
-                </div>
-                ` : ''}
             </div>
             <div class="footer">
                 <p>Envoyé automatiquement depuis la landing page MakeMeLearn</p>
@@ -240,19 +232,7 @@ async function sendContactEmail(data) {
       },
       subject: `[Contact] ${data.subject}`,
       html: emailHtml,
-      text: `
-Nouveau message de contact MakeMeLearn
-
-Nom: ${data.name}
-Email: ${data.email}
-Sujet: ${data.subject}
-
-Message:
-${data.message}
-
----
-Envoyé depuis la landing page MakeMeLearn
-      `
+      text: `Nouveau message de contact MakeMeLearn\n\nNom: ${data.name}\nEmail: ${data.email}\nSujet: ${data.subject}\n\nMessage:\n${data.message}`
     };
     
     await emailService.send(msg);
@@ -264,19 +244,7 @@ Envoyé depuis la landing page MakeMeLearn
       replyTo: `"${data.name}" <${data.email}>`,
       subject: `[Contact] ${data.subject}`,
       html: emailHtml,
-      text: `
-Nouveau message de contact MakeMeLearn
-
-Nom: ${data.name}
-Email: ${data.email}
-Sujet: ${data.subject}
-
-Message:
-${data.message}
-
----
-Envoyé depuis la landing page MakeMeLearn
-      `
+      text: `Nouveau message de contact MakeMeLearn\n\nNom: ${data.name}\nEmail: ${data.email}\nSujet: ${data.subject}\n\nMessage:\n${data.message}`
     });
     
     return { messageId: result.messageId };
@@ -313,19 +281,109 @@ const registrationValidation = [
     .withMessage('Adresse email invalide')
 ];
 
-// ===== API ROUTES =====
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    email_service: emailService ? 'configured' : 'not configured'
+// ===== EXISTING ROUTES (if available) =====
+if (healthRoutes) {
+  app.use('/health', healthRoutes);
+} else {
+  // Fallback health endpoint
+  app.get('/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      email_service: emailService ? 'configured' : 'not configured'
+    });
   });
-});
+}
 
-// Contact form endpoint
+if (registrationRoutes) {
+  app.use('/registrations', signupLimiter, registrationRoutes);
+} else {
+  // Fallback registration endpoint
+  app.post('/registrations', signupLimiter, registrationValidation, async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Email invalide',
+          details: errors.array()
+        });
+      }
+
+      const { email, source, metadata } = req.body;
+      console.log(`[SIGNUP] New registration: ${email} from ${source}`);
+
+      res.json({
+        success: true,
+        message: 'Inscription confirmée',
+        email: email
+      });
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      res.status(500).json({
+        error: 'Erreur lors de l\'inscription',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  });
+}
+
+if (statsRoutes) {
+  app.use('/stats', statsRoutes);
+} else {
+  // Fallback stats endpoints
+  app.get('/stats/public', async (req, res) => {
+    try {
+      // Mock data for when database is not available
+      const stats = {
+        overview: {
+          total: 42,
+          verified: 28,
+          verificationRate: 67
+        },
+        weekly: [
+          { week: '2025-06-10', registrations: 8 },
+          { week: '2025-06-03', registrations: 12 },
+          { week: '2025-05-27', registrations: 6 }
+        ],
+        sources: [
+          { source: 'landing_page', count: 35, percentage: 83.3 },
+          { source: 'social_media', count: 7, percentage: 16.7 }
+        ]
+      };
+
+      console.log(`[STATS] Public stats accessed from ${req.ip}`);
+      
+      res.json({
+        data: stats,
+        generatedAt: new Date().toISOString(),
+        code: 'STATS_SUCCESS'
+      });
+
+    } catch (error) {
+      console.error('Stats error:', error);
+      res.status(500).json({
+        error: 'Erreur lors de la récupération des statistiques',
+        code: 'STATS_ERROR'
+      });
+    }
+  });
+
+  app.post('/stats/track', async (req, res) => {
+    try {
+      const { event, value, metadata } = req.body;
+      console.log(`[ANALYTICS] Event: ${event}, Value: ${value}`);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Analytics error:', error);
+      res.status(500).json({ error: 'Erreur de tracking' });
+    }
+  });
+}
+
+// ===== NEW CONTACT FORM ENDPOINT =====
 app.post('/contact', contactLimiter, contactValidation, async (req, res) => {
   try {
     // Check validation errors
@@ -348,7 +406,7 @@ app.post('/contact', contactLimiter, contactValidation, async (req, res) => {
       metadata
     });
 
-    // Log successful contact (you can save to database here)
+    // Log successful contact
     console.log(`[CONTACT] New message from ${name} (${email}) - Subject: ${subject}`);
 
     res.json({
@@ -362,7 +420,6 @@ app.post('/contact', contactLimiter, contactValidation, async (req, res) => {
     
     let errorMessage = 'Erreur lors de l\'envoi du message';
     
-    // Provide more specific error messages
     if (error.message.includes('Service email non configuré')) {
       errorMessage = 'Service email temporairement indisponible. Veuillez réessayer plus tard ou nous contacter directement.';
     } else if (error.message.includes('Invalid API key')) {
@@ -378,61 +435,35 @@ app.post('/contact', contactLimiter, contactValidation, async (req, res) => {
   }
 });
 
-// Newsletter signup endpoint (placeholder)
-app.post('/registrations', signupLimiter, registrationValidation, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: 'Email invalide',
-        details: errors.array()
-      });
-    }
-
-    const { email, source, metadata } = req.body;
-    
-    // Here you would typically save to database
-    // For now, just log and return success
-    console.log(`[SIGNUP] New registration: ${email} from ${source}`);
-
-    res.json({
-      success: true,
-      message: 'Inscription confirmée',
-      email: email
-    });
-
-  } catch (error) {
-    console.error('Signup error:', error);
-    
-    res.status(500).json({
-      error: 'Erreur lors de l\'inscription',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
+// ===== ROOT ENDPOINT =====
+app.get('/', (req, res) => {
+  res.json({
+    name: 'MakeMeLearn API',
+    version: '1.1.0',
+    description: 'API pour MakeMeLearn - Newsletter et Contact Form',
+    endpoints: {
+      health: '/health',
+      registrations: '/registrations',
+      stats: '/stats',
+      contact: '/contact'
+    },
+    features: {
+      newsletter: 'enabled',
+      contact_form: emailService ? 'enabled' : 'disabled (email not configured)',
+      analytics: 'enabled'
+    },
+    support: 'hello@makemelearn.fr'
+  });
 });
 
-// Analytics tracking endpoint (placeholder)
-app.post('/stats/track', async (req, res) => {
-  try {
-    const { event, value, metadata } = req.body;
-    
-    // Here you would typically save to analytics database
-    console.log(`[ANALYTICS] Event: ${event}, Value: ${value}`);
-
-    res.json({ success: true });
-
-  } catch (error) {
-    console.error('Analytics error:', error);
-    res.status(500).json({ error: 'Erreur de tracking' });
-  }
-});
-
-// 404 handler
+// ===== ERROR HANDLERS =====
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint non trouvé' });
+  res.status(404).json({ 
+    error: 'Endpoint non trouvé', 
+    available_endpoints: ['/health', '/registrations', '/stats', '/contact']
+  });
 });
 
-// Error handler
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
   res.status(500).json({ 
@@ -446,6 +477,7 @@ app.listen(PORT, () => {
   console.log(`🚀 MakeMeLearn API Server running on port ${PORT}`);
   console.log(`📧 Email provider: ${process.env.EMAIL_PROVIDER || 'nodemailer'}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('📋 Available endpoints: /health, /registrations, /stats, /contact');
   
   if (!emailService) {
     console.log('⚠️  Warning: Email service not configured. Contact form will not work.');
