@@ -91,8 +91,23 @@ async function handleContactFormSubmit(e) {
       Envoi en cours...
     `;
     
-    // Simulation d'envoi
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Configuration API corrigée pour le fallback
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000' 
+      : 'https://makemelearn.fr/api';
+    
+    const response = await fetch(`${API_BASE_URL}/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erreur lors de l\'envoi du message');
+    }
     
     // État de succès
     button.innerHTML = `
@@ -115,6 +130,21 @@ async function handleContactFormSubmit(e) {
     button.innerHTML = originalText;
     button.disabled = false;
     console.error('Erreur lors de l\'envoi:', error);
+    
+    // Afficher une erreur à l'utilisateur
+    button.innerHTML = `
+      <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+      </svg>
+      Erreur d'envoi
+    `;
+    button.style.background = 'linear-gradient(120deg, #EF4444, #DC2626)';
+    
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.style.background = '';
+      button.disabled = false;
+    }, 3000);
   }
 }
 
