@@ -22,6 +22,14 @@ describe('config/env', () => {
     expect(env.MAIL_FROM).toBe('no-reply@makemelearn.fr');
   });
 
+  test('SHOW_DRAFT_UNIVERSES : faux par défaut, true ou 1 pour l’activer', () => {
+    expect(loadEnv({ NODE_ENV: 'development' }).SHOW_DRAFT_UNIVERSES).toBe(false);
+    expect(loadEnv({ NODE_ENV: 'development', SHOW_DRAFT_UNIVERSES: 'true' }).SHOW_DRAFT_UNIVERSES).toBe(true);
+    expect(loadEnv({ NODE_ENV: 'development', SHOW_DRAFT_UNIVERSES: '1' }).SHOW_DRAFT_UNIVERSES).toBe(true);
+    expect(loadEnv({ NODE_ENV: 'development', SHOW_DRAFT_UNIVERSES: 'false' }).SHOW_DRAFT_UNIVERSES).toBe(false);
+    expect(loadEnv({ NODE_ENV: 'production', DATABASE_URL: 'postgres://x', SESSION_SECRET: 'a'.repeat(40) }).SHOW_DRAFT_UNIVERSES).toBe(false);
+  });
+
   test('en développement : démarre sans secret, cookie non Secure', () => {
     const env = loadEnv({ NODE_ENV: 'development' });
     expect(env.COOKIE_SECURE).toBe(false);

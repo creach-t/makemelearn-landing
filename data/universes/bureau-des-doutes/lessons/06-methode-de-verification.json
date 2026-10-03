@@ -60,6 +60,7 @@
     },
     {
       "id": "bdd.c2.l3.i10",
+      "boss": true,
       "type": "qcm",
       "competence": "bdd.verification.synthese",
       "difficulte": 5,

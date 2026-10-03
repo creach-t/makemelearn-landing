@@ -76,6 +76,7 @@
     },
     {
       "id": "bdd.c1.l3.i03",
+      "boss": true,
       "type": "appariement",
       "competence": "bdd.biais.synthese",
       "difficulte": 5,

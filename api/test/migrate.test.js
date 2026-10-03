@@ -9,13 +9,13 @@ const { migrate, listMigrations, splitSql } = require('../src/lib/migrate');
 
 describe('migrations', () => {
   test('001 et 002 sont présentes, ordonnées', () => {
-    expect(listMigrations().map((m) => m.name)).toEqual(['001_legacy.sql', '002_game_core.sql']);
+    expect(listMigrations().map((m) => m.name)).toEqual(['001_legacy.sql', '002_game_core.sql', '003_game_play.sql']);
   });
 
   test('base vide : crée le schéma ; 2e exécution = rien à appliquer', async () => {
     const t = await createTestDb({ migrateSchema: false });
     try {
-      expect(await migrate(t.db, opts)).toEqual(['001_legacy.sql', '002_game_core.sql']);
+      expect(await migrate(t.db, opts)).toEqual(['001_legacy.sql', '002_game_core.sql', '003_game_play.sql']);
       expect(await migrate(t.db, opts)).toEqual([]);
       const tables = (await t.db.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")).rows.map((r) => r.table_name);
       for (const name of ['registrations', 'stats', 'users', 'items', 'srs_state', 'schema_migrations']) expect(tables).toContain(name);

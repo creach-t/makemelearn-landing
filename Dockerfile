@@ -21,6 +21,8 @@ COPY css /app/public/css
 COPY js /app/public/js
 COPY components /app/public/components
 COPY fav /app/public/fav
+# Jeu en ligne (vanilla JS, sans build) : servi sous /app/
+COPY app /app/public/app
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 \
     && mkdir -p logs && chown -R nodejs:nodejs /app

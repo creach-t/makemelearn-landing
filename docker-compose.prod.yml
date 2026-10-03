@@ -42,6 +42,9 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_FROM: no-reply@makemelearn.fr
+      # Univers pilote encore en statut « relecture » (draft) : listé et jouable avec l'indicateur beta.
+      # A RETIRER quand le pilote passe en « publie », apres verification des faits (plafond Livret A, chiffres NASA, calculs du chapitre 3).
+      SHOW_DRAFT_UNIVERSES: "true"
     networks:
       - internal
       - traefik-public

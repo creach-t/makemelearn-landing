@@ -34,7 +34,9 @@ function transformForPgMem(sql, name) {
     .replace(/DROP\s+TRIGGER[\s\S]*?;/gi, '')
     .replace(/COMMENT\s+ON[\s\S]*?;/gi, '')
     .replace(/CREATE\s+OR\s+REPLACE\s+VIEW[\s\S]*?;/gi, '')
-    .replace(/^\s*CONSTRAINT\s+users_handle_fmt[^\n]*\n/m, '');
+    .replace(/^\s*CONSTRAINT\s+users_handle_fmt[^\n]*\n/m, '')
+    // 003 remplace cette unicité par (session, item, essai) ; pg-mem n'honore pas DROP CONSTRAINT sur une contrainte implicite
+    .replace(/^\s*UNIQUE \(session_id, item_id\),\s*$/m, '');
 }
 
 const PGMEM_MIGRATE_OPTS = { transform: transformForPgMem, lock: false, split: true };

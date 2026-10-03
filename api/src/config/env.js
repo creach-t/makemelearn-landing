@@ -22,6 +22,7 @@ const schema = z
     MAINTENANCE_TOKEN: z.string().optional(),
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(15 * 60 * 1000),
     RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
+    RATE_LIMIT_GAME_MAX: z.coerce.number().int().positive().default(600),
     RATE_LIMIT_CONTACT: z.coerce.number().int().positive().default(5),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().int().positive().default(587),
@@ -34,7 +35,9 @@ const schema = z
     TO_EMAIL: z.string().optional(), // ancien nom
     CONTENT_DIR: z.string().optional(),
     STATIC_DIR: z.string().optional(), // dossier du site statique servi par l'app (image Docker : /app/public)
-    SYNC_CONTENT: bool(true)
+    SYNC_CONTENT: bool(true),
+    // true : les univers `draft` (statut « relecture ») sont listés et jouables avec un indicateur beta:true
+    SHOW_DRAFT_UNIVERSES: bool(false)
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {

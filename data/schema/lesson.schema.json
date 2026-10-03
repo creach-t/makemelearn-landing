@@ -194,6 +194,10 @@
           "minimum": 10,
           "maximum": 120
         },
+        "boss": {
+          "type": "boolean",
+          "description": "Epreuve de boss : 3 vies partagees, essais multiples tant qu il reste des vies. Au plus un boss par lecon."
+        },
         "remplace": {
           "$ref": "#/definitions/itemId"
         },

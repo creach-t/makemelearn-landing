@@ -29,6 +29,7 @@ const editJson = (file, fn) => {
   fn(data);
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 };
+const l6Consigne = (dir) => JSON.parse(fs.readFileSync(lessonFile(dir, 6), 'utf8')).items.at(-1).consigne;
 const errorsOf = (dir) => validateContent(loadContent(dir));
 const messages = (errs) => errs.map((e) => `${e.file} ${e.path} ${e.message}`).join('\n');
 
@@ -130,6 +131,25 @@ describe('validate-content (lot 2)', () => {
     const dir2 = copyData();
     editJson(lessonFile(dir2, 1), (l) => { l.items.push({ ...base, code_initial: 'x', solution_modele: 'y' }); });
     expect(errorsOf(dir2).length).toBeGreaterThan(0);
+  });
+
+  test('boss : champ explicite — au plus un par leçon, en dernier, jamais une flashcard ; type non booléen refusé', () => {
+    let dir = copyData();
+    editJson(lessonFile(dir, 3), (l) => { l.items[0].boss = true; }); // 2 boss dans la leçon, dont un pas en dernier
+    expect(messages(errorsOf(dir))).toMatch(/au plus un item boss par leçon/);
+    expect(messages(errorsOf(dir))).toMatch(/le boss doit être le dernier item/);
+    dir = copyData();
+    editJson(lessonFile(dir, 1), (l) => { l.items[0].boss = true; }); // flashcard (et pas en dernier)
+    expect(messages(errorsOf(dir))).toMatch(/flashcard.*boss/);
+    dir = copyData();
+    editJson(lessonFile(dir, 3), (l) => { l.items.at(-1).boss = 'oui'; });
+    expect(messages(errorsOf(dir))).toMatch(/must be boolean/);
+  });
+
+  test('le pilote déclare exactement 3 boss (fin de chapitre), via le champ explicite', () => {
+    const content = loadContent(DATA);
+    const bosses = content.universes[0].lessons.flatMap((l) => l.data.items.filter((i) => i.boss === true).map((i) => i.id));
+    expect(bosses).toEqual(['bdd.c1.l3.i03', 'bdd.c2.l3.i10', 'bdd.c3.l3.i03']);
   });
 
   test('CLI : exit 0 sur le contenu valide, exit 1 (avec message) sur contenu invalide', () => {
@@ -235,5 +255,37 @@ describe('sync-content (lot 2)', () => {
     await expect(syncContent(t.db, content)).rejects.toThrow();
     expect(await count('universes')).toBe(0);
     expect(await count('items')).toBe(0);
+  });
+
+  test('is_boss vient du champ explicite : exactement 3 boss ; le mot « Boss » dans un texte ne suffit plus', async () => {
+    await syncContentFromDir(t.db, DATA);
+    const bosses = (await t.db.query('SELECT key FROM items WHERE is_boss = true ORDER BY key')).rows.map((r) => r.key);
+    expect(bosses).toEqual([
+      'bureau-des-doutes/graphiques-et-taux-de-base/i03',
+      'bureau-des-doutes/methode-de-verification/i10',
+      'bureau-des-doutes/survivants-et-disponibilite/i03'
+    ]);
+    // retirer le champ d'un boss : l'item n'est plus un boss, même si sa consigne commence par « Boss : »
+    const dir = copyData();
+    editJson(lessonFile(dir, 6), (l) => { delete l.items.at(-1).boss; });
+    expect(l6Consigne(dir)).toMatch(/^Boss/);
+    const report = await syncContentFromDir(t.db, dir);
+    expect(report.items.updated).toBe(1);
+    expect(await count('items', 'WHERE is_boss = true')).toBe(2);
+  });
+
+  test('l’affichage (lore, personnages, chapitres, compétences, intro de leçon) est synchronisé', async () => {
+    await syncContentFromDir(t.db, DATA);
+    const u = (await t.db.query('SELECT meta FROM universes')).rows[0];
+    const meta = typeof u.meta === 'string' ? JSON.parse(u.meta) : u.meta;
+    expect(meta.characters.map((c) => c.id)).toEqual(['mirabelle', 'pie']);
+    expect(meta.chapters).toHaveLength(3);
+    expect(meta.skills.length).toBeGreaterThan(10);
+    expect(meta.skills.find((x) => x.id === 'bdd.biais.ancrage').requires).toEqual(['bdd.biais.confirmation']);
+    const l = (await t.db.query("SELECT meta FROM lessons WHERE key = 'bureau-des-doutes/biais-de-confirmation'")).rows[0];
+    const lm = typeof l.meta === 'string' ? JSON.parse(l.meta) : l.meta;
+    expect(lm).toMatchObject({ chapter: 'c01', competences: ['bdd.biais.confirmation'], durationMin: 2 });
+    // idempotence conservée avec les méta-données
+    expect((await syncContentFromDir(t.db, DATA)).writes).toBe(0);
   });
 });

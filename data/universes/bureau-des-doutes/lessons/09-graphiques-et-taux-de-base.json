@@ -66,6 +66,7 @@
     },
     {
       "id": "bdd.c3.l3.i03",
+      "boss": true,
       "type": "saisie",
       "competence": "bdd.chiffres.taux_de_base",
       "difficulte": 5,

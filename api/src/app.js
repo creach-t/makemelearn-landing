@@ -19,13 +19,17 @@ const { createContactRouter } = require('./modules/contact');
 const { createAuth } = require('./lib/auth');
 const { createAuthRouter } = require('./modules/auth');
 const { createMeRouter } = require('./modules/me');
+const { createUniversesRouter } = require('./modules/universes');
+const { createSessionsRouter } = require('./modules/sessions');
+const { createProgressRouter } = require('./modules/progress');
 const legacyHealthRoutes = require('./routes/health');
 const legacyStatsRoutes = require('./routes/stats');
 
-const limiterBase = (windowMs, max, code, message) =>
+const limiterBase = (windowMs, max, code, message, { skip } = {}) =>
   rateLimit({
     windowMs,
     max,
+    skip,
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
@@ -67,7 +71,19 @@ function createApp({ db, env, mailer, extraRoutes } = {}) {
   app.use(express.urlencoded({ extended: false, limit: '32kb' }));
   app.use(requestLogger);
 
-  app.use(limiterBase(env.RATE_LIMIT_WINDOW_MS, env.RATE_LIMIT_MAX_REQUESTS, 'RATE_LIMIT_EXCEEDED', 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'));
+  // Trois périmètres de quota par IP :
+  //  - API « jeu » (/api/v1/universes|sessions|progress|me) : quota large (600 / 15 min) ; les réponses ont en plus un quota par joueur ;
+  //  - fichiers statiques (site, /app/) : non limités ici (un chargement du jeu = ~20 fichiers ; Cloudflare est devant) ;
+  //  - tout le reste (waitlist, contact, auth, santé, stats historiques) : le quota global historique (100 / 15 min).
+  const isGameApi = (req) => /^\/api\/v1\/(universes|sessions|progress|me)(\/|$)/.test(req.path);
+  const isApiPath = (req) => /^\/(api|registrations|contact|health|healthz|readyz|stats)(\/|$)/.test(req.path);
+  const isStaticAsset = (req) => (req.method === 'GET' || req.method === 'HEAD') && !isApiPath(req);
+  app.use(limiterBase(env.RATE_LIMIT_WINDOW_MS, env.RATE_LIMIT_MAX_REQUESTS, 'RATE_LIMIT_EXCEEDED', 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.', {
+    skip: (req) => isGameApi(req) || isStaticAsset(req)
+  }));
+  app.use(limiterBase(env.RATE_LIMIT_WINDOW_MS, env.RATE_LIMIT_GAME_MAX, 'GAME_RATE_LIMIT_EXCEEDED', 'Trop de requêtes depuis cette IP, veuillez réessayer dans quelques minutes.', {
+    skip: (req) => !isGameApi(req)
+  }));
 
   const ctx = { db, env, mailer, limiterBase, onlyPost };
 
@@ -90,6 +106,10 @@ function createApp({ db, env, mailer, extraRoutes } = {}) {
   v1.use(auth.attachUser);
   v1.use('/auth', createAuthRouter({ db, env, mailer, auth, limiterBase }));
   v1.use('/me', createMeRouter({ db, auth }));
+  // Jeu : catalogue public ; sessions et progression exigent un joueur (invité ou compte) + CSRF sur les mutations
+  v1.use('/universes', createUniversesRouter({ db, env }));
+  v1.use('/sessions', createSessionsRouter({ db, env, auth }));
+  v1.use('/progress', createProgressRouter({ db, auth }));
   ctx.auth = auth;
   if (extraRoutes) extraRoutes(v1, ctx);
   app.use('/api/v1', v1);
@@ -104,11 +124,17 @@ function createApp({ db, env, mailer, extraRoutes } = {}) {
 
   // Site statique (image unique : l'app sert aussi le front). Les chemins /api/* non reconnus restent en 404 JSON.
   if (env.STATIC_DIR && fs.existsSync(env.STATIC_DIR)) {
-    const serveStatic = express.static(path.resolve(env.STATIC_DIR), {
+    const staticRoot = path.resolve(env.STATIC_DIR);
+    const serveStatic = express.static(staticRoot, {
       index: 'index.html',
       extensions: ['html'],
       dotfiles: 'ignore',
-      maxAge: '1h'
+      maxAge: '1h',
+      // Le jeu (/app/) n'a pas de noms de fichiers hachés : on revalide à chaque chargement (ETag) pour qu'une mise en
+      // production ne serve jamais un mélange d'anciens et de nouveaux modules JS.
+      setHeaders: (res, filePath) => {
+        if (path.relative(staticRoot, filePath).split(path.sep)[0] === 'app') res.setHeader('Cache-Control', 'no-cache');
+      }
     });
     app.use((req, res, next) => (req.path.startsWith('/api/') ? next() : serveStatic(req, res, next)));
   }

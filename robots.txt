@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+# Le jeu (application) n'est pas a indexer
+Disallow: /app/
 
 # Sitemap
 Sitemap: https://makemelearn.fr/sitemap.xml
@@ -10,12 +12,15 @@ Crawl-delay: 1
 # Specific directives for popular bots
 User-agent: Googlebot
 Allow: /
+Disallow: /app/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /app/
 
 User-agent: Slurp
 Allow: /
+Disallow: /app/
 
 # Block access to sensitive files (none in this case, but good practice)
 # Disallow: /admin/

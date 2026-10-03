@@ -1051,3 +1051,18 @@ html {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(102, 126, 234, 0.8);
 }
+/* ===== BOUTON "JOUER MAINTENANT" (accès au jeu /app/) ===== */
+.btn-play {
+    background: linear-gradient(120deg, #3ddc97, #2bb3a3);
+    color: #06231a;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(61, 220, 151, 0.28);
+}
+.btn-play:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(61, 220, 151, 0.4);
+}
+.btn-play:focus-visible {
+    outline: 3px solid #ffd166;
+    outline-offset: 3px;
+}

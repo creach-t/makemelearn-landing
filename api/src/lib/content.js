@@ -227,6 +227,13 @@ function checkUniverse(u, add) {
       checkItem(item, file, at, add);
     });
     for (const k of ['micro_cours', 'recap']) if (HTML_RE.test(l[k] || '')) add(file, `/${k}`, 'HTML brut interdit (Markdown limité)');
+    // Boss : champ explicite `boss: true` (aucune heuristique sur le texte) ; au plus un par leçon, en dernier, jamais une flashcard auto-évaluée
+    const bosses = (l.items || []).map((it, i) => [it, i]).filter(([it]) => it.boss === true);
+    if (bosses.length > 1) add(file, '/items', 'au plus un item boss par leçon');
+    for (const [it, i] of bosses) {
+      if (it.type === 'flashcard') add(file, `/items/${i}/boss`, 'une flashcard (auto-évaluée) ne peut pas être un boss');
+      if (i !== (l.items || []).length - 1) add(file, `/items/${i}/boss`, 'le boss doit être le dernier item de la leçon');
+    }
   }
   for (const { file, data: l } of lessons) {
     for (const p of l.prerequis || []) {
@@ -321,16 +328,25 @@ async function syncContent(db, content) {
         locale: un.locale || 'fr',
         status: STATUS_MAP[un.statut],
         sort_order: un.ordre || 0,
-        theme: { color: (un.theme || {}).couleur, icon: (un.theme || {}).icone }
+        theme: { color: (un.theme || {}).couleur, icon: (un.theme || {}).icone },
+        // Tout ce que l'interface affiche (jamais de solution) : lore, personnages, chapitres, compétences
+        meta: {
+          lore: un.lore || {},
+          pitch: un.pitch || {},
+          characters: (un.personnages || []).map((p) => ({ id: p.id, name: p.nom, role: p.role, bio: p.bio || '' })),
+          chapters: (un.chapitres || []).map((c) => ({ id: c.id, slug: c.slug, title: c.titre, summary: c.resume || '' })),
+          skills: ((u.skills && u.skills.competences) || []).map((c) => ({ id: c.id, name: c.nom, chapter: c.chapitre, requires: c.prerequis || [] })),
+          license: (un.legal || {}).licence_contenu || null
+        }
       };
-      const hash = hashOf(un);
+      const hash = hashOf({ un, skills: u.skills });
       const found = (await tx.query('SELECT id, content_hash FROM universes WHERE slug = $1', [u.slug])).rows[0];
       let uid;
       if (!found) {
         const ins = await write(
-          `INSERT INTO universes (slug, title, tagline, description, locale, status, sort_order, theme, content_hash)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-          [u.slug, row.title, row.tagline, row.description, row.locale, row.status, row.sort_order, JSON.stringify(row.theme), hash]
+          `INSERT INTO universes (slug, title, tagline, description, locale, status, sort_order, theme, content_hash, meta)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+          [u.slug, row.title, row.tagline, row.description, row.locale, row.status, row.sort_order, JSON.stringify(row.theme), hash, JSON.stringify(row.meta)]
         );
         uid = ins.rows[0].id;
         report.universes.created++;
@@ -338,8 +354,8 @@ async function syncContent(db, content) {
         uid = found.id;
         if (found.content_hash !== hash) {
           await write(
-            `UPDATE universes SET title = $2, tagline = $3, description = $4, locale = $5, status = $6, sort_order = $7, theme = $8, content_hash = $9 WHERE id = $1`,
-            [uid, row.title, row.tagline, row.description, row.locale, row.status, row.sort_order, JSON.stringify(row.theme), hash]
+            `UPDATE universes SET title = $2, tagline = $3, description = $4, locale = $5, status = $6, sort_order = $7, theme = $8, content_hash = $9, meta = $10 WHERE id = $1`,
+            [uid, row.title, row.tagline, row.description, row.locale, row.status, row.sort_order, JSON.stringify(row.theme), hash, JSON.stringify(row.meta)]
           );
           report.universes.updated++;
         } else report.universes.unchanged++;
@@ -357,12 +373,13 @@ async function syncContent(db, content) {
         desiredKeys.add(key);
         const { items: _items, ...rest } = l;
         const lhash = hashOf(rest);
-        const lrow = [l.slug, l.titre, l.recap || '', l.micro_cours || '', l.position, l.xp || 20, 'published', lhash];
+        const lmeta = JSON.stringify({ chapter: l.chapitre, competences: l.competences || [], intro: l.intro || null, durationMin: l.duree_min || null });
+        const lrow = [l.slug, l.titre, l.recap || '', l.micro_cours || '', l.position, l.xp || 20, 'published', lhash, lmeta];
         const ex = existingLessons.get(key);
         if (!ex) {
           const ins = await write(
-            `INSERT INTO lessons (universe_id, key, slug, title, summary, body_md, position, xp_reward, status, content_hash)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+            `INSERT INTO lessons (universe_id, key, slug, title, summary, body_md, position, xp_reward, status, content_hash, meta)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
             [uid, key, ...lrow]
           );
           lessonDbIds.set(l.id, ins.rows[0].id);
@@ -371,7 +388,7 @@ async function syncContent(db, content) {
           lessonDbIds.set(l.id, ex.id);
           if (ex.content_hash !== lhash || ex.archived_at) {
             await write(
-              `UPDATE lessons SET slug = $2, title = $3, summary = $4, body_md = $5, position = $6, xp_reward = $7, status = $8, content_hash = $9, archived_at = NULL WHERE id = $1`,
+              `UPDATE lessons SET slug = $2, title = $3, summary = $4, body_md = $5, position = $6, xp_reward = $7, status = $8, content_hash = $9, meta = $10, archived_at = NULL WHERE id = $1`,
               [ex.id, ...lrow]
             );
             report.lessons.updated++;
@@ -402,7 +419,7 @@ async function syncContent(db, content) {
           const item = l.items[i];
           const key = `${lessonKey}/${item.id.split('.').pop()}`;
           desiredItems.add(key);
-          const isBoss = /^\s*boss\b/i.test(item.consigne) || /^\s*boss\b/i.test(item.enonce);
+          const isBoss = item.boss === true; // champ explicite du format (data/schema/lesson.schema.json), plus d'heuristique sur le texte
           const ihash = hashOf({ item, lessonKey, position: i + 1, isBoss });
           const params = [lessonDbId, TYPE_TO_KIND[item.type], item.difficulte, i + 1, isBoss, JSON.stringify(item), [item.competence], ihash];
           const ex = existingItems.get(key);

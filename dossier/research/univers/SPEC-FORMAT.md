@@ -12,6 +12,7 @@ Un item = objet JSON. Champs communs :
 - indice: optionnel (1 phrase, ne donne pas la réponse)
 - sources: liste de références vérifiables (obligatoire si fait chiffré/historique), sinon []
 - duree_s: temps estimé (10-40)
+- boss: optionnel, `true` = épreuve de boss (3 vies, essais multiples). Champ EXPLICITE (plus de détection sur le mot « Boss » dans le texte) ; au plus un par leçon, en dernier, jamais une flashcard
 
 Champs par type :
 - qcm: choix:[{id,texte,distracteur_pourquoi (si faux)}] (3-4 choix), bonne:"idA" (UNE seule bonne réponse)
