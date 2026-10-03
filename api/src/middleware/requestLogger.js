@@ -1,10 +1,10 @@
 const logger = require('../utils/logger');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 // Middleware pour logger les requêtes avec ID unique
 const requestLogger = (req, res, next) => {
   const startTime = Date.now();
-  const requestId = uuidv4();
+  const requestId = randomUUID();
   
   // Ajouter l'ID de requête aux headers et au request
   req.requestId = requestId;

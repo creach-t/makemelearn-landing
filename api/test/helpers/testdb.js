@@ -59,12 +59,20 @@ async function createPgMemDb({ migrateSchema = true } = {}) {
 
 async function createRealDb({ migrateSchema = true } = {}) {
   const { Pool } = require('pg');
-  const admin = new Pool({ connectionString: process.env.TEST_DATABASE_URL });
+  // Le DROP DATABASE ... FORCE de close() peut couper une connexion que le pool est déjà en train de
+  // fermer ("terminating connection due to administrator command") : sans écouteur d'erreur sur le
+  // client, pg la remonte comme erreur non gérée (observé sur la CI, Postgres 15 en conteneur).
+  const tolerant = (pool) => {
+    pool.on('error', () => {});
+    pool.on('connect', (client) => client.on('error', () => {}));
+    return pool;
+  };
+  const admin = tolerant(new Pool({ connectionString: process.env.TEST_DATABASE_URL }));
   const name = `mml_t_${crypto.randomBytes(6).toString('hex')}`;
   await admin.query(`CREATE DATABASE ${name}`);
   const url = new URL(process.env.TEST_DATABASE_URL);
   url.pathname = `/${name}`;
-  const db = fromPool(new Pool({ connectionString: url.toString(), max: 10 }));
+  const db = fromPool(tolerant(new Pool({ connectionString: url.toString(), max: 10 })));
   if (migrateSchema) await migrate(db);
   return {
     db,
