@@ -1,128 +1,32 @@
+# Développement local : docker compose up --build  ->  http://localhost:3000
+# (la prod utilise docker-compose.prod.yml + image GHCR)
 services:
-  # Base de données PostgreSQL
   postgres:
     image: postgres:15-alpine
-    container_name: makemelearn_postgres
     environment:
       POSTGRES_DB: makemelearn
       POSTGRES_USER: makemelearn_user
-      POSTGRES_PASSWORD: MakeMeLearn2025!SecurePass
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_only_password}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - makemelearn-network
-    restart: unless-stopped
+      - postgres_dev:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U makemelearn_user -d makemelearn"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
-      start_period: 30s
-    labels:
-      - "traefik.enable=false"  # Pas exposé publiquement
+      retries: 10
 
-  # API Backend Node.js
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    container_name: makemelearn_api
+  app:
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      # Base de données PostgreSQL dans le même réseau Docker
-      DATABASE_URL: postgresql://makemelearn_user:MakeMeLearn2025!SecurePass@postgres:5432/makemelearn
-      CORS_ORIGIN: https://makemelearn.fr
-      RATE_LIMIT_WINDOW_MS: 900000
-      RATE_LIMIT_MAX_REQUESTS: 100
-    networks:
-      - traefik-public
-      - makemelearn-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s  # Augmenté pour laisser plus de temps au démarrage
-    labels:
-      # Traefik configuration pour l'API sur makemelearn.fr/api/
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
-
-      # API sur makemelearn.fr/api/
-      - "traefik.http.routers.makemelearn-api.rule=Host(`makemelearn.fr`) && PathPrefix(`/api/`)"
-      - "traefik.http.routers.makemelearn-api.entrypoints=websecure"
-      - "traefik.http.routers.makemelearn-api.tls=true"
-      - "traefik.http.routers.makemelearn-api.tls.certresolver=myresolver"
-      - "traefik.http.services.makemelearn-api.loadbalancer.server.port=3000"
-      - "traefik.http.routers.makemelearn-api.priority=10"  # Priorité élevée pour /api/
-
-      # Middleware pour supprimer /api/ du path avant d'envoyer à l'API
-      - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
-      - "traefik.http.routers.makemelearn-api.middlewares=api-stripprefix"
-
-      # Redirection HTTP vers HTTPS pour l'API
-      - "traefik.http.routers.makemelearn-api-insecure.rule=Host(`makemelearn.fr`) && PathPrefix(`/api/`)"
-      - "traefik.http.routers.makemelearn-api-insecure.entrypoints=web"
-      - "traefik.http.routers.makemelearn-api-insecure.middlewares=redirect-to-https"
-
-  # Frontend statique
-  frontend:
-    image: nginx:alpine
-    container_name: makemelearn_frontend
-    volumes:
-      - ./:/usr/share/nginx/html:ro
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - traefik-public
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    labels:
-      # Traefik configuration pour le frontend
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
-
-      # Frontend sur makemelearn.fr (tous les chemins sauf /api/)
-      - "traefik.http.routers.makemelearn-frontend.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
-      - "traefik.http.routers.makemelearn-frontend.entrypoints=websecure"
-      - "traefik.http.routers.makemelearn-frontend.tls=true"
-      - "traefik.http.routers.makemelearn-frontend.tls.certresolver=myresolver"
-      - "traefik.http.services.makemelearn-frontend.loadbalancer.server.port=80"
-      - "traefik.http.routers.makemelearn-frontend.priority=1"  # Priorité plus faible que l'API
-
-      # Redirection HTTP vers HTTPS
-      - "traefik.http.routers.makemelearn-frontend-insecure.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
-      - "traefik.http.routers.makemelearn-frontend-insecure.entrypoints=web"
-      - "traefik.http.routers.makemelearn-frontend-insecure.middlewares=redirect-to-https"
-
-      # Redirect www to non-www
-      - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.regex=^https://www\\.makemelearn\\.fr/(.*)"
-      - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.replacement=https://makemelearn.fr/$${1}"
-      - "traefik.http.routers.makemelearn-frontend.middlewares=makemelearn-redirect-www"
-
-      # Middleware de redirection HTTPS
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      NODE_ENV: development
+      DATABASE_URL: postgresql://makemelearn_user:${POSTGRES_PASSWORD:-dev_only_password}@postgres:5432/makemelearn
+      APP_URL: http://localhost:3000
+      COOKIE_SECURE: "false"
+    ports:
+      - "3000:3000"
 
 volumes:
-  postgres_data:
-    driver: local
-    name: makemelearn_postgres_data
-
-networks:
-  traefik-public:
-    external: true
-  makemelearn-network:
-    driver: bridge
-    name: makemelearn_network
+  postgres_dev:

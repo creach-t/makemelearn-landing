@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c3.l2",
+  "slug": "moyenne-mediane-risque",
+  "titre": "Moyenne, médiane et risque relatif",
+  "chapitre": "c03",
+  "position": 8,
+  "competences": [
+    "bdd.chiffres.moyenne_mediane",
+    "bdd.chiffres.relatif_absolu"
+  ],
+  "prerequis": [
+    "bdd.c3.l1"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Les 5 salaires rangés, la 3e valeur est 2 000. La moyenne (20 000 / 5 = 4 000) est tirée vers le haut par un seul salaire extrême.",
+  "recap": "(2 - 1) / 2 = 50 % de réduction relative : la pub peut dire « risque divisé par deux ».",
+  "items": [
+    {
+      "id": "bdd.c3.l2.i01",
+      "type": "saisie",
+      "competence": "bdd.chiffres.moyenne_mediane",
+      "difficulte": 2,
+      "consigne": "Calcule la médiane des salaires, en euros.",
+      "enonce": "Cinq employés de l'agence Zéro Pointé (cas fictif) gagnent : 1 800, 1 900, 2 000, 2 100 et 12 200 euros. Le patron annonce « salaire moyen : 4 000 euros ».",
+      "reponses_acceptees": [
+        "2000",
+        "2 000",
+        "2000€",
+        "2 000 €",
+        "2000 euros",
+        "2000 eur"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "2 000 euros : la valeur du milieu une fois les salaires rangés.",
+      "feedback_ok": "Les 5 salaires rangés, la 3e valeur est 2 000. La moyenne (20 000 / 5 = 4 000) est tirée vers le haut par un seul salaire extrême.",
+      "feedback_ko": "4 000 est la moyenne : 20 000 / 5, gonflée par 12 200. La médiane est la valeur centrale de la série rangée par ordre croissant.",
+      "indice": "Range les salaires et prends celui du milieu.",
+      "sources": [],
+      "duree_s": 30
+    },
+    {
+      "id": "bdd.c3.l2.i02",
+      "type": "saisie",
+      "competence": "bdd.chiffres.relatif_absolu",
+      "difficulte": 3,
+      "consigne": "Calcule la réduction relative du risque, en pourcentage.",
+      "enonce": "Une publicité pour le sirop Mirabelline (cas fictif) : sans sirop, 2 personnes sur 100 attrapent la toux rauque ; avec sirop, 1 sur 100. Elle clame « Efficacité spectaculaire ! »",
+      "reponses_acceptees": [
+        "50%",
+        "50 %",
+        "50",
+        "50 pourcent",
+        "50 pour cent"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "50 % en relatif : (2 - 1) / 2. En absolu : seulement 1 point de pourcentage.",
+      "feedback_ok": "(2 - 1) / 2 = 50 % de réduction relative : la pub peut dire « risque divisé par deux ». Mais en absolu, le risque ne baisse que de 1 point (de 2 % à 1 %) : il faut traiter 100 personnes pour éviter 1 cas.",
+      "feedback_ko": "Divise la baisse (1 point) par le risque de départ (2 %), pas par 100 : 1 / 2 = 50 %. Garde en tête que la baisse absolue, elle, n'est que de 1 point.",
+      "indice": "Relatif = baisse divisée par la valeur de départ.",
+      "sources": [],
+      "duree_s": 35,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c3.l2.i03",
+      "type": "appariement",
+      "competence": "bdd.chiffres.moyenne_mediane",
+      "difficulte": 2,
+      "consigne": "Associe chaque notion à sa définition.",
+      "enonce": "Pie classe ses fiches sur le bureau de Mirabelle. Aide-la à ne pas mélanger les outils.",
+      "paires": [
+        {
+          "gauche": "Moyenne",
+          "droite": "Somme des valeurs divisée par leur nombre, sensible aux valeurs extrêmes"
+        },
+        {
+          "gauche": "Médiane",
+          "droite": "Valeur qui sépare la série rangée en deux moitiés égales"
+        },
+        {
+          "gauche": "Réduction absolue",
+          "droite": "Différence entre deux risques, en points de pourcentage"
+        },
+        {
+          "gauche": "Réduction relative",
+          "droite": "Baisse rapportée au risque de départ, en pourcentage"
+        }
+      ],
+      "feedback_ok": "Bien rangé : moyenne et médiane résument une série, absolu et relatif décrivent une variation. Un bon enquêteur demande toujours les deux versions.",
+      "feedback_ko": "Retiens : la moyenne est sensible aux extrêmes, la médiane non ; l'absolu est une différence, le relatif un rapport à la valeur de départ.",
+      "sources": [],
+      "duree_s": 35
+    }
+  ]
+}

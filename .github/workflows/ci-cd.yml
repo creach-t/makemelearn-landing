@@ -1,0 +1,209 @@
+name: 🚀 CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Droits minimaux par défaut ; chaque job n'ajoute que ce dont il a besoin.
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Job 1 : Tests (Postgres 15 = version de prod)
+  # ──────────────────────────────────────────────
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+        working-directory: api
+      - name: Routes async enveloppées dans safe()
+        run: node scripts/check-safe.mjs
+      - name: Validation du contenu des univers
+        run: node scripts/validate-content.mjs
+      - name: Tests API
+        working-directory: api
+        env:
+          TEST_DATABASE_URL: postgres://test_user:test_password@localhost:5432/postgres
+        run: npx jest --ci
+
+  security-audit:
+    name: 🔒 Security audit (informatif)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm audit --omit=dev --audit-level=high
+        working-directory: api
+
+  # ──────────────────────────────────────────────
+  # Job 2 : Build image Docker + Push vers GHCR
+  # ──────────────────────────────────────────────
+  build-image:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔑 Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+
+      - name: 🐳 Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # ──────────────────────────────────────────────
+  # Job 3 : Deploy sur VPS via tunnel Cloudflare (rollback si pas healthy)
+  # ──────────────────────────────────────────────
+  deploy:
+    name: 🌐 Deploy to VPS (Cloudflare Tunnel)
+    runs-on: ubuntu-latest
+    needs: build-image
+    environment:
+      name: production
+      url: https://makemelearn.fr
+    env:
+      SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
+      VPS_USER: ${{ secrets.SSH_USER }}
+      VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🏷️ Set image tag
+        id: set-tag
+        run: echo "IMAGE_TAG=sha-$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      # cloudflared ÉPINGLÉ à 2026.5.1 (la 2026.6.0 casse l'auth par service token,
+      # cf. cloudflare/cloudflared#1673), comme modern-cv-react et Cashly.
+      - name: ⬇️ Install cloudflared (pinned 2026.5.1)
+        run: |
+          set -euo pipefail
+          CLOUDFLARED_VERSION="2026.5.1"
+          curl -fsSL -o cloudflared \
+            "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-amd64"
+          sudo install -m 0755 cloudflared /usr/local/bin/cloudflared
+          cloudflared --version
+
+      - name: 🔐 Configure SSH over Cloudflare Access
+        env:
+          VPS_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat > ~/.ssh/config <<EOF
+          Host ${SSH_HOSTNAME}
+            HostName ${SSH_HOSTNAME}
+            User ${VPS_USER}
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+            ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: 📤 Copy docker-compose.prod.yml to VPS
+        run: |
+          set -euo pipefail
+          ssh "$SSH_HOSTNAME" "mkdir -p '$VPS_DEPLOY_PATH'"
+          scp docker-compose.prod.yml "$SSH_HOSTNAME:$VPS_DEPLOY_PATH/"
+
+      - name: 🚀 Deploy via SSH
+        env:
+          IMAGE_TAG: ${{ steps.set-tag.outputs.IMAGE_TAG }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GHCR_USER: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          # Le PAT passe par stdin (jamais en argument de ligne de commande, visible dans `ps` sur le VPS).
+          printf '%s' "$GHCR_PAT" | ssh "$SSH_HOSTNAME" "docker login ghcr.io -u '$GHCR_USER' --password-stdin" \
+            || echo "⚠️ GHCR login ignoré (image publique)"
+          ssh "$SSH_HOSTNAME" \
+            IMAGE_TAG="$IMAGE_TAG" \
+            VPS_DEPLOY_PATH="$VPS_DEPLOY_PATH" \
+            'bash -s' <<'REMOTE'
+          set -e
+          cd "$VPS_DEPLOY_PATH"
+          test -f .env || { echo "❌ .env manquant dans $VPS_DEPLOY_PATH"; exit 1; }
+          echo "📦 Deploying image tag: $IMAGE_TAG"
+          export IMAGE_TAG
+          docker compose -f docker-compose.prod.yml pull
+          PREVIOUS_IMAGE=$(docker inspect --format '{{.Config.Image}}' makemelearn 2>/dev/null || true)
+          docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+          # Attend que le healthcheck du nouveau container passe ; sinon rollback sur l'image précédente.
+          for i in $(seq 1 30); do
+            STATUS=$(docker inspect --format '{{.State.Health.Status}}' makemelearn 2>/dev/null || echo missing)
+            [ "$STATUS" = "healthy" ] && break
+            sleep 2
+          done
+
+          if [ "$STATUS" != "healthy" ]; then
+            echo "❌ Le nouveau container n'est pas healthy (statut: $STATUS)"
+            docker logs --tail 50 makemelearn || true
+            if [ -n "$PREVIOUS_IMAGE" ]; then
+              echo "↩️ Rollback vers $PREVIOUS_IMAGE"
+              IMAGE_TAG="${PREVIOUS_IMAGE##*:}" docker compose -f docker-compose.prod.yml up -d
+            fi
+            exit 1
+          fi
+
+          docker image prune -f
+          echo "✅ Deployed!"
+          REMOTE

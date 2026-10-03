@@ -1,0 +1,14 @@
+- [game-design -> produit] Modèle économique (abonnement énergie illimitée ou 100% gratuit) ? Public mineurs (<15 ans, RGPD/accord parental) ?
+- [game-design -> tech] Auth: comptes différés après 1re mission = stockage local puis fusion serveur; faisable avec Express/Postgres ?
+- [game-design -> contenu] Format standard d'items (QCM/cloze/appariement) et modération des contenus communautaires ?
+- [seo-marche -> tech] Leçons : pré-rendu statique ou SSR Express ? Chaque leçon jouable doit avoir une version HTML lisible sans JS pour l'indexation.
+- [seo-marche -> contenu] Qui valide le contenu YMYL (finance) et audio (musique) ? Capacité de production de leçons au lancement ?
+- [univers->tech] Exécution du type `code` : Pyodide/WASM côté client OK ? Schéma JSON Schema à écrire + validateur CI + moteur de répétition espacée (J+1/3/7/21) à implémenter.
+- [univers->legal] Licence du contenu (CC BY-NC-SA ?) et politique mineurs <15 ans (compte parental ou mode sans compte) à trancher.
+- [univers->design] Besoin d'avatars/illustrations des personnages (Mirabelle, Pie, Maître du Prisme) et image OG.
+- [architecture->owner] Postgres partagé sur le VPS ou sidecar dans le compose du projet ? (hypothèse : sidecar, volume makemelearn_postgres_data conservé ; prod actuelle en postgres:15, passer en 16 exige dump/restore)
+- [architecture->owner] Conserver la base actuelle (registrations en prod) ? (hypothèse : oui, migration 001 no-op + pg_dump avant bascule)
+- [architecture->owner] Fournir le ci-cd.yml modèle (modern-cv-react / Cashly) : absent localement, requis pour le lot 10
+- [architecture->owner] Vérifier en prod : curl -I https://makemelearn.fr/docker-compose.yml (si 200 -> rotation immédiate du mot de passe DB)
+- [architecture->produit] FR uniquement en v1 ? Types d'items prioritaires (proposition : mcq, cloze, flashcard, ordering) ?
+- [architecture->produit] Expéditeur/SMTP pour le lien magique ; SPF/DKIM de makemelearn.fr configurés ?

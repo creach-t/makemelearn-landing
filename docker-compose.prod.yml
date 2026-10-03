@@ -1,0 +1,77 @@
+# Production (VPS) : copié par la CI dans /opt/makemelearn, à côté du .env créé à la main.
+# Un conteneur applicatif (API + site) + un Postgres privé. Exposé par Traefik uniquement.
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: makemelearn_postgres
+    environment:
+      POSTGRES_DB: makemelearn
+      POSTGRES_USER: makemelearn_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant dans .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U makemelearn_user -d makemelearn"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "traefik.enable=false"
+
+  app:
+    image: ghcr.io/creach-t/makemelearn-landing:${IMAGE_TAG:-latest}
+    container_name: makemelearn
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://makemelearn_user:${POSTGRES_PASSWORD}@postgres:5432/makemelearn
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET manquant dans .env}
+      MAINTENANCE_TOKEN: ${MAINTENANCE_TOKEN:-}
+      APP_URL: https://makemelearn.fr
+      CORS_ORIGIN: https://makemelearn.fr
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: no-reply@makemelearn.fr
+    networks:
+      - internal
+      - traefik-public
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.services.makemelearn.loadbalancer.server.port=3000"
+
+      - "traefik.http.routers.makemelearn.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
+      - "traefik.http.routers.makemelearn.entrypoints=websecure"
+      - "traefik.http.routers.makemelearn.tls=true"
+      - "traefik.http.routers.makemelearn.tls.certresolver=myresolver"
+      - "traefik.http.routers.makemelearn.middlewares=makemelearn-redirect-www"
+
+      - "traefik.http.routers.makemelearn-insecure.rule=Host(`makemelearn.fr`) || Host(`www.makemelearn.fr`)"
+      - "traefik.http.routers.makemelearn-insecure.entrypoints=web"
+      - "traefik.http.routers.makemelearn-insecure.middlewares=redirect-to-https"
+
+      - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.regex=^https://www\\.makemelearn\\.fr/(.*)"
+      - "traefik.http.middlewares.makemelearn-redirect-www.redirectregex.replacement=https://makemelearn.fr/$${1}"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+volumes:
+  postgres_data:
+    name: makemelearn_postgres_data   # volume existant conservé
+
+networks:
+  internal:
+    name: makemelearn_network
+  traefik-public:
+    external: true

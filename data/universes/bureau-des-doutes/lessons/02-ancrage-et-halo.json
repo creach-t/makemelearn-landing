@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c1.l2",
+  "slug": "ancrage-et-halo",
+  "titre": "Ancrage, halo et premières enquêtes sur les biais",
+  "chapitre": "c01",
+  "position": 2,
+  "competences": [
+    "bdd.biais.ancrage",
+    "bdd.biais.histoire",
+    "bdd.biais.halo"
+  ],
+  "prerequis": [
+    "bdd.c1.l1"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "C'est l'ancrage : un nombre vu en premier, même arbitraire, sert de point de départ, et l'on ne s'en éloigne pas assez dans son estimation.",
+  "recap": "Tu as la bonne chronologie : de Thorndike en 1920 à la grande synthèse de Nickerson en 1998.",
+  "items": [
+    {
+      "id": "bdd.c1.l2.i01",
+      "type": "qcm",
+      "competence": "bdd.biais.ancrage",
+      "difficulte": 2,
+      "consigne": "Choisis ce que l'expérience de la roue de la fortune a montré.",
+      "enonce": "Tversky et Kahneman (1974) font tourner une roue truquée devant des participants, puis leur demandent d'estimer le pourcentage de pays africains à l'ONU.",
+      "choix": [
+        {
+          "id": "A",
+          "texte": "Les estimations ont été attirées vers le nombre de la roue, sans rapport avec la question.",
+          "distracteur_pourquoi": ""
+        },
+        {
+          "id": "B",
+          "texte": "Les participants ont ignoré la roue, car ils savaient qu'elle était aléatoire.",
+          "distracteur_pourquoi": "Justement non : même sachant le nombre aléatoire, les estimations ont suivi l'ancre."
+        },
+        {
+          "id": "C",
+          "texte": "Seuls les participants peu confiants ont été influencés.",
+          "distracteur_pourquoi": "L'effet a touché les participants en général, pas seulement les hésitants."
+        },
+        {
+          "id": "D",
+          "texte": "La roue a rendu les estimations plus justes en les calibrant.",
+          "distracteur_pourquoi": "Un nombre arbitraire ne contient aucune information utile : il déplace les estimations sans les améliorer."
+        }
+      ],
+      "bonne": "A",
+      "feedback_ok": "C'est l'ancrage : un nombre vu en premier, même arbitraire, sert de point de départ, et l'on ne s'en éloigne pas assez dans son estimation.",
+      "feedback_ko": "Savoir que le nombre est arbitraire ne suffit pas à l'ignorer : l'ajustement à partir de l'ancre reste insuffisant.",
+      "indice": "Quel nombre as-tu vu en premier ?",
+      "sources": [
+        "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185(4157), 1124-1131."
+      ],
+      "duree_s": 35,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c1.l2.i02",
+      "type": "ordre",
+      "competence": "bdd.biais.histoire",
+      "difficulte": 3,
+      "consigne": "Remets ces travaux d'enquête sur les biais dans l'ordre chronologique.",
+      "enonce": "Pie a mélangé les fiches du Bureau. Reconstitue la chronologie, du plus ancien au plus récent.",
+      "elements": [
+        "Thorndike : l'erreur constante dans les jugements (1920)",
+        "Wald : les avions de la Seconde Guerre mondiale (années 1940)",
+        "Tversky et Kahneman : heuristiques et biais, dont l'ancrage (1974)",
+        "Nickerson : la revue sur le biais de confirmation (1998)"
+      ],
+      "critere_ordre": "Du plus ancien au plus récent.",
+      "feedback_ok": "Tu as la bonne chronologie : de Thorndike en 1920 à la grande synthèse de Nickerson en 1998.",
+      "feedback_ko": "Repère d'abord l'entre-deux-guerres (Thorndike), puis la guerre (Wald), puis les années 1970 (Tversky et Kahneman) et enfin la fin des années 1990 (Nickerson).",
+      "indice": "La Seconde Guerre mondiale se situe entre 1939 et 1945.",
+      "sources": [
+        "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29.",
+        "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors (Statistical Research Group, Columbia University).",
+        "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185.",
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+      ],
+      "duree_s": 30
+    },
+    {
+      "id": "bdd.c1.l2.i03",
+      "type": "saisie",
+      "competence": "bdd.biais.halo",
+      "difficulte": 3,
+      "consigne": "Nomme le biais que Thorndike a mis en évidence en 1920.",
+      "enonce": "Thorndike demande à des officiers de noter leurs soldats sur plusieurs qualités. Les notes d'une qualité (la prestance) contaminent celles des autres (intelligence, loyauté...). Quel est ce biais ?",
+      "reponses_acceptees": [
+        "effet de halo",
+        "halo",
+        "effet halo",
+        "l'effet de halo",
+        "biais de halo"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "L'effet de halo",
+      "feedback_ok": "Oui : une impression positive sur un trait déteint sur les autres traits, d'où le nom de « halo ».",
+      "feedback_ko": "Ce n'est ni de la confirmation ni de l'ancrage : ici, une impression générale positive contamine des jugements pourtant distincts. Le nom vient d'une image lumineuse qui entoure une tête.",
+      "indice": "Une impression générale éclaire (ou assombrit) tous les autres traits d'une personne.",
+      "sources": [
+        "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29."
+      ],
+      "duree_s": 25,
+      "statut_qa": "relu"
+    }
+  ]
+}

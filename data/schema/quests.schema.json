@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://makemelearn.fr/schema/quests.schema.json",
+  "title": "Définitions de quêtes (data/quests.json), synchronisées vers quest_defs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "quetes"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "quetes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slug", "periode", "metrique", "cible", "xp"],
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "titre": { "type": "string", "maxLength": 120 },
+          "periode": { "enum": ["daily", "weekly"] },
+          "metrique": { "enum": ["items_answered", "correct_answers", "lessons_completed", "reviews_done", "xp_earned", "perfect_sessions"] },
+          "cible": { "type": "integer", "minimum": 1 },
+          "xp": { "type": "integer", "minimum": 0, "maximum": 500 },
+          "univers": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "slug d'univers ; absent = tous les univers" },
+          "actif": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

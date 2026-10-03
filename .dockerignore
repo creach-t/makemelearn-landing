@@ -1,0 +1,13 @@
+.git
+.github
+**/node_modules
+dossier
+nginx
+*.md
+.env
+.env.*
+!.env.example
+api/test
+api/coverage
+scripts
+test-components.html

@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c1.l1",
+  "slug": "biais-de-confirmation",
+  "titre": "Le biais de confirmation",
+  "chapitre": "c01",
+  "position": 1,
+  "competences": [
+    "bdd.biais.confirmation"
+  ],
+  "prerequis": [],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Biais de confirmation : que fait ton cerveau d'une idée qu'il aime déjà ? Il cherche, retient et interprète surtout les infos qui la confirment, et néglige celles qui la contredisent. Nickerson (1998) le décrit comme omniprésent, pas réservé aux sots.",
+  "recap": "Mon cerveau est un avocat, pas un juge.",
+  "items": [
+    {
+      "id": "bdd.c1.l1.i01",
+      "type": "flashcard",
+      "competence": "bdd.biais.confirmation",
+      "difficulte": 1,
+      "consigne": "Retourne la carte : que dit l'inspectrice Mirabelle du biais de confirmation ?",
+      "enonce": "Pie a volé ta première certitude : « Je sais déjà qui est le coupable. » Mirabelle sort son carnet.",
+      "recto": "Biais de confirmation : que fait ton cerveau d'une idée qu'il aime déjà ?",
+      "verso": "Il cherche, retient et interprète surtout les infos qui la confirment, et néglige celles qui la contredisent. Nickerson (1998) le décrit comme omniprésent, pas réservé aux sots.",
+      "mnemo": "Mon cerveau est un avocat, pas un juge.",
+      "feedback_ok": "Bien vu : le biais n'est pas un mensonge, c'est un tri orienté de ce que tu cherches et retiens.",
+      "feedback_ko": "Ce n'est pas de la mauvaise foi : on le fait sans s'en rendre compte, même quand on veut être objectif.",
+      "indice": "Pense à l'avocat qui ne plaide que d'un côté.",
+      "sources": [
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220."
+      ],
+      "duree_s": 15
+    },
+    {
+      "id": "bdd.c1.l1.i02",
+      "type": "qcm",
+      "competence": "bdd.biais.confirmation",
+      "difficulte": 2,
+      "consigne": "Choisis la démarche qui échappe au biais de confirmation.",
+      "enonce": "Cas fictif : le commissaire est sûr que le jardinier a volé le collier. Il cherche un moyen de vérifier son hypothèse avant de l'arrêter.",
+      "choix": [
+        {
+          "id": "A",
+          "texte": "Chercher tous les témoignages qui placent le jardinier près du coffre.",
+          "distracteur_pourquoi": "Tu ne collectes que ce qui confirme : tu ne peux pas ainsi tester l'idée, seulement l'illustrer."
+        },
+        {
+          "id": "B",
+          "texte": "Chercher activement un indice qui prouverait que le jardinier est innocent.",
+          "distracteur_pourquoi": ""
+        },
+        {
+          "id": "C",
+          "texte": "Demander à des collègues qui pensent comme lui s'ils sont d'accord.",
+          "distracteur_pourquoi": "Des avis déjà alignés renforcent la croyance sans la tester."
+        },
+        {
+          "id": "D",
+          "texte": "Relire le dossier jusqu'à ce que tout colle bien.",
+          "distracteur_pourquoi": "Relire avec l'hypothèse en tête fait précisément interpréter chaque détail en sa faveur."
+        }
+      ],
+      "bonne": "B",
+      "feedback_ok": "Chercher ce qui pourrait réfuter ton idée est le vrai test : une hypothèse qui survit à la contradiction vaut plus qu'une qui n'a rencontré que des alliés.",
+      "feedback_ko": "Accumuler des indices favorables ne prouve rien : presque toute idée trouve des confirmations si on ne cherche que celles-là.",
+      "indice": "Que chercherait un juge qui veut vraiment savoir ?",
+      "sources": [
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+      ],
+      "duree_s": 30
+    },
+    {
+      "id": "bdd.c1.l1.i03",
+      "type": "vrai_faux",
+      "competence": "bdd.biais.confirmation",
+      "difficulte": 2,
+      "consigne": "Vrai ou faux : réponds à l'affirmation de Pie.",
+      "enonce": "Pie croasse depuis son perchoir, très sûre d'elle.",
+      "affirmation": "Le biais de confirmation ne touche que les personnes peu informées ou peu instruites.",
+      "reponse": false,
+      "feedback_ok": "Faux, bravo : la revue de Nickerson (1998) le montre présent chez les experts comme chez les novices, dans la vie courante comme dans la science.",
+      "feedback_ko": "Être instruit ne protège pas : un expert sûr de sa théorie filtre lui aussi les données. C'est un réflexe général, pas un défaut de culture.",
+      "indice": "Les experts sont-ils plus à l'abri que les autres ? Pense à ce que montre la revue de Nickerson.",
+      "sources": [
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220."
+      ],
+      "duree_s": 15,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c1.l1.i04",
+      "type": "trous",
+      "competence": "bdd.biais.confirmation",
+      "difficulte": 2,
+      "consigne": "Complète la règle d'or de Mirabelle avec les bons mots.",
+      "enonce": "Mirabelle te dicte sa règle d'enquête pour ne pas te piéger toi-même quand une idée t'a séduit.",
+      "texte": "Pour tester mon idée, je cherche d'abord des {{1}} plutôt que des preuves qui l'arrangent, car une idée qui n'a jamais été mise à l'épreuve reste une simple {{2}}.",
+      "trous": [
+        {
+          "id": "1",
+          "reponses_acceptees": [
+            "contre-exemples",
+            "contre exemples",
+            "preuves contraires",
+            "contradictions"
+          ],
+          "banque": [
+            "contre-exemples",
+            "témoins",
+            "alliés",
+            "rumeurs"
+          ]
+        },
+        {
+          "id": "2",
+          "reponses_acceptees": [
+            "hypothèse",
+            "hypothese",
+            "croyance",
+            "supposition"
+          ],
+          "banque": [
+            "hypothèse",
+            "certitude",
+            "preuve",
+            "vérité"
+          ]
+        }
+      ],
+      "feedback_ok": "Exactement : chercher le contre-exemple est ce qui transforme une croyance en hypothèse testée.",
+      "feedback_ko": "Si tu ne cherches que des alliés, tu confirmes sans tester. Une « certitude » non testée n'est qu'une hypothèse qui se prend pour une preuve.",
+      "indice": "Que doit-on trouver pour pouvoir mettre une idée en défaut ?",
+      "sources": [
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+      ],
+      "duree_s": 30,
+      "statut_qa": "relu"
+    }
+  ]
+}

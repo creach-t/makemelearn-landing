@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "badges": [
+    { "slug": "premier-indice", "titre": "Premier indice", "description": "Terminer sa première leçon.", "criteres": { "type": "lessons_completed", "count": 1 } },
+    { "slug": "serie-7", "titre": "Une semaine d'enquête", "description": "7 jours de suite à 30 XP.", "criteres": { "type": "streak", "days": 7 } },
+    { "slug": "serie-30", "titre": "Un mois d'enquête", "description": "30 jours de suite à 30 XP.", "criteres": { "type": "streak", "days": 30 } },
+    { "slug": "enqueteur-assidu", "titre": "Enquêteur assidu", "description": "Cumuler 500 XP.", "criteres": { "type": "xp_total", "xp": 500 } },
+    { "slug": "sans-faute", "titre": "Sans faute", "description": "Terminer une session sans erreur.", "criteres": { "type": "perfect_sessions", "count": 1 } },
+    { "slug": "boss-vaincu", "titre": "Boss vaincu", "description": "Réussir une épreuve de boss.", "criteres": { "type": "boss_won", "count": 1 } }
+  ]
+}

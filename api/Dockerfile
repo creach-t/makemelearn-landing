@@ -18,7 +18,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Installation des dépendances
-RUN npm install --only=production && \
+RUN npm ci --omit=dev && \
     npm cache clean --force
 
 # Création d'un utilisateur non-root pour la sécurité
@@ -45,7 +45,7 @@ USER nodejs
 
 # Script de healthcheck amélioré
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:3000/healthz || exit 1
 
 # Point d'entrée avec dumb-init pour gérer les signaux
 ENTRYPOINT ["dumb-init", "--"]

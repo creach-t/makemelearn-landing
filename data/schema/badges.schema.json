@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://makemelearn.fr/schema/badges.schema.json",
+  "title": "Définitions de badges (data/badges.json), synchronisées vers badges",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "badges"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slug", "titre", "criteres"],
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "titre": { "type": "string", "minLength": 3, "maxLength": 80 },
+          "description": { "type": "string", "maxLength": 200 },
+          "criteres": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "enum": ["lessons_completed", "streak", "xp_total", "boss_won", "perfect_sessions"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

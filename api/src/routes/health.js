@@ -1,11 +1,25 @@
 const express = require('express');
+const { safe } = require('../lib/safe');
+const crypto = require('crypto');
 const db = require('../config/database');
 const logger = require('../utils/logger');
 
 const router = express.Router();
 
+// Jeton de maintenance : refus si non défini, comparaison à temps constant
+const requireMaintenanceToken = (req, res, next) => {
+  const expected = process.env.MAINTENANCE_TOKEN;
+  const given = (req.get('Authorization') || '').replace(/^Bearer /, '');
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected || '');
+  if (!expected || a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    return res.status(401).json({ error: 'Authentification requise', code: 'AUTH_REQUIRED' });
+  }
+  next();
+};
+
 // GET /health - Health check simple (pour load balancer)
-router.get('/', async (req, res) => {
+router.get('/', safe(async (req, res) => {
   try {
     // Test basique de la base de données
     const result = await db.query('SELECT 1 as healthy');
@@ -29,10 +43,10 @@ router.get('/', async (req, res) => {
       error: 'Database connection failed'
     });
   }
-});
+}));
 
 // GET /health/detailed - Health check détaillé
-router.get('/detailed', async (req, res) => {
+router.get('/detailed', requireMaintenanceToken, safe(async (req, res) => {
   const checks = {
     database: false,
     memory: false,
@@ -166,10 +180,10 @@ router.get('/detailed', async (req, res) => {
   }
 
   res.status(statusCode).json(details);
-});
+}));
 
 // GET /health/metrics - Métriques Prometheus-style
-router.get('/metrics', async (req, res) => {
+router.get('/metrics', requireMaintenanceToken, safe(async (req, res) => {
   try {
     const [dbMetrics, systemMetrics] = await Promise.all([
       db.query(`
@@ -236,10 +250,10 @@ makemelearn_${row.metric_name} ${row.total_value}
     logger.logError(error, { operation: 'metrics_export' });
     res.status(500).send('# Error generating metrics\n');
   }
-});
+}));
 
 // GET /health/readiness - Readiness probe (K8s)
-router.get('/readiness', async (req, res) => {
+router.get('/readiness', safe(async (req, res) => {
   try {
     // Vérifier que l'application est prête à recevoir du trafic
     await db.query('SELECT 1');
@@ -261,7 +275,7 @@ router.get('/readiness', async (req, res) => {
       error: error.message
     });
   }
-});
+}));
 
 // GET /health/liveness - Liveness probe (K8s)
 router.get('/liveness', (req, res) => {
@@ -275,7 +289,7 @@ router.get('/liveness', (req, res) => {
 });
 
 // POST /health/maintenance - Déclencher la maintenance
-router.post('/maintenance', async (req, res) => {
+router.post('/maintenance', requireMaintenanceToken, safe(async (req, res) => {
   try {
     // Vérification d'authentification simple (à améliorer)
     const authHeader = req.get('Authorization');
@@ -304,6 +318,6 @@ router.post('/maintenance', async (req, res) => {
       code: 'MAINTENANCE_ERROR'
     });
   }
-});
+}));
 
 module.exports = router;

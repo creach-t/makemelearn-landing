@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c1.l3",
+  "slug": "survivants-et-disponibilite",
+  "titre": "Biais du survivant et de disponibilité (Boss)",
+  "chapitre": "c01",
+  "position": 3,
+  "competences": [
+    "bdd.biais.survivant",
+    "bdd.biais.disponibilite",
+    "bdd.biais.synthese"
+  ],
+  "prerequis": [
+    "bdd.c1.l2"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Les avions touchés dans ces zones ne revenaient pas : on ne voyait que les survivants. C'est le biais du survivant, et Wald l'a corrigé.",
+  "recap": "Faux : c'est l'heuristique de disponibilité (Tversky et Kahneman, 1973).",
+  "items": [
+    {
+      "id": "bdd.c1.l3.i01",
+      "type": "qcm",
+      "competence": "bdd.biais.survivant",
+      "difficulte": 3,
+      "consigne": "Choisis où Abraham Wald a recommandé de blinder les avions.",
+      "enonce": "Pendant la Seconde Guerre mondiale, on étudie les impacts sur les bombardiers revenus de mission. Certaines zones sont criblées de trous, d'autres presque intactes.",
+      "choix": [
+        {
+          "id": "A",
+          "texte": "Sur les zones les plus criblées de trous.",
+          "distracteur_pourquoi": "Ces avions-là sont revenus : leurs trous montrent où l'on peut être touché et survivre."
+        },
+        {
+          "id": "B",
+          "texte": "Sur les zones presque sans impact chez les avions revenus.",
+          "distracteur_pourquoi": ""
+        },
+        {
+          "id": "C",
+          "texte": "Uniformément, sur tout l'appareil.",
+          "distracteur_pourquoi": "Blinder partout alourdit l'avion : le raisonnement de Wald visait justement à cibler."
+        },
+        {
+          "id": "D",
+          "texte": "Nulle part : les trous ne prouvent rien.",
+          "distracteur_pourquoi": "Les trous informent, à condition de se souvenir qu'on ne voit que les survivants."
+        }
+      ],
+      "bonne": "B",
+      "feedback_ok": "Les avions touchés dans ces zones ne revenaient pas : on ne voyait que les survivants. C'est le biais du survivant, et Wald l'a corrigé.",
+      "feedback_ko": "Tu as raisonné à partir de ce qui est visible. Les avions abattus manquent à l'échantillon : leurs impacts se concentrent là où les revenants n'en ont pas.",
+      "indice": "Que sont devenus les avions touchés au moteur ?",
+      "sources": [
+        "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors. Statistical Research Group, Columbia University (réédité par le Center for Naval Analyses, 1980).",
+        "Mangel, M. & Samaniego, F. J. (1984). Abraham Wald's Work on Aircraft Survivability. Journal of the American Statistical Association, 79(386), 259-267."
+      ],
+      "duree_s": 35
+    },
+    {
+      "id": "bdd.c1.l3.i02",
+      "type": "vrai_faux",
+      "competence": "bdd.biais.disponibilite",
+      "difficulte": 3,
+      "consigne": "Vrai ou faux : juge l'affirmation que Pie lâche en picorant son journal.",
+      "enonce": "Pie vient de lire trois articles sur des cambriolages dans le quartier, et en conclut que la ville n'a jamais été aussi dangereuse.",
+      "affirmation": "Si des exemples d'un événement te viennent facilement à l'esprit, c'est une bonne preuve qu'il est fréquent.",
+      "reponse": false,
+      "feedback_ok": "Faux : c'est l'heuristique de disponibilité (Tversky et Kahneman, 1973). La facilité à se rappeler dépend aussi de la médiatisation et de l'émotion, pas seulement de la fréquence réelle.",
+      "feedback_ko": "Un souvenir vif n'est pas une statistique. Ce qui est spectaculaire ou récemment médiatisé s'impose à l'esprit sans être plus fréquent. Cherche des données, pas des souvenirs.",
+      "indice": "Ce qu'on retient est-il ce qui arrive le plus souvent ou ce qui frappe le plus ?",
+      "sources": [
+        "Tversky, A. & Kahneman, D. (1973). Availability: A heuristic for judging frequency and probability. Cognitive Psychology, 5(2), 207-232."
+      ],
+      "duree_s": 20
+    },
+    {
+      "id": "bdd.c1.l3.i03",
+      "type": "appariement",
+      "competence": "bdd.biais.synthese",
+      "difficulte": 5,
+      "consigne": "BOSS : associe chaque scène d'enquête au biais qui la gouverne.",
+      "enonce": "Dernier dossier du chapitre. Pie a mélangé cinq scènes (cas fictifs) : retrouve pour chacune le raccourci du cerveau en action.",
+      "paires": [
+        {
+          "gauche": "Le commissaire ne retient que les indices qui accablent son suspect favori.",
+          "droite": "Biais de confirmation"
+        },
+        {
+          "gauche": "Un prix de départ absurdement élevé fait paraître « raisonnable » une offre pourtant gonflée.",
+          "droite": "Ancrage"
+        },
+        {
+          "gauche": "Le témoin est élégant et aimable, donc on juge aussi sa mémoire excellente.",
+          "droite": "Effet de halo"
+        },
+        {
+          "gauche": "On cite les fondateurs à succès qui ont arrêté leurs études, en oubliant ceux qui ont échoué.",
+          "droite": "Biais du survivant"
+        },
+        {
+          "gauche": "Après un reportage choc sur un naufrage, on juge les traversées en mer très dangereuses.",
+          "droite": "Heuristique de disponibilité"
+        }
+      ],
+      "feedback_ok": "Dossier bouclé : tu reconnais les cinq raccourcis. Chacun économise de l'effort au prix d'une erreur systématique, et savoir le nommer, c'est déjà commencer à lui résister.",
+      "feedback_ko": "Pour départager : confirmation = tu cherches ce qui t'arrange ; ancrage = un nombre te sert de point de départ ; halo = un trait en contamine d'autres ; survivant = tu ne vois que les gagnants ; disponibilité = ce qui frappe paraît fréquent.",
+      "indice": "Demande-toi : qu'est-ce qui manque ? ce qui est vu en premier ? ce qui est le plus marquant ?",
+      "sources": [
+        "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220.",
+        "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185(4157), 1124-1131.",
+        "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29.",
+        "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors. Statistical Research Group, Columbia University.",
+        "Tversky, A. & Kahneman, D. (1973). Availability: A heuristic for judging frequency and probability. Cognitive Psychology, 5(2), 207-232."
+      ],
+      "duree_s": 40,
+      "statut_qa": "relu"
+    }
+  ]
+}

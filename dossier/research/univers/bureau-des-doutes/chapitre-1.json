@@ -1,0 +1,316 @@
+[
+  {
+    "id": "bdd.c1.l1.i01",
+    "type": "flashcard",
+    "competence": "bdd.biais.confirmation",
+    "difficulte": 1,
+    "consigne": "Retourne la carte : que dit l'inspectrice Mirabelle du biais de confirmation ?",
+    "enonce": "Pie a volé ta première certitude : « Je sais déjà qui est le coupable. » Mirabelle sort son carnet.",
+    "recto": "Biais de confirmation : que fait ton cerveau d'une idée qu'il aime déjà ?",
+    "verso": "Il cherche, retient et interprète surtout les infos qui la confirment, et néglige celles qui la contredisent. Nickerson (1998) le décrit comme omniprésent, pas réservé aux sots.",
+    "mnemo": "Mon cerveau est un avocat, pas un juge.",
+    "feedback_ok": "Bien vu : le biais n'est pas un mensonge, c'est un tri orienté de ce que tu cherches et retiens.",
+    "feedback_ko": "Ce n'est pas de la mauvaise foi : on le fait sans s'en rendre compte, même quand on veut être objectif.",
+    "indice": "Pense à l'avocat qui ne plaide que d'un côté.",
+    "sources": [
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220."
+    ],
+    "duree_s": 15
+  },
+  {
+    "id": "bdd.c1.l1.i02",
+    "type": "qcm",
+    "competence": "bdd.biais.confirmation",
+    "difficulte": 2,
+    "consigne": "Choisis la démarche qui échappe au biais de confirmation.",
+    "enonce": "Cas fictif : le commissaire est sûr que le jardinier a volé le collier. Il cherche un moyen de vérifier son hypothèse avant de l'arrêter.",
+    "choix": [
+      {
+        "id": "A",
+        "texte": "Chercher tous les témoignages qui placent le jardinier près du coffre.",
+        "distracteur_pourquoi": "Tu ne collectes que ce qui confirme : tu ne peux pas ainsi tester l'idée, seulement l'illustrer."
+      },
+      {
+        "id": "B",
+        "texte": "Chercher activement un indice qui prouverait que le jardinier est innocent.",
+        "distracteur_pourquoi": ""
+      },
+      {
+        "id": "C",
+        "texte": "Demander à des collègues qui pensent comme lui s'ils sont d'accord.",
+        "distracteur_pourquoi": "Des avis déjà alignés renforcent la croyance sans la tester."
+      },
+      {
+        "id": "D",
+        "texte": "Relire le dossier jusqu'à ce que tout colle bien.",
+        "distracteur_pourquoi": "Relire avec l'hypothèse en tête fait précisément interpréter chaque détail en sa faveur."
+      }
+    ],
+    "bonne": "B",
+    "feedback_ok": "Chercher ce qui pourrait réfuter ton idée est le vrai test : une hypothèse qui survit à la contradiction vaut plus qu'une qui n'a rencontré que des alliés.",
+    "feedback_ko": "Accumuler des indices favorables ne prouve rien : presque toute idée trouve des confirmations si on ne cherche que celles-là.",
+    "indice": "Que chercherait un juge qui veut vraiment savoir ?",
+    "sources": [
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+    ],
+    "duree_s": 30
+  },
+  {
+    "id": "bdd.c1.l1.i03",
+    "type": "vrai_faux",
+    "competence": "bdd.biais.confirmation",
+    "difficulte": 2,
+    "consigne": "Vrai ou faux : réponds à l'affirmation de Pie.",
+    "enonce": "Pie croasse depuis son perchoir, très sûre d'elle.",
+    "affirmation": "Le biais de confirmation ne touche que les personnes peu informées ou peu instruites.",
+    "reponse": false,
+    "feedback_ok": "Faux, bravo : la revue de Nickerson (1998) le montre présent chez les experts comme chez les novices, dans la vie courante comme dans la science.",
+    "feedback_ko": "Être instruit ne protège pas : un expert sûr de sa théorie filtre lui aussi les données. C'est un réflexe général, pas un défaut de culture.",
+    "indice": "Les experts sont-ils plus à l'abri que les autres ? Pense à ce que montre la revue de Nickerson.",
+    "sources": [
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220."
+    ],
+    "duree_s": 15,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c1.l1.i04",
+    "type": "trous",
+    "competence": "bdd.biais.confirmation",
+    "difficulte": 2,
+    "consigne": "Complète la règle d'or de Mirabelle avec les bons mots.",
+    "enonce": "Mirabelle te dicte sa règle d'enquête pour ne pas te piéger toi-même quand une idée t'a séduit.",
+    "texte": "Pour tester mon idée, je cherche d'abord des {{1}} plutôt que des preuves qui l'arrangent, car une idée qui n'a jamais été mise à l'épreuve reste une simple {{2}}.",
+    "trous": [
+      {
+        "id": "1",
+        "reponses_acceptees": [
+          "contre-exemples",
+          "contre exemples",
+          "preuves contraires",
+          "contradictions"
+        ],
+        "banque": [
+          "contre-exemples",
+          "témoins",
+          "alliés",
+          "rumeurs"
+        ]
+      },
+      {
+        "id": "2",
+        "reponses_acceptees": [
+          "hypothèse",
+          "hypothese",
+          "croyance",
+          "supposition"
+        ],
+        "banque": [
+          "hypothèse",
+          "certitude",
+          "preuve",
+          "vérité"
+        ]
+      }
+    ],
+    "feedback_ok": "Exactement : chercher le contre-exemple est ce qui transforme une croyance en hypothèse testée.",
+    "feedback_ko": "Si tu ne cherches que des alliés, tu confirmes sans tester. Une « certitude » non testée n'est qu'une hypothèse qui se prend pour une preuve.",
+    "indice": "Que doit-on trouver pour pouvoir mettre une idée en défaut ?",
+    "sources": [
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+    ],
+    "duree_s": 30,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c1.l2.i01",
+    "type": "qcm",
+    "competence": "bdd.biais.ancrage",
+    "difficulte": 2,
+    "consigne": "Choisis ce que l'expérience de la roue de la fortune a montré.",
+    "enonce": "Tversky et Kahneman (1974) font tourner une roue truquée devant des participants, puis leur demandent d'estimer le pourcentage de pays africains à l'ONU.",
+    "choix": [
+      {
+        "id": "A",
+        "texte": "Les estimations ont été attirées vers le nombre de la roue, sans rapport avec la question.",
+        "distracteur_pourquoi": ""
+      },
+      {
+        "id": "B",
+        "texte": "Les participants ont ignoré la roue, car ils savaient qu'elle était aléatoire.",
+        "distracteur_pourquoi": "Justement non : même sachant le nombre aléatoire, les estimations ont suivi l'ancre."
+      },
+      {
+        "id": "C",
+        "texte": "Seuls les participants peu confiants ont été influencés.",
+        "distracteur_pourquoi": "L'effet a touché les participants en général, pas seulement les hésitants."
+      },
+      {
+        "id": "D",
+        "texte": "La roue a rendu les estimations plus justes en les calibrant.",
+        "distracteur_pourquoi": "Un nombre arbitraire ne contient aucune information utile : il déplace les estimations sans les améliorer."
+      }
+    ],
+    "bonne": "A",
+    "feedback_ok": "C'est l'ancrage : un nombre vu en premier, même arbitraire, sert de point de départ, et l'on ne s'en éloigne pas assez dans son estimation.",
+    "feedback_ko": "Savoir que le nombre est arbitraire ne suffit pas à l'ignorer : l'ajustement à partir de l'ancre reste insuffisant.",
+    "indice": "Quel nombre as-tu vu en premier ?",
+    "sources": [
+      "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185(4157), 1124-1131."
+    ],
+    "duree_s": 35,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c1.l2.i02",
+    "type": "ordre",
+    "competence": "bdd.biais.histoire",
+    "difficulte": 3,
+    "consigne": "Remets ces travaux d'enquête sur les biais dans l'ordre chronologique.",
+    "enonce": "Pie a mélangé les fiches du Bureau. Reconstitue la chronologie, du plus ancien au plus récent.",
+    "elements": [
+      "Thorndike : l'erreur constante dans les jugements (1920)",
+      "Wald : les avions de la Seconde Guerre mondiale (années 1940)",
+      "Tversky et Kahneman : heuristiques et biais, dont l'ancrage (1974)",
+      "Nickerson : la revue sur le biais de confirmation (1998)"
+    ],
+    "critere_ordre": "Du plus ancien au plus récent.",
+    "feedback_ok": "Tu as la bonne chronologie : de Thorndike en 1920 à la grande synthèse de Nickerson en 1998.",
+    "feedback_ko": "Repère d'abord l'entre-deux-guerres (Thorndike), puis la guerre (Wald), puis les années 1970 (Tversky et Kahneman) et enfin la fin des années 1990 (Nickerson).",
+    "indice": "La Seconde Guerre mondiale se situe entre 1939 et 1945.",
+    "sources": [
+      "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29.",
+      "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors (Statistical Research Group, Columbia University).",
+      "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185.",
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises."
+    ],
+    "duree_s": 30
+  },
+  {
+    "id": "bdd.c1.l2.i03",
+    "type": "saisie",
+    "competence": "bdd.biais.halo",
+    "difficulte": 3,
+    "consigne": "Nomme le biais que Thorndike a mis en évidence en 1920.",
+    "enonce": "Thorndike demande à des officiers de noter leurs soldats sur plusieurs qualités. Les notes d'une qualité (la prestance) contaminent celles des autres (intelligence, loyauté...). Quel est ce biais ?",
+    "reponses_acceptees": [
+      "effet de halo",
+      "halo",
+      "effet halo",
+      "l'effet de halo",
+      "biais de halo"
+    ],
+    "normalisation": [
+      "casse",
+      "accents",
+      "espaces"
+    ],
+    "reponse_modele": "L'effet de halo",
+    "feedback_ok": "Oui : une impression positive sur un trait déteint sur les autres traits, d'où le nom de « halo ».",
+    "feedback_ko": "Ce n'est ni de la confirmation ni de l'ancrage : ici, une impression générale positive contamine des jugements pourtant distincts. Le nom vient d'une image lumineuse qui entoure une tête.",
+    "indice": "Une impression générale éclaire (ou assombrit) tous les autres traits d'une personne.",
+    "sources": [
+      "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29."
+    ],
+    "duree_s": 25,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c1.l3.i01",
+    "type": "qcm",
+    "competence": "bdd.biais.survivant",
+    "difficulte": 3,
+    "consigne": "Choisis où Abraham Wald a recommandé de blinder les avions.",
+    "enonce": "Pendant la Seconde Guerre mondiale, on étudie les impacts sur les bombardiers revenus de mission. Certaines zones sont criblées de trous, d'autres presque intactes.",
+    "choix": [
+      {
+        "id": "A",
+        "texte": "Sur les zones les plus criblées de trous.",
+        "distracteur_pourquoi": "Ces avions-là sont revenus : leurs trous montrent où l'on peut être touché et survivre."
+      },
+      {
+        "id": "B",
+        "texte": "Sur les zones presque sans impact chez les avions revenus.",
+        "distracteur_pourquoi": ""
+      },
+      {
+        "id": "C",
+        "texte": "Uniformément, sur tout l'appareil.",
+        "distracteur_pourquoi": "Blinder partout alourdit l'avion : le raisonnement de Wald visait justement à cibler."
+      },
+      {
+        "id": "D",
+        "texte": "Nulle part : les trous ne prouvent rien.",
+        "distracteur_pourquoi": "Les trous informent, à condition de se souvenir qu'on ne voit que les survivants."
+      }
+    ],
+    "bonne": "B",
+    "feedback_ok": "Les avions touchés dans ces zones ne revenaient pas : on ne voyait que les survivants. C'est le biais du survivant, et Wald l'a corrigé.",
+    "feedback_ko": "Tu as raisonné à partir de ce qui est visible. Les avions abattus manquent à l'échantillon : leurs impacts se concentrent là où les revenants n'en ont pas.",
+    "indice": "Que sont devenus les avions touchés au moteur ?",
+    "sources": [
+      "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors. Statistical Research Group, Columbia University (réédité par le Center for Naval Analyses, 1980).",
+      "Mangel, M. & Samaniego, F. J. (1984). Abraham Wald's Work on Aircraft Survivability. Journal of the American Statistical Association, 79(386), 259-267."
+    ],
+    "duree_s": 35
+  },
+  {
+    "id": "bdd.c1.l3.i02",
+    "type": "vrai_faux",
+    "competence": "bdd.biais.disponibilite",
+    "difficulte": 3,
+    "consigne": "Vrai ou faux : juge l'affirmation que Pie lâche en picorant son journal.",
+    "enonce": "Pie vient de lire trois articles sur des cambriolages dans le quartier, et en conclut que la ville n'a jamais été aussi dangereuse.",
+    "affirmation": "Si des exemples d'un événement te viennent facilement à l'esprit, c'est une bonne preuve qu'il est fréquent.",
+    "reponse": false,
+    "feedback_ok": "Faux : c'est l'heuristique de disponibilité (Tversky et Kahneman, 1973). La facilité à se rappeler dépend aussi de la médiatisation et de l'émotion, pas seulement de la fréquence réelle.",
+    "feedback_ko": "Un souvenir vif n'est pas une statistique. Ce qui est spectaculaire ou récemment médiatisé s'impose à l'esprit sans être plus fréquent. Cherche des données, pas des souvenirs.",
+    "indice": "Ce qu'on retient est-il ce qui arrive le plus souvent ou ce qui frappe le plus ?",
+    "sources": [
+      "Tversky, A. & Kahneman, D. (1973). Availability: A heuristic for judging frequency and probability. Cognitive Psychology, 5(2), 207-232."
+    ],
+    "duree_s": 20
+  },
+  {
+    "id": "bdd.c1.l3.i03",
+    "type": "appariement",
+    "competence": "bdd.biais.synthese",
+    "difficulte": 5,
+    "consigne": "BOSS : associe chaque scène d'enquête au biais qui la gouverne.",
+    "enonce": "Dernier dossier du chapitre. Pie a mélangé cinq scènes (cas fictifs) : retrouve pour chacune le raccourci du cerveau en action.",
+    "paires": [
+      {
+        "gauche": "Le commissaire ne retient que les indices qui accablent son suspect favori.",
+        "droite": "Biais de confirmation"
+      },
+      {
+        "gauche": "Un prix de départ absurdement élevé fait paraître « raisonnable » une offre pourtant gonflée.",
+        "droite": "Ancrage"
+      },
+      {
+        "gauche": "Le témoin est élégant et aimable, donc on juge aussi sa mémoire excellente.",
+        "droite": "Effet de halo"
+      },
+      {
+        "gauche": "On cite les fondateurs à succès qui ont arrêté leurs études, en oubliant ceux qui ont échoué.",
+        "droite": "Biais du survivant"
+      },
+      {
+        "gauche": "Après un reportage choc sur un naufrage, on juge les traversées en mer très dangereuses.",
+        "droite": "Heuristique de disponibilité"
+      }
+    ],
+    "feedback_ok": "Dossier bouclé : tu reconnais les cinq raccourcis. Chacun économise de l'effort au prix d'une erreur systématique, et savoir le nommer, c'est déjà commencer à lui résister.",
+    "feedback_ko": "Pour départager : confirmation = tu cherches ce qui t'arrange ; ancrage = un nombre te sert de point de départ ; halo = un trait en contamine d'autres ; survivant = tu ne vois que les gagnants ; disponibilité = ce qui frappe paraît fréquent.",
+    "indice": "Demande-toi : qu'est-ce qui manque ? ce qui est vu en premier ? ce qui est le plus marquant ?",
+    "sources": [
+      "Nickerson, R. S. (1998). Confirmation Bias: A Ubiquitous Phenomenon in Many Guises. Review of General Psychology, 2(2), 175-220.",
+      "Tversky, A. & Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. Science, 185(4157), 1124-1131.",
+      "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25-29.",
+      "Wald, A. (1943). A Method of Estimating Plane Vulnerability Based on Damage of Survivors. Statistical Research Group, Columbia University.",
+      "Tversky, A. & Kahneman, D. (1973). Availability: A heuristic for judging frequency and probability. Cognitive Psychology, 5(2), 207-232."
+    ],
+    "duree_s": 40,
+    "statut_qa": "relu"
+  }
+]

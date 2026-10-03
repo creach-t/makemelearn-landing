@@ -1,0 +1,544 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://makemelearn.fr/schema/lesson.schema.json",
+  "title": "Leçon d'un univers MakeMeLearn (format v1.0, voir dossier/research/univers/SPEC-FORMAT.md)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "slug",
+    "titre",
+    "chapitre",
+    "position",
+    "competences",
+    "micro_cours",
+    "recap",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]{2,6}\\.c\\d+\\.l\\d+$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 60
+    },
+    "titre": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "chapitre": {
+      "type": "string",
+      "pattern": "^c\\d{2}$"
+    },
+    "position": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "competences": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/competenceId"
+      }
+    },
+    "prerequis": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2,6}\\.c\\d+\\.l\\d+$"
+      }
+    },
+    "duree_min": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "xp": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "intro": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "texte"
+      ],
+      "properties": {
+        "personnage": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "texte": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        }
+      }
+    },
+    "micro_cours": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "recap": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/definitions/item"
+      }
+    }
+  },
+  "definitions": {
+    "competenceId": {
+      "type": "string",
+      "pattern": "^[a-z]{2,6}(\\.[a-z0-9_]+){2}$"
+    },
+    "itemId": {
+      "type": "string",
+      "pattern": "^[a-z]{2,6}\\.c\\d+\\.l\\d+\\.i\\d+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "competence",
+        "difficulte",
+        "consigne",
+        "enonce",
+        "feedback_ok",
+        "feedback_ko",
+        "sources",
+        "duree_s"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/itemId"
+        },
+        "type": {
+          "enum": [
+            "qcm",
+            "vrai_faux",
+            "trous",
+            "appariement",
+            "ordre",
+            "saisie",
+            "code",
+            "flashcard"
+          ]
+        },
+        "competence": {
+          "$ref": "#/definitions/competenceId"
+        },
+        "difficulte": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "consigne": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "enonce": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "feedback_ok": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "feedback_ko": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "indice": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 400
+          }
+        },
+        "duree_s": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 120
+        },
+        "remplace": {
+          "$ref": "#/definitions/itemId"
+        },
+        "statut_qa": {
+          "enum": [
+            "relu"
+          ]
+        },
+        "choix": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "texte"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9]{1,3}$"
+              },
+              "texte": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "distracteur_pourquoi": {
+                "type": "string",
+                "maxLength": 300
+              }
+            }
+          }
+        },
+        "bonne": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]{1,3}$"
+        },
+        "affirmation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "reponse": {
+          "type": "boolean"
+        },
+        "texte": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "trous": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "reponses_acceptees"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9]$"
+              },
+              "reponses_acceptees": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "banque": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "paires": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "gauche",
+              "droite"
+            ],
+            "properties": {
+              "gauche": {
+                "type": "string",
+                "minLength": 1
+              },
+              "droite": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "elements": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "critere_ordre": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "reponses_acceptees": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "normalisation": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "casse",
+              "accents",
+              "espaces"
+            ]
+          }
+        },
+        "reponse_modele": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "recto": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "verso": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "mnemo": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "langage": {
+          "enum": [
+            "python",
+            "javascript"
+          ]
+        },
+        "code_depart": {
+          "type": "string"
+        },
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entree",
+              "sortie_attendue"
+            ],
+            "properties": {
+              "entree": {
+                "type": "string"
+              },
+              "sortie_attendue": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "solution": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "qcm"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "choix",
+              "bonne"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "vrai_faux"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "affirmation",
+              "reponse"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "trous"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "texte",
+              "trous"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "appariement"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "paires"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ordre"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "elements",
+              "critere_ordre"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "saisie"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "reponses_acceptees",
+              "normalisation",
+              "reponse_modele"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "flashcard"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "recto",
+              "verso"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "code"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "langage",
+              "code_depart",
+              "tests",
+              "solution"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

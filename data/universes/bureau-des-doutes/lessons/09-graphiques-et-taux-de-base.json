@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c3.l3",
+  "slug": "graphiques-et-taux-de-base",
+  "titre": "Graphiques tronqués et taux de base (Boss)",
+  "chapitre": "c03",
+  "position": 9,
+  "competences": [
+    "bdd.chiffres.graphiques_tronques",
+    "bdd.chiffres.taux_de_base"
+  ],
+  "prerequis": [
+    "bdd.c3.l2"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Contexte, axe, calcul réel, puis conclusion : tu ne laisses plus la hauteur des barres décider à ta place.",
+  "recap": "Hauteurs visibles : 50 - 48 = 2 et 52 - 48 = 4, soit deux fois plus.",
+  "items": [
+    {
+      "id": "bdd.c3.l3.i01",
+      "type": "ordre",
+      "competence": "bdd.chiffres.graphiques_tronques",
+      "difficulte": 2,
+      "consigne": "Remets dans l'ordre la méthode pour interroger un graphique.",
+      "enonce": "Un graphique en barres circule en ville : « Le crime explose ! » Mirabelle sort sa loupe.",
+      "elements": [
+        "Lire le titre, la source et les unités",
+        "Regarder où commence l'axe vertical",
+        "Calculer l'écart réel entre les valeurs",
+        "Conclure seulement après ces vérifications"
+      ],
+      "critere_ordre": "Du contexte du graphique vers sa conclusion, en vérifiant l'axe avant de comparer.",
+      "feedback_ok": "Contexte, axe, calcul réel, puis conclusion : tu ne laisses plus la hauteur des barres décider à ta place.",
+      "feedback_ko": "Tirer une conclusion avant d'avoir regardé l'axe vertical est l'erreur classique : un axe qui ne part pas de zéro grossit les écarts.",
+      "indice": "Tu ne peux pas calculer l'écart avant de connaître l'échelle.",
+      "sources": [],
+      "duree_s": 30
+    },
+    {
+      "id": "bdd.c3.l3.i02",
+      "type": "saisie",
+      "competence": "bdd.chiffres.graphiques_tronques",
+      "difficulte": 3,
+      "consigne": "Indique combien de fois la barre B paraît plus haute que A.",
+      "enonce": "Graphique en barres (cas fictif) : A = 50 et B = 52, mais l'axe vertical commence à 48. Le journal titre « B écrase A ! » Compare les hauteurs réellement dessinées.",
+      "reponses_acceptees": [
+        "2",
+        "2 fois",
+        "x2",
+        "×2",
+        "deux",
+        "deux fois"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "2 fois : hauteurs dessinées 2 (50 - 48) et 4 (52 - 48), alors que B ne vaut que 4 % de plus que A.",
+      "feedback_ok": "Hauteurs visibles : 50 - 48 = 2 et 52 - 48 = 4, soit deux fois plus. En vrai, 52 / 50 = 1,04 : seulement 4 % d'écart.",
+      "feedback_ko": "Ne compare pas 52 et 50 : compare ce qui est dessiné au-dessus de la base de l'axe, soit 2 et 4 unités. L'axe tronqué double visuellement un écart de 4 %.",
+      "indice": "Retire 48 aux deux valeurs avant de comparer.",
+      "sources": [],
+      "duree_s": 35
+    },
+    {
+      "id": "bdd.c3.l3.i03",
+      "type": "saisie",
+      "competence": "bdd.chiffres.taux_de_base",
+      "difficulte": 5,
+      "consigne": "Calcule la probabilité d'être vraiment malade après un test positif, en % arrondi à l'unité.",
+      "enonce": "Boss : la grippe du Plumard (cas fictif) touche 1 % de la population. Le test détecte 90 % des malades, mais donne un faux positif chez 10 % des non-malades. Tu es positif. Raisonne sur 1 000 personnes.",
+      "reponses_acceptees": [
+        "8%",
+        "8 %",
+        "8",
+        "8,3%",
+        "8,3 %",
+        "8,3",
+        "8.3%",
+        "8.3",
+        "environ 8%"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "8 % : sur 1 000, 10 malades dont 9 positifs ; 990 sains dont 99 faux positifs ; 9 / (9 + 99) = 9 / 108, soit environ 8,3 %.",
+      "feedback_ok": "10 malades dont 9 détectés, et 10 % de 990 = 99 faux positifs : 9 vrais sur 108 positifs, soit 8,3 %. Quand la maladie est rare, la plupart des positifs sont de faux positifs.",
+      "feedback_ko": "Ne confonds pas « 90 % des malades sont positifs » avec « 90 % des positifs sont malades ». Compte les positifs : 9 vrais + 99 faux = 108, et seuls 9 sont malades.",
+      "indice": "Compte d'abord tous les positifs, vrais et faux.",
+      "sources": [
+        "Gigerenzer G. et al. (2007), « Helping Doctors and Patients Make Sense of Health Statistics », Psychological Science in the Public Interest 8(2), 53-96"
+      ],
+      "duree_s": 40
+    }
+  ]
+}

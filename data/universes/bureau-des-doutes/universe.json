@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "content_version": "0.1.0",
+  "id": "bdd",
+  "slug": "bureau-des-doutes",
+  "titre": "Le Bureau des Doutes",
+  "accroche": "En 3 min par jour, deviens quelqu'un qu'on n'arnaque plus.",
+  "description": "Esprit critique, biais cognitifs, fake news et statistiques : mène l'enquête avec l'inspectrice Mirabelle et Pie.",
+  "locale": "fr",
+  "statut": "relecture",
+  "ordre": 10,
+  "theme": {
+    "couleur": "#6C5CE7",
+    "icone": "magnifier"
+  },
+  "seo": {
+    "title": "Esprit critique : apprendre à ne plus se faire avoir | MakeMeLearn",
+    "meta_description": "Biais cognitifs, fake news, statistiques trompeuses : mène l'enquête en 3 min par jour. Gratuit, sans pub.",
+    "slug_url": "/univers/esprit-critique",
+    "mots_cles": [
+      "esprit critique",
+      "biais cognitifs",
+      "fake news"
+    ]
+  },
+  "pitch": {
+    "promesse": "En 3 min par jour, deviens quelqu'un qu'on n'arnaque plus.",
+    "public": "Ados 15+ à adultes curieux, enseignants",
+    "niveau": "débutant"
+  },
+  "lore": {
+    "accroche": "L'Agence du Doute recrute des stagiaires de l'évidence.",
+    "monde": "Dans la ville de Brumelune, tout se murmure et rien ne se vérifie. L'Agence du Doute, minuscule bureau au-dessus d'une boulangerie, recrute des « stagiaires de l'évidence » : tu fais les enquêtes que personne n'ose faire.",
+    "ton": "polar malicieux, tutoiement"
+  },
+  "personnages": [
+    {
+      "id": "mirabelle",
+      "nom": "Inspectrice Mirabelle Doute",
+      "role": "mentor",
+      "bio": "Sèche et bienveillante, phrase fétiche : « Qu'est-ce qui te prouve ça ? »"
+    },
+    {
+      "id": "pie",
+      "nom": "Pie",
+      "role": "sidekick",
+      "bio": "Pie voleuse de certitudes, elle apporte les cas."
+    }
+  ],
+  "chapitres": [
+    {
+      "id": "c01",
+      "slug": "raccourcis-du-cerveau",
+      "titre": "Les raccourcis du cerveau",
+      "resume": "Biais de confirmation, ancrage, halo, survivant, disponibilité."
+    },
+    {
+      "id": "c02",
+      "slug": "enquete-sur-les-sources",
+      "titre": "Enquête sur les sources",
+      "resume": "Sources, clickbait, lecture latérale, images et vérification."
+    },
+    {
+      "id": "c03",
+      "slug": "les-chiffres-qui-mentent",
+      "titre": "Les chiffres qui mentent",
+      "resume": "Corrélation, échantillons, moyennes, risques, graphiques et taux de base."
+    }
+  ],
+  "legal": {
+    "licence_contenu": "CC BY-NC-SA 4.0",
+    "date_revue": "2026-10-03",
+    "notes": "Statut relecture : faits et calculs revérifiés (REVUE-QUALITE.md) ; publication après validation propriétaire."
+  }
+}

@@ -118,6 +118,7 @@ const logger = winston.createLogger({
     environment: process.env.NODE_ENV || 'development'
   },
   transports,
+  silent: process.env.NODE_ENV === 'test' && !process.env.TEST_LOGS,
   // Ne pas sortir du processus sur les erreurs
   exitOnError: false,
   // Gestion des rejections et exceptions non capturées

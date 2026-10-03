@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c2.l1",
+  "slug": "sources-et-clickbait",
+  "titre": "Sources primaires, sources secondaires et clickbait",
+  "chapitre": "c02",
+  "position": 4,
+  "competences": [
+    "bdd.sources.primaire_secondaire",
+    "bdd.sources.clickbait"
+  ],
+  "prerequis": [
+    "bdd.c1.l3"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Source primaire ou secondaire : quelle différence ? Primaire : le témoin, le document ou la donnée d'origine (photo prise sur place, courrier d'époque, résultat brut). Secondaire : quelqu'un qui en parle, résume ou interprète ensuite. Remonte toujours vers la primaire.",
+  "recap": "Primaire = à la source, secondaire = au second récit.",
+  "items": [
+    {
+      "id": "bdd.c2.l1.i01",
+      "type": "qcm",
+      "competence": "bdd.sources.primaire_secondaire",
+      "difficulte": 1,
+      "consigne": "Choisis la source primaire dans cette enquête.",
+      "enonce": "Mirabelle Doute enquête sur une fuite d'eau à l'école (cas fictif). Pie lui apporte quatre documents. Lequel est une source primaire ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Le rapport signé du plombier, rédigé le jour de l'intervention"
+        },
+        {
+          "id": "b",
+          "texte": "Un article de blog qui résume le rapport du plombier",
+          "distracteur_pourquoi": "Il raconte le rapport après coup : c'est une source secondaire."
+        },
+        {
+          "id": "c",
+          "texte": "Un message de ton cousin qui a entendu parler de la fuite",
+          "distracteur_pourquoi": "C'est une rumeur de seconde main, loin de l'événement."
+        },
+        {
+          "id": "d",
+          "texte": "Un résumé de la fuite écrit par un élève d'une autre classe",
+          "distracteur_pourquoi": "Cet élève n'était pas là : il rapporte ce que d'autres ont dit."
+        }
+      ],
+      "bonne": "a",
+      "feedback_ok": "Une source primaire vient de quelqu'un qui a vu, fait ou produit la chose lui-même, au moment des faits. Le rapport du plombier en est une.",
+      "feedback_ko": "Résumer, commenter ou répéter, c'est de la seconde main. Une source primaire, c'est le témoin ou le document d'origine, pas celui qui en parle ensuite.",
+      "indice": "Cherche qui était sur place au moment des faits.",
+      "sources": [],
+      "duree_s": 20
+    },
+    {
+      "id": "bdd.c2.l1.i02",
+      "type": "appariement",
+      "competence": "bdd.sources.clickbait",
+      "difficulte": 2,
+      "consigne": "Associe chaque ficelle de clickbait à sa description.",
+      "enonce": "Pie a collectionné des titres appât (cas fictif). L'inspectrice veut savoir quelle ficelle chacun utilise.",
+      "paires": [
+        {
+          "gauche": "« Tu ne devineras jamais la suite… »",
+          "droite": "Il cache l'info pour te forcer à cliquer"
+        },
+        {
+          "gauche": "« CHOQUANT !!! Ils nous mentent tous »",
+          "droite": "Il joue sur l'indignation et la colère plutôt que sur des faits"
+        },
+        {
+          "gauche": "« Cette astuce que les médecins détestent »",
+          "droite": "Il promet un secret miracle sans le prouver"
+        },
+        {
+          "gauche": "« 3 raisons de ne plus jamais dormir »",
+          "droite": "Il exploite la peur en exagérant un fait banal"
+        }
+      ],
+      "feedback_ok": "Bien vu : le clickbait vise ton clic, pas ta compréhension. Chaque ficelle exploite la curiosité, l'émotion ou la peur.",
+      "feedback_ko": "Le point commun de ces titres : aucun ne donne d'information vérifiable. Repère ce qu'ils cherchent à provoquer (curiosité, émotion, peur) avant de cliquer.",
+      "sources": [],
+      "duree_s": 35,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c2.l1.i03",
+      "type": "vrai_faux",
+      "competence": "bdd.sources.clickbait",
+      "difficulte": 2,
+      "consigne": "Dis si l'affirmation est vraie ou fausse.",
+      "enonce": "Pie triomphe : « Ce titre est clickbait (cas fictif), donc l'information dedans est forcément fausse ! »",
+      "affirmation": "Un titre accrocheur de type clickbait prouve que l'information qu'il annonce est fausse.",
+      "reponse": false,
+      "feedback_ok": "Exact : le clickbait est un signal d'alerte, pas une preuve. Une info vraie peut avoir un titre racoleur.",
+      "feedback_ko": "Un titre racoleur doit te rendre prudent, mais il ne tranche pas. Il faut ensuite aller voir le contenu et les sources, sinon tu remplaces un biais par un autre.",
+      "sources": [],
+      "duree_s": 15
+    },
+    {
+      "id": "bdd.c2.l1.i04",
+      "type": "flashcard",
+      "competence": "bdd.sources.primaire_secondaire",
+      "difficulte": 1,
+      "consigne": "Retourne la carte et retiens la différence.",
+      "enonce": "Pie a glissé une fiche dans ton carnet d'enquête.",
+      "recto": "Source primaire ou secondaire : quelle différence ?",
+      "verso": "Primaire : le témoin, le document ou la donnée d'origine (photo prise sur place, courrier d'époque, résultat brut). Secondaire : quelqu'un qui en parle, résume ou interprète ensuite. Remonte toujours vers la primaire.",
+      "mnemo": "Primaire = à la source, secondaire = au second récit.",
+      "feedback_ok": "Carte retenue : remonter à l'origine est le premier réflexe de l'enquêteur.",
+      "feedback_ko": "Relis la carte : ce qui compte, c'est la distance avec les faits.",
+      "sources": [],
+      "duree_s": 15
+    }
+  ]
+}

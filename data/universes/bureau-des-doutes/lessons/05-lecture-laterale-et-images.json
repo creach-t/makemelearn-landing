@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c2.l2",
+  "slug": "lecture-laterale-et-images",
+  "titre": "Lecture latérale et images détournées",
+  "chapitre": "c02",
+  "position": 5,
+  "competences": [
+    "bdd.sources.lecture_laterale",
+    "bdd.sources.image_inversee",
+    "bdd.images.hors_contexte"
+  ],
+  "prerequis": [
+    "bdd.c2.l1"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "La lecture latérale consiste à quitter la page pour juger la source depuis l'extérieur, comme le fait un pro de la vérification.",
+  "recap": "Retrouver la plus ancienne apparition d'une image permet de dire si elle correspond vraiment à l'événement annoncé.",
+  "items": [
+    {
+      "id": "bdd.c2.l2.i05",
+      "type": "ordre",
+      "competence": "bdd.sources.lecture_laterale",
+      "difficulte": 3,
+      "consigne": "Remets dans l'ordre les étapes d'une lecture latérale.",
+      "enonce": "Tu tombes sur un site inconnu qui annonce une « révélation » (cas fictif). Mirabelle te montre la méthode des enquêteurs.",
+      "elements": [
+        "Tu relèves le nom du site ou de son auteur sur la page",
+        "Avec ce nom en tête, tu ouvres un nouvel onglet, sans rester sur la page",
+        "Tu cherches ce nom et ce que d'autres sources disent de lui",
+        "Tu compares plusieurs résultats indépendants",
+        "Tu reviens sur la page avec un avis éclairé"
+      ],
+      "critere_ordre": "De l'identification de la source jusqu'au retour sur la page avec un avis.",
+      "feedback_ok": "La lecture latérale consiste à quitter la page pour juger la source depuis l'extérieur, comme le fait un pro de la vérification.",
+      "feedback_ko": "Le piège est de rester sur le site et de lire sa page « À propos », écrite par lui-même. Il faut d'abord sortir, puis comparer.",
+      "indice": "On quitte la page avant de juger.",
+      "sources": [
+        "Wineburg, S. & McGrew, S. (2019). Lateral Reading and the Nature of Expertise: Reading Less and Learning More When Evaluating Digital Information. Teachers College Record, 121(11), 1-40."
+      ],
+      "duree_s": 35,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c2.l2.i06",
+      "type": "trous",
+      "competence": "bdd.sources.image_inversee",
+      "difficulte": 2,
+      "consigne": "Complète le texte sur la vérification d'une photo suspecte.",
+      "enonce": "Une photo de tempête circule sur un réseau (cas fictif). Pie jure qu'elle date d'hier.",
+      "texte": "Avec la recherche d'image {{1}}, tu envoies la photo à un moteur qui retrouve ses {{2}} sur le web. Tu peux ainsi voir où elle est apparue pour la {{3}} fois.",
+      "trous": [
+        {
+          "id": "1",
+          "reponses_acceptees": [
+            "inversée",
+            "inverse"
+          ],
+          "banque": [
+            "inversée",
+            "rapide",
+            "floutée"
+          ]
+        },
+        {
+          "id": "2",
+          "reponses_acceptees": [
+            "occurrences",
+            "copies",
+            "versions"
+          ],
+          "banque": [
+            "occurrences",
+            "couleurs",
+            "auteurs"
+          ]
+        },
+        {
+          "id": "3",
+          "reponses_acceptees": [
+            "première",
+            "1re"
+          ],
+          "banque": [
+            "première",
+            "dernière",
+            "centième"
+          ]
+        }
+      ],
+      "feedback_ok": "Retrouver la plus ancienne apparition d'une image permet de dire si elle correspond vraiment à l'événement annoncé.",
+      "feedback_ko": "La recherche d'image inversée sert à retrouver l'origine et la date d'une image, pas à l'améliorer. Cherche la plus ancienne trace.",
+      "sources": [],
+      "duree_s": 30,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c2.l2.i07",
+      "type": "qcm",
+      "competence": "bdd.images.hors_contexte",
+      "difficulte": 3,
+      "consigne": "Choisis l'explication la plus probable.",
+      "enonce": "Un post (cas fictif) montre une foule et affirme « manifestation d'hier en ville ». Une recherche d'image inversée renvoie la même photo publiée il y a six ans, sur un concert dans un autre pays.",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Un deepfake généré par une IA hier",
+          "distracteur_pourquoi": "Une image publiée il y a six ans n'a pas été créée hier : l'ancienneté dit autre chose."
+        },
+        {
+          "id": "b",
+          "texte": "Une preuve que la manifestation n'a jamais existé",
+          "distracteur_pourquoi": "On prouve seulement que CETTE photo ne la montre pas, pas que l'événement n'a pas eu lieu."
+        },
+        {
+          "id": "c",
+          "texte": "Une vraie photo réutilisée hors de son contexte"
+        },
+        {
+          "id": "d",
+          "texte": "Une photo authentique de la manifestation, malgré la date",
+          "distracteur_pourquoi": "La date et le lieu d'origine contredisent la légende du post."
+        }
+      ],
+      "bonne": "c",
+      "feedback_ok": "L'image est réelle, mais la légende est fausse : c'est de la désinformation par décontextualisation, très courante.",
+      "feedback_ko": "Une image peut être authentique et pourtant servir à mentir. Vérifie ce qu'elle montre, quand et où, avant de croire la légende.",
+      "sources": [],
+      "duree_s": 30,
+      "statut_qa": "relu"
+    }
+  ]
+}

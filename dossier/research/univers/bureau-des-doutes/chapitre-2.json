@@ -1,0 +1,285 @@
+[
+  {
+    "id": "bdd.c2.l1.i01",
+    "type": "qcm",
+    "competence": "bdd.sources.primaire_secondaire",
+    "difficulte": 1,
+    "consigne": "Choisis la source primaire dans cette enquête.",
+    "enonce": "Mirabelle Doute enquête sur une fuite d'eau à l'école (cas fictif). Pie lui apporte quatre documents. Lequel est une source primaire ?",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "Le rapport signé du plombier, rédigé le jour de l'intervention"
+      },
+      {
+        "id": "b",
+        "texte": "Un article de blog qui résume le rapport du plombier",
+        "distracteur_pourquoi": "Il raconte le rapport après coup : c'est une source secondaire."
+      },
+      {
+        "id": "c",
+        "texte": "Un message de ton cousin qui a entendu parler de la fuite",
+        "distracteur_pourquoi": "C'est une rumeur de seconde main, loin de l'événement."
+      },
+      {
+        "id": "d",
+        "texte": "Un résumé de la fuite écrit par un élève d'une autre classe",
+        "distracteur_pourquoi": "Cet élève n'était pas là : il rapporte ce que d'autres ont dit."
+      }
+    ],
+    "bonne": "a",
+    "feedback_ok": "Une source primaire vient de quelqu'un qui a vu, fait ou produit la chose lui-même, au moment des faits. Le rapport du plombier en est une.",
+    "feedback_ko": "Résumer, commenter ou répéter, c'est de la seconde main. Une source primaire, c'est le témoin ou le document d'origine, pas celui qui en parle ensuite.",
+    "indice": "Cherche qui était sur place au moment des faits.",
+    "sources": [],
+    "duree_s": 20
+  },
+  {
+    "id": "bdd.c2.l1.i02",
+    "type": "appariement",
+    "competence": "bdd.sources.clickbait",
+    "difficulte": 2,
+    "consigne": "Associe chaque ficelle de clickbait à sa description.",
+    "enonce": "Pie a collectionné des titres appât (cas fictif). L'inspectrice veut savoir quelle ficelle chacun utilise.",
+    "paires": [
+      {
+        "gauche": "« Tu ne devineras jamais la suite… »",
+        "droite": "Il cache l'info pour te forcer à cliquer"
+      },
+      {
+        "gauche": "« CHOQUANT !!! Ils nous mentent tous »",
+        "droite": "Il joue sur l'indignation et la colère plutôt que sur des faits"
+      },
+      {
+        "gauche": "« Cette astuce que les médecins détestent »",
+        "droite": "Il promet un secret miracle sans le prouver"
+      },
+      {
+        "gauche": "« 3 raisons de ne plus jamais dormir »",
+        "droite": "Il exploite la peur en exagérant un fait banal"
+      }
+    ],
+    "feedback_ok": "Bien vu : le clickbait vise ton clic, pas ta compréhension. Chaque ficelle exploite la curiosité, l'émotion ou la peur.",
+    "feedback_ko": "Le point commun de ces titres : aucun ne donne d'information vérifiable. Repère ce qu'ils cherchent à provoquer (curiosité, émotion, peur) avant de cliquer.",
+    "sources": [],
+    "duree_s": 35,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c2.l1.i03",
+    "type": "vrai_faux",
+    "competence": "bdd.sources.clickbait",
+    "difficulte": 2,
+    "consigne": "Dis si l'affirmation est vraie ou fausse.",
+    "enonce": "Pie triomphe : « Ce titre est clickbait (cas fictif), donc l'information dedans est forcément fausse ! »",
+    "affirmation": "Un titre accrocheur de type clickbait prouve que l'information qu'il annonce est fausse.",
+    "reponse": false,
+    "feedback_ok": "Exact : le clickbait est un signal d'alerte, pas une preuve. Une info vraie peut avoir un titre racoleur.",
+    "feedback_ko": "Un titre racoleur doit te rendre prudent, mais il ne tranche pas. Il faut ensuite aller voir le contenu et les sources, sinon tu remplaces un biais par un autre.",
+    "sources": [],
+    "duree_s": 15
+  },
+  {
+    "id": "bdd.c2.l1.i04",
+    "type": "flashcard",
+    "competence": "bdd.sources.primaire_secondaire",
+    "difficulte": 1,
+    "consigne": "Retourne la carte et retiens la différence.",
+    "enonce": "Pie a glissé une fiche dans ton carnet d'enquête.",
+    "recto": "Source primaire ou secondaire : quelle différence ?",
+    "verso": "Primaire : le témoin, le document ou la donnée d'origine (photo prise sur place, courrier d'époque, résultat brut). Secondaire : quelqu'un qui en parle, résume ou interprète ensuite. Remonte toujours vers la primaire.",
+    "mnemo": "Primaire = à la source, secondaire = au second récit.",
+    "feedback_ok": "Carte retenue : remonter à l'origine est le premier réflexe de l'enquêteur.",
+    "feedback_ko": "Relis la carte : ce qui compte, c'est la distance avec les faits.",
+    "sources": [],
+    "duree_s": 15
+  },
+  {
+    "id": "bdd.c2.l2.i05",
+    "type": "ordre",
+    "competence": "bdd.sources.lecture_laterale",
+    "difficulte": 3,
+    "consigne": "Remets dans l'ordre les étapes d'une lecture latérale.",
+    "enonce": "Tu tombes sur un site inconnu qui annonce une « révélation » (cas fictif). Mirabelle te montre la méthode des enquêteurs.",
+    "elements": [
+      "Tu relèves le nom du site ou de son auteur sur la page",
+      "Avec ce nom en tête, tu ouvres un nouvel onglet, sans rester sur la page",
+      "Tu cherches ce nom et ce que d'autres sources disent de lui",
+      "Tu compares plusieurs résultats indépendants",
+      "Tu reviens sur la page avec un avis éclairé"
+    ],
+    "critere_ordre": "De l'identification de la source jusqu'au retour sur la page avec un avis.",
+    "feedback_ok": "La lecture latérale consiste à quitter la page pour juger la source depuis l'extérieur, comme le fait un pro de la vérification.",
+    "feedback_ko": "Le piège est de rester sur le site et de lire sa page « À propos », écrite par lui-même. Il faut d'abord sortir, puis comparer.",
+    "indice": "On quitte la page avant de juger.",
+    "sources": [
+      "Wineburg, S. & McGrew, S. (2019). Lateral Reading and the Nature of Expertise: Reading Less and Learning More When Evaluating Digital Information. Teachers College Record, 121(11), 1-40."
+    ],
+    "duree_s": 35,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c2.l2.i06",
+    "type": "trous",
+    "competence": "bdd.sources.image_inversee",
+    "difficulte": 2,
+    "consigne": "Complète le texte sur la vérification d'une photo suspecte.",
+    "enonce": "Une photo de tempête circule sur un réseau (cas fictif). Pie jure qu'elle date d'hier.",
+    "texte": "Avec la recherche d'image {{1}}, tu envoies la photo à un moteur qui retrouve ses {{2}} sur le web. Tu peux ainsi voir où elle est apparue pour la {{3}} fois.",
+    "trous": [
+      {
+        "id": "1",
+        "reponses_acceptees": [
+          "inversée",
+          "inverse"
+        ],
+        "banque": [
+          "inversée",
+          "rapide",
+          "floutée"
+        ]
+      },
+      {
+        "id": "2",
+        "reponses_acceptees": [
+          "occurrences",
+          "copies",
+          "versions"
+        ],
+        "banque": [
+          "occurrences",
+          "couleurs",
+          "auteurs"
+        ]
+      },
+      {
+        "id": "3",
+        "reponses_acceptees": [
+          "première",
+          "1re"
+        ],
+        "banque": [
+          "première",
+          "dernière",
+          "centième"
+        ]
+      }
+    ],
+    "feedback_ok": "Retrouver la plus ancienne apparition d'une image permet de dire si elle correspond vraiment à l'événement annoncé.",
+    "feedback_ko": "La recherche d'image inversée sert à retrouver l'origine et la date d'une image, pas à l'améliorer. Cherche la plus ancienne trace.",
+    "sources": [],
+    "duree_s": 30,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c2.l2.i07",
+    "type": "qcm",
+    "competence": "bdd.images.hors_contexte",
+    "difficulte": 3,
+    "consigne": "Choisis l'explication la plus probable.",
+    "enonce": "Un post (cas fictif) montre une foule et affirme « manifestation d'hier en ville ». Une recherche d'image inversée renvoie la même photo publiée il y a six ans, sur un concert dans un autre pays.",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "Un deepfake généré par une IA hier",
+        "distracteur_pourquoi": "Une image publiée il y a six ans n'a pas été créée hier : l'ancienneté dit autre chose."
+      },
+      {
+        "id": "b",
+        "texte": "Une preuve que la manifestation n'a jamais existé",
+        "distracteur_pourquoi": "On prouve seulement que CETTE photo ne la montre pas, pas que l'événement n'a pas eu lieu."
+      },
+      {
+        "id": "c",
+        "texte": "Une vraie photo réutilisée hors de son contexte"
+      },
+      {
+        "id": "d",
+        "texte": "Une photo authentique de la manifestation, malgré la date",
+        "distracteur_pourquoi": "La date et le lieu d'origine contredisent la légende du post."
+      }
+    ],
+    "bonne": "c",
+    "feedback_ok": "L'image est réelle, mais la légende est fausse : c'est de la désinformation par décontextualisation, très courante.",
+    "feedback_ko": "Une image peut être authentique et pourtant servir à mentir. Vérifie ce qu'elle montre, quand et où, avant de croire la légende.",
+    "sources": [],
+    "duree_s": 30,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c2.l3.i08",
+    "type": "saisie",
+    "competence": "bdd.verification.demarche",
+    "difficulte": 2,
+    "consigne": "Écris le mot-clé du critère d'enquête qui manque.",
+    "enonce": "Ta grille d'enquêteur : Qui parle ? Quoi exactement ? Quelle preuve ? Quatrième question, celle qui démasque les vieilles infos recyclées : à quelle ____ cette info a-t-elle été publiée ou captée ?",
+    "reponses_acceptees": [
+      "date",
+      "la date",
+      "moment",
+      "le moment",
+      "date de publication"
+    ],
+    "normalisation": [
+      "casse",
+      "accents",
+      "espaces"
+    ],
+    "reponse_modele": "Date",
+    "feedback_ok": "Oui : qui, quoi, preuve, date. Une info juste peut devenir trompeuse si elle est déterrée hors de son moment.",
+    "feedback_ko": "Pense au temps : on vérifie quand l'information a été publiée ou captée. Une vieille info recyclée trompe très bien.",
+    "sources": [],
+    "duree_s": 20,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "bdd.c2.l3.i09",
+    "type": "vrai_faux",
+    "competence": "bdd.images.deepfakes",
+    "difficulte": 3,
+    "consigne": "Dis si l'affirmation est vraie ou fausse.",
+    "enonce": "Une vidéo (cas fictif) montre un personnage public tenir des propos étonnants. Elle est nette, fluide et très convaincante.",
+    "affirmation": "Si une vidéo paraît parfaitement réaliste, c'est une garantie qu'elle est authentique.",
+    "reponse": false,
+    "feedback_ok": "Exact : le réalisme ne prouve rien. Les contenus générés ou truqués peuvent être très convaincants, d'où l'importance de la source et du contexte.",
+    "feedback_ko": "Se fier à son œil ne suffit plus. Cherche l'origine de la vidéo, d'autres sources fiables qui la relaient et la date, plutôt que de juger sur l'apparence.",
+    "sources": [],
+    "duree_s": 15
+  },
+  {
+    "id": "bdd.c2.l3.i10",
+    "type": "qcm",
+    "competence": "bdd.verification.synthese",
+    "difficulte": 5,
+    "consigne": "Boss : choisis la meilleure démarche d'enquête complète.",
+    "enonce": "Un compte inconnu (cas fictif) poste une photo choc : « Un barrage vient de céder ! » Le post est viral, sans lien ni auteur identifiable. Pie veut le relayer tout de suite. Que fait Mirabelle ?",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "Elle vérifie que le compte a beaucoup d'abonnés et un profil soigné, puis relaie si tout lui paraît sérieux",
+        "distracteur_pourquoi": "Abonnés et profil soigné s'achètent ou s'imitent : cela ne dit rien de l'origine ni de la date de la photo."
+      },
+      {
+        "id": "b",
+        "texte": "Elle lance une recherche d'image inversée, ouvre d'autres onglets sur le compte, cherche une source primaire (autorité locale, témoin identifié) et la date, puis conclut"
+      },
+      {
+        "id": "c",
+        "texte": "Elle relaie en ajoutant « à confirmer », car prévenir vite compte plus que d'attendre la vérification",
+        "distracteur_pourquoi": "Relayer une info non vérifiée, même avec une réserve, la propage."
+      },
+      {
+        "id": "d",
+        "texte": "Elle regarde les commentaires : si la majorité y croit et s'inquiète, elle considère l'info comme fiable",
+        "distracteur_pourquoi": "La popularité n'est pas une preuve : une foule peut se tromper ensemble."
+      }
+    ],
+    "bonne": "b",
+    "feedback_ok": "Tu as réuni toute la méthode : qui parle, quoi, quelle preuve, quelle date, en croisant les sources et en remontant à l'origine.",
+    "feedback_ko": "Une enquête solide combine image inversée, lecture latérale, source primaire et date. S'appuyer sur la vitesse, la foule ou l'apparence, c'est laisser Pie voler tes certitudes.",
+    "indice": "Cherche la réponse qui vérifie AVANT de partager.",
+    "sources": [],
+    "duree_s": 40,
+    "statut_qa": "relu"
+  }
+]

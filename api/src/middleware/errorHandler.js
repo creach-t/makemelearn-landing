@@ -36,6 +36,15 @@ const errorHandler = (error, req, res, next) => {
     method: req.method
   };
 
+  // Ne jamais exposer le message interne d'une erreur serveur hors développement
+  if (status >= 500 && process.env.NODE_ENV !== 'development') {
+    errorResponse.error = 'Erreur interne du serveur';
+  }
+  // Détails de validation volontairement publics (HttpError 4xx)
+  if (error.name === 'HttpError' && error.details !== undefined && status < 500) {
+    errorResponse.details = error.details;
+  }
+
   // En développement, inclure la stack trace
   if (process.env.NODE_ENV === 'development') {
     errorResponse.stack = error.stack;

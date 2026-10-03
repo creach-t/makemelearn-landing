@@ -1,0 +1,24 @@
+- [game-design] Onboarding: 1re mission AVANT inscription (Duolingo: +20% DAU), time-to-first-win <60s (source: relaunch.ai/appcues, confiance moyenne)
+- [game-design] SRS: FSRS via ts-fsrs, R=(1+t/(9S))^-1, I=9S(1/R_cible-1), R_cible 0.90; file max 20 cartes/jour (source: awesome-fsrs wiki, haute)
+- [game-design] Difficulté adaptative Elo/IRT, cible P(correct)=0.80; boss 0.65 (Wilson 2019, moyenne)
+- [game-design] Exclus: loot box payantes, streak culpabilisant, énergie bloquante; streak=30 XP, 2 gels/mois offerts, ligues opt-in
+- [game-design] Cibles rétention web: D1 35% / D7 18% / D30 8%; benchmark éducation D1 22 / D7 10 / D30 ~3 (AppsFlyer via blogs)
+- [game-design] Univers = paquet JSON data-driven (palette, mascotte, carte, monnaies, boss, lore) sur moteur commun; schéma dans research/game-design.md §9-10
+- [seo-marche] Google a retiré les rich results Course Info (juin 2025) et FAQ (7 mai 2026) ; schema.org Course/FAQPage restent valides sans gain visuel garanti ; BreadcrumbList reste actif (SEJ/blogs ; moyenne)
+- [seo-marche] CWV bon : LCP<=2,5s, INP<=200ms, CLS<=0,1 au 75e percentile (bonne)
+- [seo-marche] Aucun volume FR de recherche trouvé via web search : valider avec Keyword Planner/Search Console, mes ordres de grandeur sont non vérifiés (faible)
+- [seo-marche] Top 6 univers proposé : code, culture générale/quiz, langues (niches), maths/calcul mental, finance perso (YMYL), cuisine ou musique (moyenne-faible)
+- [seo-marche] Éviter milliers de pages minces indexées (qualité jugée au niveau domaine depuis mars 2024) : 3-6 univers x 5-10 leçons riches, noindex le reste (moyenne)
+- [seo-marche] Streak = levier de rétention n°1 Duolingo ; gems sans usage réel inutiles (72% non dépensés) : concevoir une économie utile (moyenne)
+- [univers] Format univers v1.0 : universe.json + skills.json (DAG) + leçons 2-3 min (4-6 items) + 8 types d'items + boss (3 vies, seuil 70 %, sans minuteur) ; spec dans research/univers-pedagogie.md §1 (haute)
+- [univers] Univers pilote = Le Bureau des Doutes (esprit critique), 30 items relus dans research/univers/bureau-des-doutes/ ; 4 autres univers : cda (Python), atp (finance perso), arl (anglais B1 pro), cdc (astronomie) (décision)
+- [univers] Items : grille qualité 12 points (>=10 pour publier), 18/42 items corrigés en revue ; chiffres Livret A/NASA des échantillons à revérifier (moyenne)
+- [architecture] Front = vanilla JS modules + Vite MPA (sans framework), SEO pré-rendu par scripts/build-seo.mjs depuis data/universes/ (décision)
+- [architecture] Cible = 1 conteneur app Express (dist/ + /api/v1, same-origin, sans nginx ni CORS) + sidecar postgres privé ; image ghcr.io/creach-t/makemelearn ; deploy via cloudflared access ssh vers /opt/deployments/makemelearn (décision)
+- [architecture] Auth = invité anonyme (cookie HttpOnly, hash du jeton en DB) puis upgrade compte par lien magique, même user_id conservé ; pas de mot de passe en v1 (décision)
+- [architecture] Contenu = JSON versionné data/universes/<slug>/ ; lessons.key/items.key stables et immuables ; sync idempotent vers DB, jamais de DELETE (archived_at) ; solutions jamais envoyées avant réponse (décision)
+- [architecture] Schéma DB complet prêt à coller : dossier/research/architecture.md section 3 ; SRS = SM-2 simplifié, colonnes FSRS réservées
+- [architecture] AUDIT CRITIQUE : nginx monte ./ (tout le repo) en racine web -> /docker-compose.yml et /database/init.sql probablement servis publiquement (à vérifier par curl) ; mot de passe Postgres en clair dans docker-compose.yml, .env.example et historique git -> rotation requise (lu dans le code)
+- [architecture] AUDIT : pas de trust proxy (quota rate-limit partagé), /stats/system accepte tout Bearer, /stats/track écriture anonyme, unhandledRejection -> exit(1), asyncHandler existe mais inutilisé, api/server.js doublon mort, deploy.yml = SSH port 22 direct + build sur VPS (hors pattern) (lu dans le code)
+- [architecture] Monitoring : makemelearn.fr déjà dans le job blackbox "sites" -> aucune action Prometheus, uptime seul
+- [architecture] Boucle saine : gel de streak automatique (1/semaine), classement opt-in, pas de vies ni notifs culpabilisantes ; XP et SRS calculés côté serveur (décision)

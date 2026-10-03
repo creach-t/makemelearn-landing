@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://makemelearn.fr/schema/skills.schema.json",
+  "title": "Carte de compétences d'un univers (skills.json, graphe orienté acyclique)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "competences"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "competences": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "nom", "chapitre", "prerequis"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z]{2,6}(\\.[a-z0-9_]+){2}$" },
+          "nom": { "type": "string", "minLength": 3, "maxLength": 120 },
+          "chapitre": { "type": "string", "pattern": "^c\\d{2}$" },
+          "prerequis": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z]{2,6}(\\.[a-z0-9_]+){2}$" } }
+        }
+      }
+    }
+  }
+}

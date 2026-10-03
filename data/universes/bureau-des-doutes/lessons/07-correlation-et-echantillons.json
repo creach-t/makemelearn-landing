@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c3.l1",
+  "slug": "correlation-et-echantillons",
+  "titre": "Corrélation, causalité et échantillons biaisés",
+  "chapitre": "c03",
+  "position": 7,
+  "competences": [
+    "bdd.chiffres.correlation_causalite",
+    "bdd.chiffres.echantillon_biaise"
+  ],
+  "prerequis": [
+    "bdd.c2.l3"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Un troisième facteur (la chaleur) agit sur les deux courbes : c'est une variable confondante. Le lien statistique est réel, le lien causal direct ne l'est pas.",
+  "recap": "Exact : la variable confondante crée une corrélation sans cause directe entre les deux phénomènes observés.",
+  "items": [
+    {
+      "id": "bdd.c3.l1.i01",
+      "type": "qcm",
+      "competence": "bdd.chiffres.correlation_causalite",
+      "difficulte": 1,
+      "consigne": "Choisis l'explication la plus solide du lien observé.",
+      "enonce": "Pie a trouvé un tableau (cas fictif) : les mois où les ventes de glaces grimpent, les noyades en baignade augmentent aussi. Mirabelle fronce les sourcils : « Les glaces tuent ? »",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Manger une glace provoque des noyades.",
+          "distracteur_pourquoi": "Aucun mécanisme ne relie manger une glace à une noyade : deux courbes qui montent ensemble ne prouvent pas une cause."
+        },
+        {
+          "id": "b",
+          "texte": "Les noyades donnent soudain envie de glaces.",
+          "distracteur_pourquoi": "Inverser le sens de la cause ne règle rien : les noyades ne déclenchent pas l'envie de glaces."
+        },
+        {
+          "id": "c",
+          "texte": "La chaleur fait monter à la fois les ventes de glaces et la fréquentation des plages."
+        },
+        {
+          "id": "d",
+          "texte": "C'est un pur hasard, il n'y a aucun lien statistique.",
+          "distracteur_pourquoi": "Le lien statistique existe bel et bien (les courbes montent ensemble) ; ce qui manque, c'est une cause directe."
+        }
+      ],
+      "bonne": "c",
+      "feedback_ok": "Un troisième facteur (la chaleur) agit sur les deux courbes : c'est une variable confondante. Le lien statistique est réel, le lien causal direct ne l'est pas.",
+      "feedback_ko": "Deux courbes qui montent ensemble prouvent une corrélation, pas une cause. Cherche toujours ce qui pourrait agir sur les deux à la fois.",
+      "indice": "Que se passe-t-il en juillet qui n'arrive pas en janvier ?",
+      "sources": [],
+      "duree_s": 20,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c3.l1.i02",
+      "type": "trous",
+      "competence": "bdd.chiffres.correlation_causalite",
+      "difficulte": 2,
+      "consigne": "Complète le rapport de l'inspectrice avec les bons mots.",
+      "enonce": "Rapport de Mirabelle sur l'affaire des glaces (cas fictif).",
+      "texte": "Quand un facteur caché agit sur deux phénomènes, on l'appelle une variable {{1}}. Ici, c'est la {{2}} qui explique tout.",
+      "trous": [
+        {
+          "id": "1",
+          "reponses_acceptees": [
+            "confondante"
+          ],
+          "banque": [
+            "confondante",
+            "aléatoire",
+            "médiane"
+          ]
+        },
+        {
+          "id": "2",
+          "reponses_acceptees": [
+            "chaleur",
+            "température",
+            "canicule"
+          ],
+          "banque": [
+            "chaleur",
+            "glace",
+            "noyade"
+          ]
+        }
+      ],
+      "feedback_ok": "Exact : la variable confondante crée une corrélation sans cause directe entre les deux phénomènes observés.",
+      "feedback_ko": "Une variable « aléatoire » ou une « médiane » n'explique pas un lien trompeur. Il te faut le facteur commun qui tire les deux courbes : ici la chaleur.",
+      "sources": [],
+      "duree_s": 25
+    },
+    {
+      "id": "bdd.c3.l1.i03",
+      "type": "qcm",
+      "competence": "bdd.chiffres.echantillon_biaise",
+      "difficulte": 3,
+      "consigne": "Identifie le principal défaut de ce sondage historique.",
+      "enonce": "En 1936, le magazine Literary Digest prédit la défaite de Roosevelt après plus de 2 millions de réponses. Roosevelt est réélu largement. Les sondés venaient surtout d'annuaires téléphoniques et de listes de propriétaires de voitures.",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "L'échantillon était trop petit pour être fiable.",
+          "distracteur_pourquoi": "Plus de 2 millions de réponses, c'est énorme : la taille n'était pas le problème."
+        },
+        {
+          "id": "b",
+          "texte": "L'échantillon était biaisé : les plus aisés étaient sur-représentés.",
+          "distracteur_pourquoi": ""
+        },
+        {
+          "id": "c",
+          "texte": "Les sondés ont tous menti volontairement.",
+          "distracteur_pourquoi": "Rien ne l'indique ; le défaut vient de qui a été interrogé, pas d'un mensonge généralisé."
+        },
+        {
+          "id": "d",
+          "texte": "La moyenne a été calculée à la place de la médiane.",
+          "distracteur_pourquoi": "Il s'agit de proportions de votes, pas d'une moyenne contre médiane."
+        }
+      ],
+      "bonne": "b",
+      "feedback_ok": "En 1936, téléphone et voiture étaient un luxe : les sondés n'étaient pas représentatifs de tous les électeurs. (Le faible taux de réponse a aussi joué, selon Squire.)",
+      "feedback_ko": "Ce n'est pas la taille qui compte d'abord, c'est la façon de choisir les gens. Un grand échantillon mal choisi se trompe en grand.",
+      "indice": "Qui avait le téléphone en 1936 ?",
+      "sources": [
+        "Squire P. (1988), « Why the 1936 Literary Digest Poll Failed », Public Opinion Quarterly 52(1), 125-133"
+      ],
+      "duree_s": 35,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c3.l1.i04",
+      "type": "vrai_faux",
+      "competence": "bdd.chiffres.echantillon_biaise",
+      "difficulte": 2,
+      "consigne": "Vrai ou faux ? Tranche comme Mirabelle.",
+      "enonce": "Pie défend sa méthode : elle n'a interrogé que les pies de son quartier, mais en grand nombre.",
+      "affirmation": "Interroger beaucoup plus de personnes suffit à corriger un échantillon mal choisi.",
+      "reponse": false,
+      "feedback_ok": "Faux : un biais de sélection ne disparaît pas avec le nombre. Il faut un tirage représentatif de la population visée.",
+      "feedback_ko": "Plus de monde dans un mauvais échantillon, c'est le même biais en plus gros. Comme en 1936 avec le Literary Digest : des millions de réponses, mais pas les bonnes personnes.",
+      "sources": [
+        "Squire P. (1988), Public Opinion Quarterly 52(1), 125-133"
+      ],
+      "duree_s": 20
+    }
+  ]
+}

@@ -1,0 +1,378 @@
+[
+  {
+    "id": "cda.c1.l1.i01",
+    "type": "code",
+    "competence": "cda.variables.affectation",
+    "difficulte": 1,
+    "consigne": "Complète le script pour stocker ton pseudo et ton crédit dans deux variables, puis affiche le message demandé.",
+    "enonce": "Néo-Paris, 2089. Le terminal de la borne de recharge attend un profil : pseudo « Zéro » et 120 crédits. À toi de ranger ces infos dans des variables avant que le vigile-drone ne s'impatiente.",
+    "langage": "python",
+    "code_initial": "# Crée les variables pseudo et credits\n\n\nprint(pseudo, \"possède\", credits, \"crédits\")",
+    "tests": [
+      {
+        "entree": "",
+        "sortie_attendue": "Zéro possède 120 crédits"
+      }
+    ],
+    "solution_modele": "pseudo = \"Zéro\"\ncredits = 120\nprint(pseudo, \"possède\", credits, \"crédits\")",
+    "feedback_ok": "Bravo : le signe = n'est pas une égalité mathématique, il range la valeur de droite dans la boîte nommée à gauche. Le texte va entre guillemets, le nombre non.",
+    "feedback_ko": "Vérifie que le texte est entre guillemets (sinon Python cherche une variable nommée Zéro) et que tu écris nom = valeur, pas valeur = nom. Pense aussi à l'orthographe exacte des noms de variables.",
+    "indice": "Une variable se crée en écrivant son nom, le signe =, puis la valeur à ranger dedans.",
+    "sources": [],
+    "duree_s": 40
+  },
+  {
+    "id": "cda.c1.l1.i02",
+    "type": "qcm",
+    "competence": "cda.variables.copie_valeur",
+    "difficulte": 2,
+    "consigne": "Choisis ce que le script affiche réellement.",
+    "enonce": "Dans le noyau de la ville, un script ligne par ligne :\n\nbatterie = 80\nsauvegarde = batterie\nbatterie = 20\nprint(sauvegarde)",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "80"
+      },
+      {
+        "id": "b",
+        "texte": "20",
+        "distracteur_pourquoi": "Tu imagines que sauvegarde reste liée à batterie. Avec des nombres, sauvegarde = batterie copie la valeur du moment : elle ne suit pas les changements suivants."
+      },
+      {
+        "id": "c",
+        "texte": "100",
+        "distracteur_pourquoi": "Python n'additionne rien ici : il n'y a aucun +. Chaque ligne range simplement une valeur dans une boîte."
+      },
+      {
+        "id": "d",
+        "texte": "Une erreur, car batterie change de valeur",
+        "distracteur_pourquoi": "Réaffecter une variable est parfaitement permis : la boîte reçoit simplement un nouveau contenu."
+      }
+    ],
+    "bonne": "a",
+    "feedback_ok": "Exact : à la ligne 2, la valeur 80 est copiée dans sauvegarde. Changer batterie ensuite ne touche plus à cette copie.",
+    "feedback_ko": "Relis ligne par ligne, dans l'ordre. À la ligne 2, sauvegarde reçoit 80 ; la ligne 3 ne modifie que la boîte batterie. Une variable n'est pas un lien permanent, c'est une boîte.",
+    "indice": "Que contient sauvegarde au moment exact où elle est remplie ?",
+    "sources": [],
+    "duree_s": 30
+  },
+  {
+    "id": "cda.c1.l1.i03",
+    "type": "appariement",
+    "competence": "cda.variables.types_de_base",
+    "difficulte": 2,
+    "consigne": "Relie chaque valeur au type Python qui la décrit.",
+    "enonce": "Au marché noir des données, chaque colis porte une étiquette de type. Aide le scanner à les classer.",
+    "paires": [
+      {
+        "gauche": "42",
+        "droite": "int (entier)"
+      },
+      {
+        "gauche": "3.14",
+        "droite": "float (nombre à virgule)"
+      },
+      {
+        "gauche": "\"Zéro\"",
+        "droite": "str (texte)"
+      },
+      {
+        "gauche": "True",
+        "droite": "bool (vrai/faux)"
+      }
+    ],
+    "feedback_ok": "Bien vu : un entier n'a pas de point, un float en a un, un str est entouré de guillemets, et True/False (sans guillemets) forment le type bool.",
+    "feedback_ko": "Piège classique : \"42\" entre guillemets serait du texte, pas un nombre. Regarde la forme : guillemets = str, point décimal = float, True/False = bool, chiffres seuls = int.",
+    "indice": "Les guillemets et le point décimal sont tes meilleurs détecteurs.",
+    "sources": [],
+    "duree_s": 30
+  },
+  {
+    "id": "atp.c1.l1.i01",
+    "type": "qcm",
+    "competence": "atp.interets.composes",
+    "difficulte": 2,
+    "consigne": "Calcule le capital obtenu après deux ans avec des intérêts composés.",
+    "enonce": "À l'établi : tu places 1 000 € à 3 % par an, intérêts réinvestis chaque année (taux fictif, pour s'exercer). Combien as-tu au bout de 2 ans ?",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "1 060,00 €",
+        "distracteur_pourquoi": "C'est le calcul en intérêts simples (2 × 30 €). En intérêts composés, les intérêts de la 1re année produisent eux-mêmes des intérêts."
+      },
+      {
+        "id": "b",
+        "texte": "1 060,90 €"
+      },
+      {
+        "id": "c",
+        "texte": "1 690,00 €",
+        "distracteur_pourquoi": "Tu as utilisé un coefficient de 1,3 au lieu de 1,03 : 3 % s'écrit 0,03, donc on multiplie par 1,03 chaque année."
+      },
+      {
+        "id": "d",
+        "texte": "1 030,00 €",
+        "distracteur_pourquoi": "C'est le capital après seulement 1 an."
+      }
+    ],
+    "bonne": "b",
+    "feedback_ok": "Oui : 1 000 × 1,03 = 1 030 € après un an, puis 1 030 × 1,03 = 1 060,90 €. Les 0,90 € en plus viennent des intérêts gagnés sur les intérêts.",
+    "feedback_ko": "Refais le calcul année par année : an 1 = 1 000 × 1,03 = 1 030 € ; an 2 = 1 030 × 1,03 = 1 060,90 €. La 2e année, les 3 % portent sur 1 030 €, pas sur 1 000 €.",
+    "indice": "La 2e année, quel capital sert de base au calcul des 3 % ?",
+    "sources": [
+      "Formule du capital final : C × (1 + t)^n, avec C = 1 000, t = 0,03, n = 2 (exemple pédagogique, taux fictif)"
+    ],
+    "duree_s": 35,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "atp.c1.l1.i02",
+    "type": "vrai_faux",
+    "competence": "atp.livret_a.fiscalite",
+    "difficulte": 1,
+    "consigne": "Dis si l'affirmation sur le Livret A est vraie ou fausse.",
+    "enonce": "Un ami te dit : « Les intérêts de mon Livret A sont à déclarer et imposés comme un salaire. »",
+    "affirmation": "Les intérêts du Livret A sont soumis à l'impôt sur le revenu et aux prélèvements sociaux.",
+    "reponse": false,
+    "feedback_ok": "Exact : les intérêts du Livret A sont exonérés d'impôt sur le revenu et de prélèvements sociaux. En contrepartie, le dépôt est plafonné (22 950 € pour un particulier, plafond à vérifier à la date de lecture).",
+    "feedback_ko": "C'est l'inverse : le Livret A est un produit d'épargne réglementé dont les intérêts sont exonérés d'impôt et de prélèvements sociaux. Ne le confonds pas avec un compte à terme ou un compte-titres, qui sont imposés.",
+    "indice": "Pense à la contrepartie du plafond de dépôt.",
+    "sources": [
+      "service-public.fr, fiche « Livret A : fonctionnement » (exonération fiscale et plafond de 22 950 € pour une personne physique)",
+      "Banque de France, page « Livret A »"
+    ],
+    "duree_s": 15,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "atp.c1.l1.i03",
+    "type": "trous",
+    "competence": "atp.budget.regle_50_30_20",
+    "difficulte": 2,
+    "consigne": "Répartis un revenu net mensuel selon la règle 50/30/20.",
+    "enonce": "Ton salaire net est de 1 400 € par mois (cas fictif). La règle 50/30/20 est une simple méthode de répartition : besoins, envies, épargne. À toi de poser les montants.",
+    "texte": "Besoins (loyer, courses, transports) : {{1}} € ; envies (sorties, loisirs) : {{2}} € ; épargne : {{3}} €.",
+    "trous": [
+      {
+        "id": "1",
+        "reponses_acceptees": [
+          "700"
+        ],
+        "banque": [
+          "700",
+          "420",
+          "280",
+          "560"
+        ]
+      },
+      {
+        "id": "2",
+        "reponses_acceptees": [
+          "420"
+        ],
+        "banque": [
+          "700",
+          "420",
+          "280",
+          "560"
+        ]
+      },
+      {
+        "id": "3",
+        "reponses_acceptees": [
+          "280"
+        ],
+        "banque": [
+          "700",
+          "420",
+          "280",
+          "560"
+        ]
+      }
+    ],
+    "feedback_ok": "Parfait : 50 % de 1 400 = 700 € ; 30 % = 420 € ; 20 % = 280 €. Et 700 + 420 + 280 = 1 400 €, le compte est bon.",
+    "feedback_ko": "Calcule chaque part sur le net : 1 400 × 0,50 = 700 ; × 0,30 = 420 ; × 0,20 = 280. Vérifie que la somme retombe sur 1 400 €. Ce n'est qu'une règle de départ, à adapter à ta situation (un loyer élevé peut dépasser 50 %).",
+    "indice": "20 % d'un montant, c'est le cinquième : 1 400 ÷ 5.",
+    "sources": [
+      "Elizabeth Warren et Amelia Warren Tyagi, All Your Worth (2005), origine de la règle 50/30/20"
+    ],
+    "duree_s": 35
+  },
+  {
+    "id": "arl.c1.l1.i01",
+    "type": "trous",
+    "competence": "arl.email.formules_pro",
+    "difficulte": 2,
+    "consigne": "Complète l'email professionnel avec les mots qui conviennent.",
+    "enonce": "Tu envoies l'ordre du jour d'une réunion à ton équipe. Dans cet email, chaque formule doit sonner naturelle et polie.",
+    "texte": "Hi team, I'm writing to confirm tomorrow's meeting. Please find {{1}} the agenda. Let me know if you have any {{2}}.",
+    "trous": [
+      {
+        "id": "1",
+        "reponses_acceptees": [
+          "attached"
+        ],
+        "banque": [
+          "attached",
+          "attach",
+          "attaching",
+          "joined"
+        ]
+      },
+      {
+        "id": "2",
+        "reponses_acceptees": [
+          "questions"
+        ],
+        "banque": [
+          "questions",
+          "ask",
+          "doubts",
+          "answers"
+        ]
+      }
+    ],
+    "feedback_ok": "Oui : « Please find attached... » est la formule standard pour signaler une pièce jointe, et « any questions » (pluriel, avec any) clôt l'email de façon courtoise.",
+    "feedback_ko": "En anglais pro, on écrit « Please find attached... » (participe passé, pas « joined » calqué sur « joint »). Pour clore, « any questions » est la formule standard ; « doubts » existe, mais sonne comme un manque de confiance.",
+    "indice": "Un fichier est ___ à ton message : quel participe passé exprime cela ?",
+    "sources": [],
+    "duree_s": 30,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "arl.c1.l1.i02",
+    "type": "qcm",
+    "competence": "arl.email.structures_gerondif",
+    "difficulte": 3,
+    "consigne": "Choisis la fin de phrase correcte pour clore un email à un client.",
+    "enonce": "Tu termines ton email à un client avec cette formule classique : « I look forward to ___ from you. »",
+    "choix": [
+      {
+        "id": "a",
+        "texte": "hearing"
+      },
+      {
+        "id": "b",
+        "texte": "hear",
+        "distracteur_pourquoi": "Tu as calqué « look forward to » sur un verbe modal. Ici « to » est une préposition, donc le verbe qui suit prend -ing."
+      },
+      {
+        "id": "c",
+        "texte": "heard",
+        "distracteur_pourquoi": "Le participe passé exprimerait quelque chose d'accompli ; on parle d'une attente future, avec un gérondif."
+      },
+      {
+        "id": "d",
+        "texte": "to hear",
+        "distracteur_pourquoi": "Doubler « to » est incorrect : il fait déjà partie de l'expression « look forward to »."
+      }
+    ],
+    "bonne": "a",
+    "feedback_ok": "Exact : dans « look forward to », le « to » est une préposition, donc on utilise le verbe en -ing : « I look forward to hearing from you ».",
+    "feedback_ko": "Piège fréquent : « to » fait penser à l'infinitif. Mais ici c'est une préposition, comme dans « I'm used to working ». Après une préposition, le verbe prend -ing.",
+    "indice": "Remplace « hearing » par un nom : « I look forward to your reply ». Cela te rappelle-t-il quelque chose ?",
+    "sources": [],
+    "duree_s": 25
+  },
+  {
+    "id": "arl.c1.l1.i03",
+    "type": "appariement",
+    "competence": "arl.reunion.fonctions_langagieres",
+    "difficulte": 2,
+    "consigne": "Relie chaque phrase de réunion à son rôle dans la discussion.",
+    "enonce": "Cap sur l'île de la Réunion d'équipe ! Pour y naviguer, chaque phrase a une fonction précise : ouvrir, clarifier, conclure, annoncer un suivi.",
+    "paires": [
+      {
+        "gauche": "Let's get started.",
+        "droite": "Ouvrir la réunion"
+      },
+      {
+        "gauche": "Could you clarify that point?",
+        "droite": "Demander une précision"
+      },
+      {
+        "gauche": "To sum up, we agreed on three actions.",
+        "droite": "Conclure"
+      },
+      {
+        "gauche": "I'll follow up by email.",
+        "droite": "Annoncer un suivi"
+      }
+    ],
+    "feedback_ok": "Bien joué : ces quatre phrases passe-partout t'accompagnent de l'ouverture à la clôture. Mémorise-les comme des blocs.",
+    "feedback_ko": "Cherche le mot-clé : « get started » = commencer, « clarify » = clarifier, « to sum up » = en résumé, « follow up » = assurer le suivi. Ne les traduis pas mot à mot, retiens-les en blocs.",
+    "indice": "« To sum up » est le signal que la réunion touche à sa fin.",
+    "sources": [],
+    "duree_s": 30
+  },
+  {
+    "id": "cdc.c1.l1.i01",
+    "type": "ordre",
+    "competence": "cdc.echelles.tailles",
+    "difficulte": 2,
+    "consigne": "Range ces objets du plus petit au plus grand.",
+    "enonce": "Autour du feu, la vieille conteuse demande : « Quand on regarde le ciel, tout semble au même niveau. Mais dis-moi, qui est grand et qui est minuscule ? »",
+    "elements": [
+      "La Lune (diamètre : environ 3 474 km)",
+      "La Terre (diamètre : environ 12 742 km)",
+      "Le Soleil (diamètre : environ 1,39 million de km)",
+      "La Voie lactée (environ 100 000 années-lumière de large)"
+    ],
+    "critere_ordre": "Du plus petit au plus grand diamètre.",
+    "feedback_ok": "Bien rangé : en diamètre, la Lune tient environ 3,7 fois dans la Terre, plus d'un million de Terres tiendraient dans le Soleil (en volume), et la Voie lactée contient des centaines de milliards d'étoiles comme lui.",
+    "feedback_ko": "Retiens les échelles : la Lune est plus petite que la Terre ; le Soleil, une étoile, dépasse de très loin les planètes ; et notre galaxie, la Voie lactée, rassemble des centaines de milliards d'étoiles, Soleil compris.",
+    "indice": "Le Soleil n'est qu'une étoile parmi celles de la galaxie.",
+    "sources": [
+      "NASA, Moon Fact Sheet (diamètre 3 474,8 km)",
+      "NASA, Earth Fact Sheet (diamètre équatorial 12 756 km, moyen environ 12 742 km)",
+      "NASA, Sun Fact Sheet (diamètre environ 1 392 700 km)",
+      "NASA, Milky Way Galaxy (environ 100 000 années-lumière de diamètre)"
+    ],
+    "duree_s": 35,
+    "statut_qa": "relu"
+  },
+  {
+    "id": "cdc.c1.l1.i02",
+    "type": "vrai_faux",
+    "competence": "cdc.saisons.cause",
+    "difficulte": 2,
+    "consigne": "Dis si cette explication des saisons est vraie ou fausse.",
+    "enonce": "Au coin du feu, un enfant s'écrie : « L'été, il fait chaud parce que la Terre se rapproche du Soleil ! »",
+    "affirmation": "Il fait plus chaud en été dans l'hémisphère nord parce que la Terre est alors plus proche du Soleil.",
+    "reponse": false,
+    "feedback_ok": "Exact : les saisons viennent de l'inclinaison de l'axe terrestre (environ 23,4°), qui change l'angle des rayons du Soleil et la durée du jour. Et en juillet, la Terre est même au plus loin du Soleil.",
+    "feedback_ko": "La distance n'explique pas les saisons : la Terre est au plus près du Soleil début janvier (environ 147 millions de km) et au plus loin début juillet (environ 152 millions de km). Ce qui compte, c'est l'inclinaison de son axe.",
+    "indice": "Quand c'est l'hiver chez nous, c'est l'été en Australie : le Soleil, lui, n'a pas bougé.",
+    "sources": [
+      "NASA, Earth Fact Sheet (obliquité 23,44° ; périhélie environ 147,1 millions de km, aphélie environ 152,1 millions de km)"
+    ],
+    "duree_s": 25
+  },
+  {
+    "id": "cdc.c1.l1.i03",
+    "type": "saisie",
+    "competence": "cdc.gravite.masse_poids",
+    "difficulte": 3,
+    "consigne": "Donne la masse de l'astronaute sur la Lune, en kilogrammes (nombre seul).",
+    "enonce": "Un astronaute a une masse de 60 kg sur Terre. Sur la Lune, la pesanteur est environ six fois plus faible. Quelle est alors sa masse ?",
+    "reponses_acceptees": [
+      "60",
+      "60 kg",
+      "60kg"
+    ],
+    "normalisation": [
+      "casse",
+      "accents",
+      "espaces"
+    ],
+    "reponse_modele": "60 kg : sa masse ne change pas, seul son poids diminue.",
+    "feedback_ok": "Oui : la masse mesure la quantité de matière et ne change pas d'un astre à l'autre. Seul le poids, la force de la gravité sur cette masse, diminue : environ 6 fois moins sur la Lune.",
+    "feedback_ko": "Ne confonds pas masse et poids. Ton corps contient toujours la même quantité de matière (60 kg), mais la gravité lunaire (environ 1,62 m/s² contre 9,81 m/s² sur Terre) le tire six fois moins fort : il y pèse environ 10 kg-force.",
+    "indice": "Qu'est-ce qui change quand la gravité change : la matière ou la force qui l'attire ?",
+    "sources": [
+      "NASA, Moon Fact Sheet (gravité de surface 1,62 m/s²)",
+      "NASA, Earth Fact Sheet (gravité de surface 9,80 m/s²)"
+    ],
+    "duree_s": 30
+  }
+]

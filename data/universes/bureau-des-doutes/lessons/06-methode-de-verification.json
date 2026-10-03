@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bdd.c2.l3",
+  "slug": "methode-de-verification",
+  "titre": "La méthode de vérification et les deepfakes (Boss)",
+  "chapitre": "c02",
+  "position": 6,
+  "competences": [
+    "bdd.verification.demarche",
+    "bdd.images.deepfakes",
+    "bdd.verification.synthese"
+  ],
+  "prerequis": [
+    "bdd.c2.l2"
+  ],
+  "duree_min": 2,
+  "xp": 20,
+  "micro_cours": "Oui : qui, quoi, preuve, date. Une info juste peut devenir trompeuse si elle est déterrée hors de son moment.",
+  "recap": "Exact : le réalisme ne prouve rien.",
+  "items": [
+    {
+      "id": "bdd.c2.l3.i08",
+      "type": "saisie",
+      "competence": "bdd.verification.demarche",
+      "difficulte": 2,
+      "consigne": "Écris le mot-clé du critère d'enquête qui manque.",
+      "enonce": "Ta grille d'enquêteur : Qui parle ? Quoi exactement ? Quelle preuve ? Quatrième question, celle qui démasque les vieilles infos recyclées : à quelle ____ cette info a-t-elle été publiée ou captée ?",
+      "reponses_acceptees": [
+        "date",
+        "la date",
+        "moment",
+        "le moment",
+        "date de publication"
+      ],
+      "normalisation": [
+        "casse",
+        "accents",
+        "espaces"
+      ],
+      "reponse_modele": "Date",
+      "feedback_ok": "Oui : qui, quoi, preuve, date. Une info juste peut devenir trompeuse si elle est déterrée hors de son moment.",
+      "feedback_ko": "Pense au temps : on vérifie quand l'information a été publiée ou captée. Une vieille info recyclée trompe très bien.",
+      "sources": [],
+      "duree_s": 20,
+      "statut_qa": "relu"
+    },
+    {
+      "id": "bdd.c2.l3.i09",
+      "type": "vrai_faux",
+      "competence": "bdd.images.deepfakes",
+      "difficulte": 3,
+      "consigne": "Dis si l'affirmation est vraie ou fausse.",
+      "enonce": "Une vidéo (cas fictif) montre un personnage public tenir des propos étonnants. Elle est nette, fluide et très convaincante.",
+      "affirmation": "Si une vidéo paraît parfaitement réaliste, c'est une garantie qu'elle est authentique.",
+      "reponse": false,
+      "feedback_ok": "Exact : le réalisme ne prouve rien. Les contenus générés ou truqués peuvent être très convaincants, d'où l'importance de la source et du contexte.",
+      "feedback_ko": "Se fier à son œil ne suffit plus. Cherche l'origine de la vidéo, d'autres sources fiables qui la relaient et la date, plutôt que de juger sur l'apparence.",
+      "sources": [],
+      "duree_s": 15
+    },
+    {
+      "id": "bdd.c2.l3.i10",
+      "type": "qcm",
+      "competence": "bdd.verification.synthese",
+      "difficulte": 5,
+      "consigne": "Boss : choisis la meilleure démarche d'enquête complète.",
+      "enonce": "Un compte inconnu (cas fictif) poste une photo choc : « Un barrage vient de céder ! » Le post est viral, sans lien ni auteur identifiable. Pie veut le relayer tout de suite. Que fait Mirabelle ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Elle vérifie que le compte a beaucoup d'abonnés et un profil soigné, puis relaie si tout lui paraît sérieux",
+          "distracteur_pourquoi": "Abonnés et profil soigné s'achètent ou s'imitent : cela ne dit rien de l'origine ni de la date de la photo."
+        },
+        {
+          "id": "b",
+          "texte": "Elle lance une recherche d'image inversée, ouvre d'autres onglets sur le compte, cherche une source primaire (autorité locale, témoin identifié) et la date, puis conclut"
+        },
+        {
+          "id": "c",
+          "texte": "Elle relaie en ajoutant « à confirmer », car prévenir vite compte plus que d'attendre la vérification",
+          "distracteur_pourquoi": "Relayer une info non vérifiée, même avec une réserve, la propage."
+        },
+        {
+          "id": "d",
+          "texte": "Elle regarde les commentaires : si la majorité y croit et s'inquiète, elle considère l'info comme fiable",
+          "distracteur_pourquoi": "La popularité n'est pas une preuve : une foule peut se tromper ensemble."
+        }
+      ],
+      "bonne": "b",
+      "feedback_ok": "Tu as réuni toute la méthode : qui parle, quoi, quelle preuve, quelle date, en croisant les sources et en remontant à l'origine.",
+      "feedback_ko": "Une enquête solide combine image inversée, lecture latérale, source primaire et date. S'appuyer sur la vitesse, la foule ou l'apparence, c'est laisser Pie voler tes certitudes.",
+      "indice": "Cherche la réponse qui vérifie AVANT de partager.",
+      "sources": [],
+      "duree_s": 40,
+      "statut_qa": "relu"
+    }
+  ]
+}

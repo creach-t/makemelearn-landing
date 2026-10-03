@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "quetes": [
+    { "slug": "stagiaire-du-jour", "titre": "Le stagiaire du jour", "periode": "daily", "metrique": "lessons_completed", "cible": 1, "xp": 10 },
+    { "slug": "trente-xp-du-jour", "titre": "30 XP aujourd'hui", "periode": "daily", "metrique": "xp_earned", "cible": 30, "xp": 5 },
+    { "slug": "dossier-de-la-semaine", "titre": "Dossier de la semaine", "periode": "weekly", "metrique": "reviews_done", "cible": 15, "xp": 30 },
+    { "slug": "semaine-reguliere", "titre": "Cinq leçons dans la semaine", "periode": "weekly", "metrique": "lessons_completed", "cible": 5, "xp": 40 },
+    { "slug": "sans-faute", "titre": "Une session sans faute", "periode": "weekly", "metrique": "perfect_sessions", "cible": 1, "xp": 25 }
+  ]
+}

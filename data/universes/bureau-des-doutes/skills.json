@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0.0",
+  "competences": [
+    {
+      "id": "bdd.biais.confirmation",
+      "nom": "Repérer le biais de confirmation",
+      "chapitre": "c01",
+      "prerequis": []
+    },
+    {
+      "id": "bdd.biais.ancrage",
+      "nom": "Reconnaître l'effet d'ancrage",
+      "chapitre": "c01",
+      "prerequis": [
+        "bdd.biais.confirmation"
+      ]
+    },
+    {
+      "id": "bdd.biais.histoire",
+      "nom": "Situer les grandes étapes de l'étude des biais",
+      "chapitre": "c01",
+      "prerequis": []
+    },
+    {
+      "id": "bdd.biais.halo",
+      "nom": "Reconnaître le biais de halo",
+      "chapitre": "c01",
+      "prerequis": []
+    },
+    {
+      "id": "bdd.biais.survivant",
+      "nom": "Déjouer le biais du survivant",
+      "chapitre": "c01",
+      "prerequis": [
+        "bdd.biais.ancrage"
+      ]
+    },
+    {
+      "id": "bdd.biais.disponibilite",
+      "nom": "Reconnaître le biais de disponibilité",
+      "chapitre": "c01",
+      "prerequis": [
+        "bdd.biais.confirmation"
+      ]
+    },
+    {
+      "id": "bdd.biais.synthese",
+      "nom": "Identifier le biais en jeu dans une situation",
+      "chapitre": "c01",
+      "prerequis": [
+        "bdd.biais.survivant",
+        "bdd.biais.disponibilite",
+        "bdd.biais.halo"
+      ]
+    },
+    {
+      "id": "bdd.sources.primaire_secondaire",
+      "nom": "Distinguer source primaire et source secondaire",
+      "chapitre": "c02",
+      "prerequis": []
+    },
+    {
+      "id": "bdd.sources.clickbait",
+      "nom": "Repérer les ficelles du clickbait",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.sources.primaire_secondaire"
+      ]
+    },
+    {
+      "id": "bdd.sources.lecture_laterale",
+      "nom": "Pratiquer la lecture latérale",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.sources.primaire_secondaire"
+      ]
+    },
+    {
+      "id": "bdd.sources.image_inversee",
+      "nom": "Vérifier une image par recherche inversée",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.sources.lecture_laterale"
+      ]
+    },
+    {
+      "id": "bdd.images.hors_contexte",
+      "nom": "Repérer une image détournée de son contexte",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.sources.image_inversee"
+      ]
+    },
+    {
+      "id": "bdd.images.deepfakes",
+      "nom": "Se méfier des deepfakes",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.images.hors_contexte"
+      ]
+    },
+    {
+      "id": "bdd.verification.demarche",
+      "nom": "Suivre une démarche d'enquête",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.sources.lecture_laterale"
+      ]
+    },
+    {
+      "id": "bdd.verification.synthese",
+      "nom": "Mener une vérification complète",
+      "chapitre": "c02",
+      "prerequis": [
+        "bdd.verification.demarche",
+        "bdd.images.deepfakes",
+        "bdd.sources.clickbait"
+      ]
+    },
+    {
+      "id": "bdd.chiffres.correlation_causalite",
+      "nom": "Ne pas confondre corrélation et causalité",
+      "chapitre": "c03",
+      "prerequis": [
+        "bdd.biais.confirmation"
+      ]
+    },
+    {
+      "id": "bdd.chiffres.echantillon_biaise",
+      "nom": "Repérer un échantillon biaisé",
+      "chapitre": "c03",
+      "prerequis": [
+        "bdd.chiffres.correlation_causalite"
+      ]
+    },
+    {
+      "id": "bdd.chiffres.moyenne_mediane",
+      "nom": "Distinguer moyenne et médiane",
+      "chapitre": "c03",
+      "prerequis": []
+    },
+    {
+      "id": "bdd.chiffres.relatif_absolu",
+      "nom": "Distinguer risque relatif et risque absolu",
+      "chapitre": "c03",
+      "prerequis": [
+        "bdd.chiffres.moyenne_mediane"
+      ]
+    },
+    {
+      "id": "bdd.chiffres.graphiques_tronques",
+      "nom": "Interroger un graphique tronqué",
+      "chapitre": "c03",
+      "prerequis": [
+        "bdd.chiffres.moyenne_mediane"
+      ]
+    },
+    {
+      "id": "bdd.chiffres.taux_de_base",
+      "nom": "Raisonner avec le taux de base",
+      "chapitre": "c03",
+      "prerequis": [
+        "bdd.chiffres.relatif_absolu"
+      ]
+    }
+  ]
+}
